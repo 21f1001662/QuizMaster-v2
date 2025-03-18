@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models.user import User
 from app import db
 from app.utils.helpers import admin_required
+from datetime import datetime
 
 user_bp = Blueprint('user', __name__)
 
@@ -24,7 +25,10 @@ def update_profile():
     if 'full_name' in data:
         user.full_name = data['full_name']
     if 'dob' in data:
-        user.dob = data['dob']
+        try:
+            user.dob = datetime.strptime(data['dob'], '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({'message': 'Invalid date format. Use YYYY-MM-DD'}), 400
     if 'qualification' in data:
         user.qualification = data['qualification']
     
