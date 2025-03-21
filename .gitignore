@@ -1,5 +1,10 @@
-.env
+# Virtual environment
 venv
-__pycache__
+
+# Environment variables
+.env
+
+# Byte-compiled / cached Python files
+__pycache__/
 *.pyc
 *.pyo
