@@ -5,6 +5,7 @@ class Quiz(db.Model):
     __tablename__ = 'quizzes'
     
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
     chapter_id = db.Column(db.Integer, db.ForeignKey('chapters.id'), nullable=False)
     date_of_quiz = db.Column(db.DateTime, nullable=False)
     duration = db.Column(db.Integer, nullable=False)  # duration in minutes
@@ -21,6 +22,7 @@ class Quiz(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
+            'name': self.name,
             'chapter_id': self.chapter_id,
             'date_of_quiz': self.date_of_quiz.isoformat(),
             'duration': self.duration,

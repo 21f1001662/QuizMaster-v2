@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from app.models.quiz import Quiz, Question, MCQQuestion, NumericQuestion, Option
+from app.models.subject import Chapter
 from app import db
 from app.utils.helpers import admin_required
 from sqlalchemy import or_
@@ -16,7 +17,7 @@ def create_quiz():
     data = request.get_json()
     
     # Validate required fields
-    required_fields = ['chapter_id', 'date_of_quiz', 'duration']
+    required_fields = ['name', 'chapter_id', 'date_of_quiz', 'duration']
     if not all(field in data for field in required_fields):
         return jsonify({'message': 'Missing required fields'}), 400
     
@@ -26,6 +27,7 @@ def create_quiz():
         return jsonify({'message': 'Invalid date format. Use ISO format'}), 400
     
     quiz = Quiz(
+        name=data['name'],
         chapter_id=data['chapter_id'],
         date_of_quiz=date_of_quiz,
         duration=data['duration'],
@@ -42,7 +44,10 @@ def create_quiz():
 @jwt_required()
 @admin_required
 def get_quizzes():
+    # Get query parameters with defaults
+    quiz_id = request.args.get('quiz_id', type=int)
     chapter_id = request.args.get('chapter_id', type=int)
+    name = request.args.get('name', type=str)
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
     
@@ -50,8 +55,13 @@ def get_quizzes():
     query = Quiz.query
     
     # Apply filters
+    if quiz_id:
+        query = query.filter_by(id=quiz_id)
     if chapter_id:
         query = query.filter_by(chapter_id=chapter_id)
+    if name:
+        # Fuzzy search on quiz name
+        query = query.filter(Quiz.name.ilike(f'%{name}%'))
     
     # Apply pagination
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
@@ -70,6 +80,8 @@ def update_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
     data = request.get_json()
     
+    if 'name' in data:
+        quiz.name = data['name']
     if 'date_of_quiz' in data:
         try:
             quiz.date_of_quiz = datetime.fromisoformat(data['date_of_quiz'])
