@@ -16,7 +16,7 @@ def create_quiz():
     data = request.get_json()
     
     # Validate required fields
-    required_fields = ['chapter_id', 'date_of_quiz', 'duration', 'total_questions']
+    required_fields = ['chapter_id', 'date_of_quiz', 'duration']
     if not all(field in data for field in required_fields):
         return jsonify({'message': 'Missing required fields'}), 400
     
@@ -29,7 +29,6 @@ def create_quiz():
         chapter_id=data['chapter_id'],
         date_of_quiz=date_of_quiz,
         duration=data['duration'],
-        total_questions=data['total_questions'],
         remarks=data.get('remarks', ''),
         instructions=data.get('instructions', '')
     )
@@ -79,8 +78,6 @@ def update_quiz(quiz_id):
     
     if 'duration' in data:
         quiz.duration = data['duration']
-    if 'total_questions' in data:
-        quiz.total_questions = data['total_questions']
     if 'remarks' in data:
         quiz.remarks = data['remarks']
     if 'instructions' in data:
@@ -155,6 +152,8 @@ def create_question(quiz_id):
         )
     
     db.session.add(question)
+    # Increment total questions count
+    quiz.total_questions += 1
     db.session.commit()
     
     return jsonify(question.to_dict()), 201
@@ -202,6 +201,7 @@ def update_question(quiz_id, question_id):
 @admin_required
 def delete_question(quiz_id, question_id):
     question = Question.query.filter_by(id=question_id, quiz_id=quiz_id).first_or_404()
+    quiz = question.quiz
     
     # Delete related records based on question type
     if question.type == 'mcq':
@@ -212,6 +212,9 @@ def delete_question(quiz_id, question_id):
     else:  # numeric question
         # Delete the numeric question
         NumericQuestion.query.filter_by(id=question.numeric_question_id).delete()
+    
+    # Decrement total questions count
+    quiz.total_questions -= 1
     
     # Finally delete the question record
     db.session.delete(question)

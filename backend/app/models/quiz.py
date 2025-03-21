@@ -10,7 +10,7 @@ class Quiz(db.Model):
     duration = db.Column(db.Integer, nullable=False)  # duration in minutes
     remarks = db.Column(db.Text)
     instructions = db.Column(db.Text)
-    total_questions = db.Column(db.Integer, nullable=False)
+    total_questions = db.Column(db.Integer, default=0)  # Set default to 0
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
