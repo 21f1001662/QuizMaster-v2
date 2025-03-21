@@ -202,6 +202,19 @@ def update_question(quiz_id, question_id):
 @admin_required
 def delete_question(quiz_id, question_id):
     question = Question.query.filter_by(id=question_id, quiz_id=quiz_id).first_or_404()
+    
+    # Delete related records based on question type
+    if question.type == 'mcq':
+        # Delete all options first
+        Option.query.filter_by(mcq_question_id=question.mcq_question_id).delete()
+        # Delete the MCQ question
+        MCQQuestion.query.filter_by(id=question.mcq_question_id).delete()
+    else:  # numeric question
+        # Delete the numeric question
+        NumericQuestion.query.filter_by(id=question.numeric_question_id).delete()
+    
+    # Finally delete the question record
     db.session.delete(question)
     db.session.commit()
-    return jsonify({'message': 'Question deleted successfully'}), 200 
+    
+    return jsonify({'message': 'Question and related records deleted successfully'}), 200 
