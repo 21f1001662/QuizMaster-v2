@@ -126,4 +126,66 @@ class Option(db.Model):
             'is_correct': self.is_correct,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
+        }
+
+class Attempt(db.Model):
+    __tablename__ = 'attempts'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    quiz_id = db.Column(db.Integer, db.ForeignKey('quizzes.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    score = db.Column(db.Float, default=0.0)
+    status = db.Column(db.String(20), nullable=False, default='started')  # started, completed, result_declared
+    started_at = db.Column(db.DateTime, default=datetime.utcnow)
+    completed_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    quiz = db.relationship('Quiz', backref='attempts', lazy=True)
+    user = db.relationship('User', backref='attempts', lazy=True)
+    responses = db.relationship('Response', backref='attempt', lazy=True, cascade='all, delete-orphan')
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'quiz_id': self.quiz_id,
+            'user_id': self.user_id,
+            'score': self.score,
+            'status': self.status,
+            'started_at': self.started_at.isoformat(),
+            'completed_at': self.completed_at.isoformat() if self.completed_at else None,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat(),
+            'responses': [response.to_dict() for response in self.responses]
+        }
+
+class Response(db.Model):
+    __tablename__ = 'responses'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    question_id = db.Column(db.Integer, db.ForeignKey('questions.id'), nullable=False)
+    attempt_id = db.Column(db.Integer, db.ForeignKey('attempts.id'), nullable=False)
+    mcq_question_answer = db.Column(db.Integer, db.ForeignKey('options.id'))
+    numeric_question_answer = db.Column(db.Float)
+    is_attempted = db.Column(db.Boolean, default=False)
+    is_correct = db.Column(db.Boolean)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    question = db.relationship('Question', backref='responses', lazy=True)
+    selected_option = db.relationship('Option', backref='responses', lazy=True)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'question_id': self.question_id,
+            'attempt_id': self.attempt_id,
+            'mcq_question_answer': self.mcq_question_answer,
+            'numeric_question_answer': self.numeric_question_answer,
+            'is_attempted': self.is_attempted,
+            'is_correct': self.is_correct,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
         } 
