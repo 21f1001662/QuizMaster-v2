@@ -31,11 +31,13 @@ def create_app():
     from app.routes.user import user_bp
     from app.routes.subject import subject_bp
     from app.routes.quiz import quiz_bp
+    from app.routes.quiz_attempts import quiz_attempts
     
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(user_bp, url_prefix='/user')
     app.register_blueprint(subject_bp, url_prefix='/api')
     app.register_blueprint(quiz_bp, url_prefix='/api')
+    app.register_blueprint(quiz_attempts, url_prefix='/api')
     
     # Create database tables
     with app.app_context():
