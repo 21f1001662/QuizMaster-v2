@@ -146,13 +146,15 @@ def create_question(quiz_id):
         )
         
     else:  # numeric question
-        if not all(field in data for field in ['question_text', 'answer_lower_bound', 'answer_upper_bound']):
+        if not all(field in data for field in ['question_text', 'answer_lower_bound', 'answer_upper_bound', 'correct_marks', 'incorrect_marks']):
             return jsonify({'message': 'Missing required fields for numeric question'}), 400
         
         numeric = NumericQuestion(
             question_text=data['question_text'],
             answer_lower_bound=data['answer_lower_bound'],
-            answer_upper_bound=data['answer_upper_bound']
+            answer_upper_bound=data['answer_upper_bound'],
+            correct_marks=data['correct_marks'],
+            incorrect_marks=data['incorrect_marks']
         )
         db.session.add(numeric)
         db.session.flush()  # Get the ID of numeric
@@ -204,6 +206,10 @@ def update_question(quiz_id, question_id):
             numeric.answer_lower_bound = data['answer_lower_bound']
         if 'answer_upper_bound' in data:
             numeric.answer_upper_bound = data['answer_upper_bound']
+        if 'correct_marks' in data:
+            numeric.correct_marks = data['correct_marks']
+        if 'incorrect_marks' in data:
+            numeric.incorrect_marks = data['incorrect_marks']
     
     db.session.commit()
     return jsonify(question.to_dict()), 200

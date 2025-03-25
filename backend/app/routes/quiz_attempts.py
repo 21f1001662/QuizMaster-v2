@@ -22,6 +22,7 @@ def start_quiz(quiz_id):
     
     # Check if quiz is currently active
     current_time = datetime.utcnow()
+    print(current_time)
     if current_time < quiz.date_of_quiz:
         return jsonify({'error': 'Quiz has not started yet'}), 400
     
@@ -92,7 +93,11 @@ def submit_quiz(attempt_id):
         # Check if answer is correct
         if question.type == 'mcq':
             if response.mcq_question_answer:
-                selected_option = question.mcq_question.options.filter_by(id=response.mcq_question_answer).first()
+                # Find the selected option from the options list
+                selected_option = next(
+                    (opt for opt in question.mcq_question.options if opt.id == response.mcq_question_answer),
+                    None
+                )
                 if selected_option and selected_option.is_correct:
                     response.is_correct = True
                     total_score += question.mcq_question.correct_marks
@@ -103,7 +108,9 @@ def submit_quiz(attempt_id):
                 if (question.numeric_question.answer_lower_bound <= response.numeric_question_answer <= 
                     question.numeric_question.answer_upper_bound):
                     response.is_correct = True
-                    total_score += 1  # to do.. update schema for numeric question add score field
+                    total_score += question.numeric_question.correct_marks
+                else:
+                    total_score += question.numeric_question.incorrect_marks
     
     # Update attempt status and score
     attempt.status = 'completed'

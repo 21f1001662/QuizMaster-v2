@@ -96,6 +96,8 @@ class NumericQuestion(db.Model):
     question_text = db.Column(db.Text, nullable=False)
     answer_lower_bound = db.Column(db.Float, nullable=False)
     answer_upper_bound = db.Column(db.Float, nullable=False)
+    correct_marks = db.Column(db.Float, nullable=False)
+    incorrect_marks = db.Column(db.Float, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -105,6 +107,8 @@ class NumericQuestion(db.Model):
             'question_text': self.question_text,
             'answer_lower_bound': self.answer_lower_bound,
             'answer_upper_bound': self.answer_upper_bound,
+            'correct_marks': self.correct_marks,
+            'incorrect_marks': self.incorrect_marks,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }
