@@ -1,13 +1,20 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { onMounted } from 'vue'
+import { validateAdminToken } from '../utils/auth'
 
 const router = useRouter()
 
-onMounted(() => {
+onMounted(async () => {
   const adminToken = localStorage.getItem('adminToken')
   if (adminToken) {
-    router.push('/admin/dashboard')
+    const isValid = await validateAdminToken(adminToken)
+    if (isValid) {
+      router.push('/admin/dashboard')
+    } else {
+      localStorage.removeItem('adminToken')
+      localStorage.removeItem('adminUser')
+    }
   }
 })
 </script>

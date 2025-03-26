@@ -5,6 +5,7 @@ import Quizzes from '../views/admin/Quizzes.vue'
 import Subjects from '../views/admin/Subjects.vue'
 import Stats from '../views/admin/Stats.vue'
 import Home from '../views/Home.vue'
+import { validateAdminToken } from '../utils/auth'
 
 const routes = [
   {
@@ -16,11 +17,17 @@ const routes = [
     path: '/admin/login',
     name: 'AdminLogin',
     component: AdminLogin,
-    beforeEnter: (to, from, next) => {
+    beforeEnter: async (to, from, next) => {
       const adminToken = localStorage.getItem('adminToken')
       if (adminToken) {
-        // To-Do :Implement better logic to check if the token is valid
-        next('/admin/dashboard')
+        const isValid = await validateAdminToken(adminToken)
+        if (isValid) {
+          next('/admin/dashboard')
+        } else {
+          localStorage.removeItem('adminToken')
+          localStorage.removeItem('adminUser')
+          next()
+        }
       } else {
         next()
       }
@@ -29,12 +36,19 @@ const routes = [
   {
     path: '/admin/dashboard',
     component: AdminDashboard,
-    beforeEnter: (to, from, next) => {
+    beforeEnter: async (to, from, next) => {
       const adminToken = localStorage.getItem('adminToken')
       if (!adminToken) {
         next('/admin/login')
       } else {
-        next()
+        const isValid = await validateAdminToken(adminToken)
+        if (isValid) {
+          next()
+        } else {
+          localStorage.removeItem('adminToken')
+          localStorage.removeItem('adminUser')
+          next('/admin/login')
+        }
       }
     },
     children: [
