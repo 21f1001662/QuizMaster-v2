@@ -34,6 +34,17 @@ def get_subjects():
     search = request.args.get('search', '')
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
+    sort_by = request.args.get('sort_by', 'name')  # Default sort by name
+    sort = request.args.get('sort', 'asc').lower()  # Default ascending order
+    
+    # Validate sort_by parameter
+    valid_sort_fields = ['name', 'created_at', 'updated_at']
+    if sort_by not in valid_sort_fields:
+        return jsonify({'message': f'Invalid sort_by. Must be one of: {", ".join(valid_sort_fields)}'}), 400
+    
+    # Validate sort direction
+    if sort not in ['asc', 'desc']:
+        return jsonify({'message': 'Invalid sort. Must be either "asc" or "desc"'}), 400
     
     # Base query
     query = Subject.query
@@ -52,6 +63,13 @@ def get_subjects():
             )
         )
     
+    # Apply sorting
+    sort_column = getattr(Subject, sort_by)
+    if sort == 'asc':
+        query = query.order_by(sort_column.asc())
+    else:
+        query = query.order_by(sort_column.desc())
+    
     # Apply pagination
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     
@@ -60,7 +78,9 @@ def get_subjects():
         'subjects': [subject.to_dict() for subject in pagination.items],
         'total': pagination.total,
         'pages': pagination.pages,
-        'current_page': page
+        'current_page': page,
+        'sort_by': sort_by,
+        'sort': sort
     }), 200
 
 @subject_bp.route('/subjects/<int:subject_id>', methods=['PUT'])
@@ -114,8 +134,20 @@ def create_chapter(subject_id):
 def get_chapters():
     chapter_id = request.args.get('chapter_id', type=int)
     subject_id = request.args.get('subject_id', type=int)
+    search = request.args.get('search', '')
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
+    sort_by = request.args.get('sort_by', 'name')  # Default sort by name
+    sort = request.args.get('sort', 'asc').lower()  # Default ascending order
+    
+    # Validate sort_by parameter
+    valid_sort_fields = ['name', 'subject_id', 'created_at', 'updated_at']
+    if sort_by not in valid_sort_fields:
+        return jsonify({'message': f'Invalid sort_by. Must be one of: {", ".join(valid_sort_fields)}'}), 400
+    
+    # Validate sort direction
+    if sort not in ['asc', 'desc']:
+        return jsonify({'message': 'Invalid sort. Must be either "asc" or "desc"'}), 400
     
     # Base query
     query = Chapter.query
@@ -126,6 +158,23 @@ def get_chapters():
     if subject_id:
         query = query.filter_by(subject_id=subject_id)
     
+    # Apply search filter if search parameter is provided
+    if search:
+        search_term = f"%{search}%"
+        query = query.filter(
+            or_(
+                Chapter.name.ilike(search_term),
+                Chapter.description.ilike(search_term)
+            )
+        )
+    
+    # Apply sorting
+    sort_column = getattr(Chapter, sort_by)
+    if sort == 'asc':
+        query = query.order_by(sort_column.asc())
+    else:
+        query = query.order_by(sort_column.desc())
+    
     # Apply pagination
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     
@@ -134,7 +183,9 @@ def get_chapters():
         'chapters': [chapter.to_dict() for chapter in pagination.items],
         'total': pagination.total,
         'pages': pagination.pages,
-        'current_page': page
+        'current_page': page,
+        'sort_by': sort_by,
+        'sort': sort
     }), 200
 
 @subject_bp.route('/chapters/<int:chapter_id>', methods=['PUT'])
