@@ -38,7 +38,11 @@ class Chapter(db.Model):
             'id': self.id,
             'name': self.name,
             'description': self.description,
-            'subject_id': self.subject_id,
             'created_at': self.created_at.isoformat(),
-            'updated_at': self.updated_at.isoformat()
+            'updated_at': self.updated_at.isoformat(),
+            'subject': {
+                'id': self.subject.id,
+                'name': self.subject.name,
+                'description': self.subject.description
+            }
         } 
