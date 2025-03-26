@@ -58,6 +58,10 @@ const routes = [
     },
     children: [
       {
+        path: '',
+        redirect: '/admin/dashboard/quizzes'
+      },
+      {
         path: 'quizzes',
         name: 'Quizzes',
         component: Quizzes

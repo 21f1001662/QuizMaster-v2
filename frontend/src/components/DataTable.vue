@@ -19,10 +19,18 @@ defineProps({
   modelValue: {
     type: String,
     default: ''
+  },
+  currentPage: {
+    type: Number,
+    required: true
+  },
+  totalPages: {
+    type: Number,
+    required: true
   }
 })
 
-defineEmits(['search', 'create', 'edit', 'delete', 'update:modelValue'])
+defineEmits(['search', 'create', 'edit', 'delete', 'update:modelValue', 'page-change'])
 </script>
 
 <template>
@@ -71,6 +79,27 @@ defineEmits(['search', 'create', 'edit', 'delete', 'update:modelValue'])
           </tbody>
         </table>
       </div>
+
+      <!-- Pagination -->
+      <nav v-if="totalPages > 1" class="mt-4">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" :class="{ disabled: currentPage === 1 }">
+            <a class="page-link" href="#" @click.prevent="$emit('page-change', currentPage - 1)">
+              <i class="bi bi-chevron-left"></i>
+            </a>
+          </li>
+          <li v-for="page in totalPages" :key="page" 
+              class="page-item" 
+              :class="{ active: currentPage === page }">
+            <a class="page-link" href="#" @click.prevent="$emit('page-change', page)">{{ page }}</a>
+          </li>
+          <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+            <a class="page-link" href="#" @click.prevent="$emit('page-change', currentPage + 1)">
+              <i class="bi bi-chevron-right"></i>
+            </a>
+          </li>
+        </ul>
+      </nav>
     </div>
   </div>
 </template>
@@ -79,5 +108,14 @@ defineEmits(['search', 'create', 'edit', 'delete', 'update:modelValue'])
 .table th {
   background-color: #f8f9fa;
   border-bottom: 2px solid #dee2e6;
+}
+
+.page-link {
+  cursor: pointer;
+}
+
+.page-item.disabled .page-link {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 </style> 

@@ -7,6 +7,8 @@ const quizzes = ref([])
 const loading = ref(false)
 const error = ref(null)
 const searchQuery = ref('')
+const currentPage = ref(1)
+const totalPages = ref(1)
 
 const columns = [
   { key: 'name', label: 'Name' },
@@ -26,13 +28,13 @@ const debounce = (fn, delay) => {
   }
 }
 
-const fetchQuizzes = async (name = '') => {
+const fetchQuizzes = async (name = '', page = 1) => {
   try {
     loading.value = true
     const token = localStorage.getItem('adminToken')
     const response = await axios.get('http://localhost:5000/api/quizzes', {
       params: {
-        page: 1,
+        page: page,
         per_page: 10,
         name: name
       },
@@ -41,6 +43,8 @@ const fetchQuizzes = async (name = '') => {
       }
     })
     quizzes.value = response.data.quizzes
+    currentPage.value = response.data.current_page
+    totalPages.value = response.data.pages
   } catch (err) {
     error.value = 'Failed to fetch quizzes'
     console.error(err)
@@ -52,11 +56,18 @@ const fetchQuizzes = async (name = '') => {
 // Debounced search function
 const debouncedSearch = debounce((value) => {
   searchQuery.value = value
-  fetchQuizzes(value)
+  currentPage.value = 1 // Reset to first page on new search
+  fetchQuizzes(value, 1)
 }, 500)
 
 const handleSearch = (value) => {
   debouncedSearch(value)
+}
+
+const handlePageChange = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    fetchQuizzes(searchQuery.value, page)
+  }
 }
 
 const handleCreate = () => {
@@ -97,10 +108,13 @@ onMounted(() => {
       search-placeholder="Search quizzes by name..."
       create-button-text="Create New Quiz"
       v-model="searchQuery"
+      :current-page="currentPage"
+      :total-pages="totalPages"
       @search="handleSearch"
       @create="handleCreate"
       @edit="handleEdit"
       @delete="handleDelete"
+      @page-change="handlePageChange"
     />
   </div>
 </template> 
