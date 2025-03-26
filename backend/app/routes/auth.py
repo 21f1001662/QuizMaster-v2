@@ -55,6 +55,10 @@ def login():
     if not user or not check_password(data['password'], user.password):
         return jsonify({'message': 'Invalid username or password'}), 401
     
+    # Prevent admin users from logging in through regular login
+    if user.is_admin:
+        return jsonify({'message': 'Invalid User'}), 403
+    
     access_token = create_access_token(identity=str(user.id))
     return jsonify({
         'access_token': access_token,
