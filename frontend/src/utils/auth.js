@@ -11,4 +11,17 @@ export const validateAdminToken = async (token) => {
   } catch (error) {
     return false
   }
+}
+
+export const validateStudentToken = async (token) => {
+  try {
+    const response = await axios.get('http://localhost:5000/auth/own', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    return response.data.user.is_admin === false
+  } catch (error) {
+    return false
+  }
 } 

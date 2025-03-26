@@ -11,6 +11,10 @@ const password = ref('')
 
 const handleLogin = async () => {
   try {
+    // Clear student session if exists
+    localStorage.removeItem('studentToken')
+    localStorage.removeItem('studentUser')
+
     const response = await axios.post('http://localhost:5000/auth/admin/login', {
       username: username.value,
       password: password.value
