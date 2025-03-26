@@ -1,0 +1,330 @@
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import axios from 'axios'
+import { useToast } from 'vue-toastification'
+import { Modal } from 'bootstrap'
+
+const route = useRoute()
+const router = useRouter()
+const toast = useToast()
+
+const quiz = ref(null)
+const questions = ref([])
+const loading = ref(false)
+const error = ref(null)
+const questionModal = ref(null)
+const selectedQuestion = ref(null)
+const isEditMode = ref(false)
+const questionType = ref('mcq')
+const formData = ref({
+  type: 'mcq',
+  question_text: '',
+  correct_marks: 4,
+  incorrect_marks: 0,
+  options: [],
+  answer_lower_bound: 0,
+  answer_upper_bound: 0
+})
+
+const fetchQuiz = async () => {
+  try {
+    loading.value = true
+    const token = localStorage.getItem('adminToken')
+    const response = await axios.get(`http://localhost:5000/api/quizzes`, {
+      params: {
+        quiz_id: route.params.id
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    quiz.value = response.data.quizzes[0]
+    questions.value = quiz.value.questions
+  } catch (err) {
+    error.value = 'Failed to fetch quiz'
+    console.error(err)
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleCreateQuestion = () => {
+  isEditMode.value = false
+  selectedQuestion.value = null
+  questionType.value = 'mcq'
+  formData.value = {
+    type: 'mcq',
+    question_text: '',
+    correct_marks: 4,
+    incorrect_marks: 0,
+    options: [],
+    answer_lower_bound: 0,
+    answer_upper_bound: 0
+  }
+  questionModal.value.show()
+}
+
+const handleEditQuestion = (question) => {
+  isEditMode.value = true
+  selectedQuestion.value = question
+  questionType.value = question.type
+  formData.value = {
+    type: question.type,
+    question_text: question.question_details.question_text,
+    correct_marks: question.question_details.correct_marks,
+    incorrect_marks: question.question_details.incorrect_marks,
+    options: question.question_details.options || [],
+    answer_lower_bound: question.question_details.answer_lower_bound || 0,
+    answer_upper_bound: question.question_details.answer_upper_bound || 0
+  }
+  questionModal.value.show()
+}
+
+const handleDeleteQuestion = async (question) => {
+  if (!confirm('Are you sure you want to delete this question?')) return
+
+  try {
+    const token = localStorage.getItem('adminToken')
+    await axios.delete(`http://localhost:5000/api/quizzes/${route.params.id}/questions/${question.id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    toast.success('Question deleted successfully')
+    fetchQuiz()
+  } catch (err) {
+    toast.error('Failed to delete question')
+    console.error(err)
+  }
+}
+
+const handleCloseModal = () => {
+  questionModal.value.hide()
+}
+
+const handleSubmitQuestion = async () => {
+  if (!validateForm()) return
+
+  try {
+    const token = localStorage.getItem('adminToken')
+    if (isEditMode.value) {
+      await axios.put(`http://localhost:5000/api/quizzes/${route.params.id}/questions/${selectedQuestion.value.id}`, formData.value, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      toast.success('Question updated successfully')
+    } else {
+      await axios.post(`http://localhost:5000/api/quizzes/${route.params.id}/questions`, formData.value, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      toast.success('Question created successfully')
+    }
+    questionModal.value.hide()
+    fetchQuiz()
+  } catch (err) {
+    toast.error(isEditMode.value ? 'Failed to update question' : 'Failed to create question')
+    console.error(err)
+  }
+}
+
+const addOption = () => {
+  formData.value.options.push({
+    text: '',
+    is_correct: false
+  })
+}
+
+const removeOption = (index) => {
+  formData.value.options.splice(index, 1)
+}
+
+const handleCorrectOptionChange = (changedIndex) => {
+  // If the changed option is being marked as correct, unmark all other options
+  if (formData.value.options[changedIndex].is_correct) {
+    formData.value.options.forEach((option, index) => {
+      if (index !== changedIndex) {
+        option.is_correct = false
+      }
+    })
+  }
+}
+
+const validateForm = () => {
+  if (!formData.value.question_text) {
+    toast.error('Question text is required')
+    return false
+  }
+  if (formData.value.type === 'mcq') {
+    if (formData.value.options.length < 2) {
+      toast.error('At least two options are required')
+      return false
+    }
+    const correctOptions = formData.value.options.filter(opt => opt.is_correct)
+    if (correctOptions.length !== 1) {
+      toast.error('Exactly one option must be marked as correct')
+      return false
+    }
+  } else {
+    if (!formData.value.answer_lower_bound || !formData.value.answer_upper_bound) {
+      toast.error('Answer bounds are required')
+      return false
+    }
+  }
+  return true
+}
+
+onMounted(() => {
+  fetchQuiz()
+  // Initialize Bootstrap modal
+  questionModal.value = new Modal(document.getElementById('questionModal'))
+})
+</script>
+
+<template>
+  <div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div class="d-flex align-items-center">
+        <button class="btn btn-link text-dark me-3 p-0" @click="router.push('/admin/dashboard/quizzes')">
+          <i class="bi bi-arrow-left fs-4"></i>
+        </button>
+        <h2 class="mb-0">{{ quiz?.name }}</h2>
+      </div>
+      <button class="btn btn-primary" @click="handleCreateQuestion">
+        <i class="bi bi-plus-lg me-2"></i>Add Question
+      </button>
+    </div>
+
+    <div v-if="loading" class="text-center">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <div v-else-if="error" class="alert alert-danger">
+      {{ error }}
+    </div>
+
+    <div v-else class="card">
+      <div class="card-body">
+        <div v-if="questions.length === 0" class="text-center py-5">
+          <p class="text-muted">No questions added yet. Click the button above to add a question.</p>
+        </div>
+
+        <div v-else class="list-group">
+          <div v-for="(question, index) in questions" :key="question.id" class="list-group-item">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h5 class="mb-1">Question {{ index + 1 }}</h5>
+                <p class="mb-1">{{ question.question_details.question_text }}</p>
+                <small class="text-muted">
+                  Type: {{ question.type.toUpperCase() }} | 
+                  Marks: +{{ question.question_details.correct_marks }}/-{{ Math.abs(question.question_details.incorrect_marks) }}
+                </small>
+              </div>
+              <div>
+                <button class="btn btn-sm btn-outline-primary me-2" @click="handleEditQuestion(question)">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" @click="handleDeleteQuestion(question)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Question Modal -->
+    <div class="modal fade" id="questionModal" tabindex="-1" aria-labelledby="questionModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="questionModalLabel">{{ isEditMode ? 'Edit Question' : 'Add Question' }}</h5>
+            <button type="button" class="btn-close" @click="handleCloseModal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Question Type</label>
+              <select class="form-select" v-model="questionType" @change="formData.type = questionType">
+                <option value="mcq">Multiple Choice</option>
+                <option value="numeric">Numeric</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Question Text</label>
+              <textarea class="form-control" v-model="formData.question_text" rows="3"></textarea>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Correct Marks</label>
+                <input type="number" class="form-control" v-model="formData.correct_marks" min="0" step="0.5">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Incorrect Marks</label>
+                <input type="number" class="form-control" v-model="formData.incorrect_marks" max="0" step="0.5">
+              </div>
+            </div>
+
+            <template v-if="questionType === 'mcq'">
+              <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <label class="form-label mb-0">Options</label>
+                  <button type="button" class="btn btn-sm btn-outline-primary" @click="addOption">
+                    <i class="bi bi-plus-lg"></i> Add Option
+                  </button>
+                </div>
+                <div v-for="(option, index) in formData.options" :key="index" class="input-group mb-2">
+                  <input type="text" class="form-control" v-model="option.text" placeholder="Option text">
+                  <div class="input-group-text">
+                    <input type="checkbox" class="form-check-input mt-0" 
+                           v-model="option.is_correct"
+                           @change="handleCorrectOptionChange(index)">
+                  </div>
+                  <button class="btn btn-outline-danger" type="button" @click="removeOption(index)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </template>
+
+            <template v-else>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Lower Bound</label>
+                  <input type="number" class="form-control" v-model="formData.answer_lower_bound" step="any">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Upper Bound</label>
+                  <input type="number" class="form-control" v-model="formData.answer_upper_bound" step="any">
+                </div>
+              </div>
+            </template>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="handleCloseModal">Cancel</button>
+            <button type="button" class="btn btn-primary" @click="handleSubmitQuestion">
+              {{ isEditMode ? 'Update' : 'Create' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.modal {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.btn-link:hover {
+  opacity: 0.7;
+}
+</style> 

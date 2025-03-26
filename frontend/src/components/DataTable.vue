@@ -75,12 +75,14 @@ const getCellValue = (item, column) => {
                 {{ getCellValue(item, column) }}
               </td>
               <td>
-                <button class="btn btn-sm btn-outline-primary me-2" @click="$emit('edit', item)">
-                  <i class="bi bi-pencil"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" @click="$emit('delete', item)">
-                  <i class="bi bi-trash"></i>
-                </button>
+                <slot name="actions" :item="item">
+                  <button class="btn btn-sm btn-outline-primary me-2" @click="$emit('edit', item)">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" @click="$emit('delete', item)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </slot>
               </td>
             </tr>
           </tbody>

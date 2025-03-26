@@ -5,6 +5,7 @@ import Quizzes from '../views/admin/Quizzes.vue'
 import Subjects from '../views/admin/Subjects.vue'
 import Chapters from '../views/admin/Chapters.vue'
 import Stats from '../views/admin/Stats.vue'
+import QuizBuild from '../views/admin/QuizBuild.vue'
 import Home from '../views/Home.vue'
 import StudentLogin from '../views/student/Login.vue'
 import StudentDashboard from '../views/student/Dashboard.vue'
@@ -66,6 +67,11 @@ const routes = [
         path: 'quizzes',
         name: 'Quizzes',
         component: Quizzes
+      },
+      {
+        path: 'quizzes/:id/build',
+        name: 'QuizBuild',
+        component: QuizBuild
       },
       {
         path: 'subjects',

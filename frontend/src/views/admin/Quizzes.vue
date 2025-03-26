@@ -4,6 +4,7 @@ import axios from 'axios'
 import DataTable from '../../components/DataTable.vue'
 import QuizForm from '../../components/QuizForm.vue'
 import { useToast } from 'vue-toastification'
+import { useRouter } from 'vue-router'
 
 const toast = useToast()
 const quizzes = ref([])
@@ -15,6 +16,7 @@ const totalPages = ref(1)
 const showModal = ref(false)
 const selectedQuiz = ref(null)
 const isEditMode = ref(false)
+const router = useRouter()
 
 const columns = [
   { key: 'name', label: 'Name' },
@@ -140,6 +142,10 @@ const handleCloseModal = () => {
   isEditMode.value = false
 }
 
+const handleBuild = (quiz) => {
+  router.push(`/admin/dashboard/quizzes/${quiz.id}/build`)
+}
+
 onMounted(() => {
   fetchQuizzes()
 })
@@ -170,7 +176,19 @@ onMounted(() => {
       @edit="handleEdit"
       @delete="handleDelete"
       @page-change="handlePageChange"
-    />
+    >
+      <template #actions="{ item }">
+        <button class="btn btn-sm btn-outline-primary me-2" @click="handleEdit(item)">
+          <i class="bi bi-pencil"></i>
+        </button>
+        <button class="btn btn-sm btn-outline-success me-2" @click="handleBuild(item)">
+          <i class="bi bi-gear"></i>
+        </button>
+        <button class="btn btn-sm btn-outline-danger" @click="handleDelete(item)">
+          <i class="bi bi-trash"></i>
+        </button>
+      </template>
+    </DataTable>
 
     <QuizForm
       :show="showModal"
