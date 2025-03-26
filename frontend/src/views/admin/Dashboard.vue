@@ -41,8 +41,8 @@ onMounted(() => {
               <router-link class="nav-link" to="/admin/dashboard/stats" active-class="active">Stats</router-link>
             </li>
           </ul>
-          <button @click="handleLogout" class="btn btn-primary ms-3">
-            Logout
+          <button @click="handleLogout" class="btn btn-link text-danger p-0" title="Logout">
+            <i class="bi bi-box-arrow-right fs-5"></i>
           </button>
         </div>
       </div>
@@ -58,5 +58,9 @@ onMounted(() => {
 .nav-link.active {
   color: var(--bs-primary) !important;
   font-weight: 500;
+}
+
+.btn-link:hover {
+  opacity: 0.8;
 }
 </style> 

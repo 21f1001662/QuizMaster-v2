@@ -2,13 +2,19 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import DataTable from '../../components/DataTable.vue'
+import QuizForm from '../../components/QuizForm.vue'
+import { useToast } from 'vue-toastification'
 
+const toast = useToast()
 const quizzes = ref([])
 const loading = ref(false)
 const error = ref(null)
 const searchQuery = ref('')
 const currentPage = ref(1)
 const totalPages = ref(1)
+const showModal = ref(false)
+const selectedQuiz = ref(null)
+const isEditMode = ref(false)
 
 const columns = [
   { key: 'name', label: 'Name' },
@@ -36,7 +42,9 @@ const fetchQuizzes = async (name = '', page = 1) => {
       params: {
         page: page,
         per_page: 10,
-        name: name
+        name: name,
+        sort_by: 'created_at',
+        sort: 'desc'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -71,18 +79,65 @@ const handlePageChange = (page) => {
 }
 
 const handleCreate = () => {
-  // Implement create functionality
-  console.log('Create new quiz')
+  isEditMode.value = false
+  selectedQuiz.value = null
+  showModal.value = true
 }
 
 const handleEdit = (quiz) => {
-  // Implement edit functionality
-  console.log('Edit quiz:', quiz)
+  isEditMode.value = true
+  selectedQuiz.value = quiz
+  showModal.value = true
 }
 
-const handleDelete = (quiz) => {
-  // Implement delete functionality
-  console.log('Delete quiz:', quiz)
+const handleDelete = async (quiz) => {
+  if (!confirm('Are you sure you want to delete this quiz?')) return
+
+  try {
+    const token = localStorage.getItem('adminToken')
+    await axios.delete(`http://localhost:5000/api/quizzes/${quiz.id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    toast.success('Quiz deleted successfully')
+    fetchQuizzes(searchQuery.value, currentPage.value)
+  } catch (err) {
+    toast.error('Failed to delete quiz')
+    console.error(err)
+  }
+}
+
+const handleSubmit = async (formData) => {
+  try {
+    const token = localStorage.getItem('adminToken')
+    if (isEditMode.value) {
+      await axios.put(`http://localhost:5000/api/quizzes/${selectedQuiz.value.id}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      toast.success('Quiz updated successfully')
+    } else {
+      await axios.post('http://localhost:5000/api/quizzes', formData, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      toast.success('Quiz created successfully')
+    }
+    showModal.value = false
+    fetchQuizzes(searchQuery.value, currentPage.value)
+  } catch (err) {
+    toast.error(isEditMode.value ? 'Failed to update quiz' : 'Failed to create quiz')
+    console.error(err)
+  }
+}
+
+const handleCloseModal = () => {
+  showModal.value = false
+  selectedQuiz.value = null
+  isEditMode.value = false
 }
 
 onMounted(() => {
@@ -115,6 +170,14 @@ onMounted(() => {
       @edit="handleEdit"
       @delete="handleDelete"
       @page-change="handlePageChange"
+    />
+
+    <QuizForm
+      :show="showModal"
+      :quiz="selectedQuiz"
+      :is-edit="isEditMode"
+      @close="handleCloseModal"
+      @submit="handleSubmit"
     />
   </div>
 </template> 
