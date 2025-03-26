@@ -19,31 +19,44 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <nav class="bg-white shadow">
-      <div class="max-w-7xl mx-auto px-4">
-        <div class="flex justify-between h-16">
-          <div class="flex space-x-8">
-            <h1 class="flex items-center text-xl font-bold text-indigo-600">Admin Panel</h1>
-            <div class="flex space-x-4">
-              <router-link to="/admin/dashboard/quizzes" class="flex items-center px-3 text-gray-700 hover:text-indigo-600"
-                active-class="text-indigo-600">Quizzes</router-link>
-              <router-link to="/admin/dashboard/subjects" class="flex items-center px-3 text-gray-700 hover:text-indigo-600"
-                active-class="text-indigo-600">Subjects</router-link>
-              <router-link to="/admin/dashboard/stats" class="flex items-center px-3 text-gray-700 hover:text-indigo-600"
-                active-class="text-indigo-600">Stats</router-link>
-            </div>
-          </div>
-          <button @click="handleLogout"
-            class="flex items-center px-4 py-2 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700">
+  <div class="min-vh-100 bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+      <div class="container">
+        <router-link class="navbar-brand text-primary fw-bold" to="/admin/dashboard">
+          Admin Panel
+        </router-link>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav mx-auto">
+            <li class="nav-item">
+              <router-link class="nav-link" to="/admin/dashboard/quizzes" active-class="active">Quizzes</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/admin/dashboard/subjects" active-class="active">Subjects</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/admin/dashboard/stats" active-class="active">Stats</router-link>
+            </li>
+          </ul>
+          <button @click="handleLogout" class="btn btn-primary ms-3">
             Logout
           </button>
         </div>
       </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto py-6 px-4">
+    <main class="container py-4">
       <router-view></router-view>
     </main>
   </div>
-</template> 
+</template>
+
+<style scoped>
+.nav-link.active {
+  color: var(--bs-primary) !important;
+  font-weight: 500;
+}
+</style> 
