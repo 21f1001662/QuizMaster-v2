@@ -50,9 +50,37 @@ def get_quizzes():
     name = request.args.get('name', type=str)
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
+    date_lb = request.args.get('date_lb', type=str)
+    date_ub = request.args.get('date_ub', type=str)
+    sort_by = request.args.get('sort_by', 'date_of_quiz')  # Default sort by date
+    sort = request.args.get('sort', 'asc').lower()  # Default ascending order
+    
+    # Validate sort_by parameter
+    valid_sort_fields = ['date_of_quiz', 'name', 'duration', 'total_questions', 'created_at', 'updated_at']
+    if sort_by not in valid_sort_fields:
+        return jsonify({'message': f'Invalid sort_by. Must be one of: {", ".join(valid_sort_fields)}'}), 400
+    
+    # Validate sort direction
+    if sort not in ['asc', 'desc']:
+        return jsonify({'message': 'Invalid sort. Must be either "asc" or "desc"'}), 400
     
     # Base query
     query = Quiz.query
+    
+    # Apply date range filters if provided
+    if date_lb:
+        try:
+            date_lb = datetime.fromisoformat(date_lb)
+            query = query.filter(Quiz.date_of_quiz >= date_lb)
+        except ValueError:
+            return jsonify({'message': 'Invalid date_lb format. Use ISO format (YYYY-MM-DD)'}), 400
+    
+    if date_ub:
+        try:
+            date_ub = datetime.fromisoformat(date_ub)
+            query = query.filter(Quiz.date_of_quiz <= date_ub)
+        except ValueError:
+            return jsonify({'message': 'Invalid date_ub format. Use ISO format (YYYY-MM-DD)'}), 400
     
     # Apply filters
     if quiz_id:
@@ -63,6 +91,13 @@ def get_quizzes():
         # Fuzzy search on quiz name
         query = query.filter(Quiz.name.ilike(f'%{name}%'))
     
+    # Apply sorting
+    sort_column = getattr(Quiz, sort_by)
+    if sort == 'asc':
+        query = query.order_by(sort_column.asc())
+    else:
+        query = query.order_by(sort_column.desc())
+    
     # Apply pagination
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     
@@ -70,7 +105,9 @@ def get_quizzes():
         'quizzes': [quiz.to_dict() for quiz in pagination.items],
         'total': pagination.total,
         'pages': pagination.pages,
-        'current_page': page
+        'current_page': page,
+        'sort_by': sort_by,
+        'sort': sort
     }), 200
 
 @quiz_bp.route('/quizzes/<int:quiz_id>', methods=['PUT'])
