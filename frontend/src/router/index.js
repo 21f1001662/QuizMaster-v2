@@ -3,6 +3,7 @@ import AdminLogin from '../views/admin/Login.vue'
 import AdminDashboard from '../views/admin/Dashboard.vue'
 import Quizzes from '../views/admin/Quizzes.vue'
 import Subjects from '../views/admin/Subjects.vue'
+import Chapters from '../views/admin/Chapters.vue'
 import Stats from '../views/admin/Stats.vue'
 import Home from '../views/Home.vue'
 import StudentLogin from '../views/student/Login.vue'
@@ -70,6 +71,11 @@ const routes = [
         path: 'subjects',
         name: 'Subjects',
         component: Subjects
+      },
+      {
+        path: 'chapters',
+        name: 'Chapters',
+        component: Chapters
       },
       {
         path: 'stats',

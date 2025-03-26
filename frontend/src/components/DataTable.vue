@@ -31,6 +31,13 @@ defineProps({
 })
 
 defineEmits(['search', 'create', 'edit', 'delete', 'update:modelValue', 'page-change'])
+
+const getCellValue = (item, column) => {
+  if (column.formatter) {
+    return column.formatter(item)
+  }
+  return item[column.key]
+}
 </script>
 
 <template>
@@ -65,7 +72,7 @@ defineEmits(['search', 'create', 'edit', 'delete', 'update:modelValue', 'page-ch
           <tbody>
             <tr v-for="item in data" :key="item.id">
               <td v-for="column in columns" :key="column.key">
-                {{ item[column.key] }}
+                {{ getCellValue(item, column) }}
               </td>
               <td>
                 <button class="btn btn-sm btn-outline-primary me-2" @click="$emit('edit', item)">
