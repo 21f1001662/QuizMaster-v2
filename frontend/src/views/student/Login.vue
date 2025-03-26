@@ -1,113 +1,104 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8">
-      <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Student Login
-        </h2>
+  <div class="container">
+    <div class="row justify-content-center align-items-center min-vh-100">
+      <div class="col-md-6 col-lg-4">
+        <div class="card shadow">
+          <div class="card-body p-4">
+            <h2 class="text-center mb-4">Student Login</h2>
+            <form @submit.prevent="handleLogin">
+              <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input
+                  id="username"
+                  v-model="username"
+                  type="text"
+                  class="form-control"
+                  required
+                  placeholder="Enter your username"
+                />
+              </div>
+              <div class="mb-4">
+                <label for="password" class="form-label">Password</label>
+                <input
+                  id="password"
+                  v-model="password"
+                  type="password"
+                  class="form-control"
+                  required
+                  placeholder="Enter your password"
+                />
+              </div>
+              <button
+                type="submit"
+                class="btn btn-success w-100"
+                :disabled="loading"
+              >
+                <span v-if="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                {{ loading ? 'Signing in...' : 'Sign in' }}
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
-      <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
-        <div class="rounded-md shadow-sm -space-y-px">
-          <div>
-            <label for="username" class="sr-only">Username</label>
-            <input
-              id="username"
-              v-model="username"
-              name="username"
-              type="text"
-              required
-              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Username"
-            />
-          </div>
-          <div>
-            <label for="password" class="sr-only">Password</label>
-            <input
-              id="password"
-              v-model="password"
-              name="password"
-              type="password"
-              required
-              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-              placeholder="Password"
-            />
-          </div>
-        </div>
-
-        <div>
-          <button
-            type="submit"
-            :disabled="loading"
-            class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <span v-if="loading">Signing in...</span>
-            <span v-else>Sign in</span>
-          </button>
-        </div>
-      </form>
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from "vue-toastification"
+import axios from 'axios'
 
-export default {
-  name: 'StudentLogin',
-  setup() {
-    const router = useRouter()
-    const toast = useToast()
-    const username = ref('')
-    const password = ref('')
-    const loading = ref(false)
+const router = useRouter()
+const toast = useToast()
+const username = ref('')
+const password = ref('')
+const loading = ref(false)
 
-    const handleLogin = async () => {
-      try {
-        loading.value = true
+const handleLogin = async () => {
+  try {
+    loading.value = true
+    // Clear admin session if exists
+    localStorage.removeItem('adminToken')
+    localStorage.removeItem('adminUser')
 
-        // Clear admin session if exists
-        localStorage.removeItem('adminToken')
-        localStorage.removeItem('adminUser')
-
-        const response = await fetch('http://localhost:5000/auth/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            username: username.value,
-            password: password.value
-          })
-        })
-
-        const data = await response.json()
-
-        if (!response.ok) {
-          throw new Error(data.detail || 'Login failed')
-        }
-
-        // Store the token and user data
-        localStorage.setItem('studentToken', data.access_token)
-        localStorage.setItem('studentUser', JSON.stringify(data.user))
-        
-        toast.success('Login successful!')
-        router.push('/student/dashboard/quizzes')
-      } catch (err) {
-        toast.error(err.message || 'Login failed. Please check your credentials.')
-        console.error('Login failed:', err)
-      } finally {
-        loading.value = false
-      }
-    }
-
-    return {
-      username,
-      password,
-      loading,
-      handleLogin
-    }
+    const response = await axios.post('http://localhost:5000/auth/login', {
+      username: username.value,
+      password: password.value,
+    })
+    localStorage.setItem('studentToken', response.data.access_token)
+    localStorage.setItem('studentUser', JSON.stringify(response.data.user))
+    toast.success('Login successful!')
+    router.push('/student/dashboard/quizzes')
+  } catch (error) {
+    toast.error('Login failed. Please check your credentials.')
+  } finally {
+    loading.value = false
   }
 }
-</script> 
+</script>
+
+<style scoped>
+.min-vh-100 {
+  min-height: 100vh;
+}
+
+.spinner-border {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 0.2em solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spinner-border .75s linear infinite;
+}
+
+.me-2 {
+  margin-right: 0.5rem;
+}
+
+@keyframes spinner-border {
+  to { transform: rotate(360deg); }
+}
+</style> 

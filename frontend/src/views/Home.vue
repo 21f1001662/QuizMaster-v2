@@ -34,21 +34,31 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-    <h1 class="text-6xl font-bold text-indigo-600 mb-8">QuizMaster</h1>
-    <div class="space-y-4">
-      <router-link
-        to="/admin/login"
-        class="block w-full px-4 py-2 text-center text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
-      >
-        Admin Login
-      </router-link>
-      <router-link
-        to="/student/login"
-        class="block w-full px-4 py-2 text-center text-white bg-green-600 rounded-md hover:bg-green-700"
-      >
-        Student Login
-      </router-link>
+  <div class="container">
+    <div class="row justify-content-center align-items-center min-vh-100">
+      <div class="col-md-6 text-center">
+        <h1 class="display-4 text-primary mb-4">QuizMaster</h1>
+        <div class="d-grid gap-3">
+          <router-link
+            to="/admin/login"
+            class="btn btn-primary btn-lg"
+          >
+            Admin Login
+          </router-link>
+          <router-link
+            to="/student/login"
+            class="btn btn-success btn-lg"
+          >
+            Student Login
+          </router-link>
+        </div>
+      </div>
     </div>
   </div>
-</template> 
+</template>
+
+<style scoped>
+.min-vh-100 {
+  min-height: 100vh;
+}
+</style> 
