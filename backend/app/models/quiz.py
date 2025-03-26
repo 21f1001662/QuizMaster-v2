@@ -33,6 +33,21 @@ class Quiz(db.Model):
             'updated_at': self.updated_at.isoformat(),
             'questions': [question.to_dict() for question in self.questions]
         }
+    
+    def to_dict_student(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'chapter_id': self.chapter_id,
+            'date_of_quiz': self.date_of_quiz.isoformat(),
+            'duration': self.duration,
+            'remarks': self.remarks,
+            'instructions': self.instructions,
+            'total_questions': self.total_questions,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat(),
+            'questions': [question.to_dict_student() for question in self.questions]
+        }
 
 class Question(db.Model):
     __tablename__ = 'questions'
@@ -64,6 +79,22 @@ class Question(db.Model):
             data['question_details'] = self.numeric_question.to_dict() if self.numeric_question else None
             
         return data
+    
+    def to_dict_student(self):
+        data = {
+            'id': self.id,
+            'quiz_id': self.quiz_id,
+            'type': self.type,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
+        
+        if self.type == 'mcq':
+            data['mcq_question'] = self.mcq_question.to_dict_student() if self.mcq_question else None
+        else:
+            data['numeric_question'] = self.numeric_question.to_dict_student() if self.numeric_question else None
+            
+        return data
 
 class MCQQuestion(db.Model):
     __tablename__ = 'mcq_questions'
@@ -87,6 +118,17 @@ class MCQQuestion(db.Model):
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat(),
             'options': [option.to_dict() for option in self.options]
+        }
+    
+    def to_dict_student(self):
+        return {
+            'id': self.id,
+            'question_text': self.question_text,
+            'correct_marks': self.correct_marks,
+            'incorrect_marks': self.incorrect_marks,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat(),
+            'options': [option.to_dict_student() for option in self.options]
         }
 
 class NumericQuestion(db.Model):
@@ -112,6 +154,16 @@ class NumericQuestion(db.Model):
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }
+    
+    def to_dict_student(self):
+        return {
+            'id': self.id,
+            'question_text': self.question_text,
+            'correct_marks': self.correct_marks,
+            'incorrect_marks': self.incorrect_marks,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
 
 class Option(db.Model):
     __tablename__ = 'options'
@@ -128,6 +180,14 @@ class Option(db.Model):
             'id': self.id,
             'text': self.text,
             'is_correct': self.is_correct,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
+    
+    def to_dict_student(self):
+        return {
+            'id': self.id,
+            'text': self.text,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }
