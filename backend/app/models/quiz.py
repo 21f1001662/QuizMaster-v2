@@ -23,7 +23,16 @@ class Quiz(db.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'chapter_id': self.chapter_id,
+            'chapter': {
+                'id': self.chapter.id,
+                'name': self.chapter.name,
+                'description': self.chapter.description,
+                'subject': {
+                    'id': self.chapter.subject.id,
+                    'name': self.chapter.subject.name,
+                    'description': self.chapter.subject.description
+                }
+            },
             'date_of_quiz': self.date_of_quiz.isoformat(),
             'duration': self.duration,
             'remarks': self.remarks,
