@@ -154,20 +154,31 @@ onMounted(() => {
       {{ error }}
     </div>
     <DataTable
-      v-else
       :columns="columns"
       :data="subjects"
-      search-placeholder="Search subjects by name..."
-      create-button-text="Create New Subject"
-      v-model="searchQuery"
-      :current-page="currentPage"
-      :total-pages="totalPages"
-      @search="handleSearch"
-      @create="handleCreate"
-      @edit="handleEdit"
-      @delete="handleDelete"
+      :loading="loading"
+      :error="error"
+      v-model:searchQuery="searchQuery"
+      :currentPage="currentPage"
+      :totalPages="totalPages"
+      :showActions="true"
       @page-change="handlePageChange"
-    />
+      @search="handleSearch"
+    >
+      <template #headerActions>
+        <button class="btn btn-primary" @click="handleCreate">
+          <i class="bi bi-plus-lg me-2"></i>Create New Subject
+        </button>
+      </template>
+      <template #actions="{ item }">
+        <button class="btn btn-sm btn-outline-primary me-2" @click.stop="handleEdit(item)">
+          <i class="bi bi-pencil"></i>
+        </button>
+        <button class="btn btn-sm btn-outline-danger" @click.stop="handleDelete(item)">
+          <i class="bi bi-trash"></i>
+        </button>
+      </template>
+    </DataTable>
 
     <SubjectForm
       :show="showModal"

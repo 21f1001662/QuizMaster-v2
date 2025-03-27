@@ -20,11 +20,20 @@ const router = useRouter()
 
 const columns = [
   { key: 'name', label: 'Name' },
-  { key: 'chapter_id', label: 'Chapter ID' },
+  { 
+    key: 'chapter', 
+    label: 'Subject',
+    formatter: (item) => item.chapter?.subject?.name || '-'
+  },
+  { 
+    key: 'chapter', 
+    label: 'Chapter',
+    formatter: (item) => item.chapter?.name || '-'
+  },
   { key: 'date_of_quiz', label: 'Date' },
   { key: 'duration', label: 'Duration (mins)' },
   { key: 'total_questions', label: 'Questions' },
-  { key: 'remarks', label: 'Remark' }
+  { key: 'created_at', label: 'Created At' }
 ]
 
 // Debounce function
@@ -163,29 +172,21 @@ onMounted(() => {
       {{ error }}
     </div>
     <DataTable
-      v-else
       :columns="columns"
       :data="quizzes"
-      search-placeholder="Search quizzes by name..."
-      create-button-text="Create New Quiz"
-      v-model="searchQuery"
-      :current-page="currentPage"
-      :total-pages="totalPages"
-      @search="handleSearch"
-      @create="handleCreate"
-      @edit="handleEdit"
-      @delete="handleDelete"
+      :loading="loading"
+      :error="error"
+      v-model:searchQuery="searchQuery"
+      :currentPage="currentPage"
+      :totalPages="totalPages"
+      :showActions="false"
+      @row-click="handleBuild"
       @page-change="handlePageChange"
+      @search="handleSearch"
     >
-      <template #actions="{ item }">
-        <button class="btn btn-sm btn-outline-primary me-2" @click="handleEdit(item)">
-          <i class="bi bi-pencil"></i>
-        </button>
-        <button class="btn btn-sm btn-outline-success me-2" @click="handleBuild(item)">
-          <i class="bi bi-gear"></i>
-        </button>
-        <button class="btn btn-sm btn-outline-danger" @click="handleDelete(item)">
-          <i class="bi bi-trash"></i>
+      <template #headerActions>
+        <button class="btn btn-primary" @click="handleCreate">
+          <i class="bi bi-plus-lg me-2"></i>Create New Quiz
         </button>
       </template>
     </DataTable>

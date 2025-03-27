@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useToast } from 'vue-toastification'
+import axios from 'axios'
 
 const props = defineProps({
   show: {
@@ -9,7 +10,7 @@ const props = defineProps({
   },
   quiz: {
     type: Object,
-    default: () => ({})
+    default: null
   },
   isEdit: {
     type: Boolean,
@@ -18,37 +19,73 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close', 'submit'])
-
 const toast = useToast()
+const chapters = ref([])
+const loading = ref(false)
 
-const form = ref({
+const formData = ref({
   name: '',
-  chapter_id: 1,
+  description: '',
+  chapter_id: '',
   date_of_quiz: '',
-  duration: 60,
-  total_questions: 0,
-  remarks: '',
-  instructions: ''
+  duration: 30
+})
+
+// Add function to fetch chapters
+const fetchChapters = async () => {
+  try {
+    loading.value = true
+    const token = localStorage.getItem('adminToken')
+    const response = await axios.get('http://localhost:5000/api/chapters', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    chapters.value = response.data.chapters
+  } catch (err) {
+    toast.error('Failed to fetch chapters')
+    console.error(err)
+  } finally {
+    loading.value = false
+  }
+}
+
+// Watch for quiz prop changes
+watch(() => props.quiz, (newQuiz) => {
+  if (newQuiz) {
+    formData.value = {
+      name: newQuiz.name,
+      description: newQuiz.description || '',
+      chapter_id: newQuiz.chapter_id,
+      date_of_quiz: newQuiz.date_of_quiz ? newQuiz.date_of_quiz.slice(0, 16) : '',
+      duration: newQuiz.duration
+    }
+  }
+}, { immediate: true })
+
+// Watch for show prop to fetch chapters when modal opens
+watch(() => props.show, (newShow) => {
+  if (newShow) {
+    fetchChapters()
+  }
 })
 
 const resetForm = () => {
-  form.value = {
+  formData.value = {
     name: '',
-    chapter_id: 1,
+    description: '',
+    chapter_id: '',
     date_of_quiz: '',
-    duration: 60,
-    total_questions: 0,
-    remarks: '',
-    instructions: ''
+    duration: 30
   }
 }
 
 const handleSubmit = () => {
-  if (!form.value.name || !form.value.date_of_quiz || !form.value.duration) {
+  if (!formData.value.name || !formData.value.date_of_quiz || !formData.value.duration || !formData.value.chapter_id) {
     toast.error('Please fill in all required fields')
     return
   }
-  emit('submit', { ...form.value })
+  emit('submit', { ...formData.value })
 }
 
 const handleClose = () => {
@@ -56,23 +93,11 @@ const handleClose = () => {
   emit('close')
 }
 
-// Watch for changes in quiz prop
-watch(() => props.quiz, (newQuiz) => {
-  if (props.isEdit && newQuiz) {
-    // Format the date to be compatible with datetime-local input
-    const formattedDate = newQuiz.date_of_quiz ? newQuiz.date_of_quiz.slice(0, 16) : ''
-    form.value = {
-      ...newQuiz,
-      date_of_quiz: formattedDate
-    }
-  }
-}, { immediate: true })
-
 onMounted(() => {
   if (props.isEdit && props.quiz) {
     // Format the date to be compatible with datetime-local input
     const formattedDate = props.quiz.date_of_quiz ? props.quiz.date_of_quiz.slice(0, 16) : ''
-    form.value = {
+    formData.value = {
       ...props.quiz,
       date_of_quiz: formattedDate
     }
@@ -81,42 +106,39 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="modal fade show" :class="{ 'd-block': show }" tabindex="-1">
+  <div class="modal" :class="{ 'd-block': show }" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">{{ isEdit ? 'Edit Quiz' : 'Create New Quiz' }}</h5>
+          <h5 class="modal-title">{{ isEdit ? 'Edit Quiz' : 'Create Quiz' }}</h5>
           <button type="button" class="btn-close" @click="handleClose"></button>
         </div>
         <div class="modal-body">
           <form @submit.prevent="handleSubmit">
             <div class="mb-3">
               <label class="form-label">Name <span class="text-danger">*</span></label>
-              <input type="text" class="form-control" v-model="form.name" required>
+              <input type="text" class="form-control" v-model="formData.name" required>
             </div>
             <div class="mb-3">
-              <label class="form-label">Chapter ID <span class="text-danger">*</span></label>
-              <input type="number" class="form-control" v-model="form.chapter_id" required>
+              <label class="form-label">Description</label>
+              <textarea class="form-control" v-model="formData.description" rows="2"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Chapter <span class="text-danger">*</span></label>
+              <select class="form-select" v-model="formData.chapter_id" required>
+                <option value="">Select a chapter</option>
+                <option v-for="chapter in chapters" :key="chapter.id" :value="chapter.id">
+                  {{ chapter.subject.name }} - {{ chapter.name }}
+                </option>
+              </select>
             </div>
             <div class="mb-3">
               <label class="form-label">Date & Time <span class="text-danger">*</span></label>
-              <input type="datetime-local" class="form-control" v-model="form.date_of_quiz" required>
+              <input type="datetime-local" class="form-control" v-model="formData.date_of_quiz" required>
             </div>
             <div class="mb-3">
               <label class="form-label">Duration (minutes) <span class="text-danger">*</span></label>
-              <input type="number" class="form-control" v-model="form.duration" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Total Questions</label>
-              <input type="number" class="form-control" v-model="form.total_questions">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Remarks</label>
-              <textarea class="form-control" v-model="form.remarks" rows="2"></textarea>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Instructions</label>
-              <textarea class="form-control" v-model="form.instructions" rows="3"></textarea>
+              <input type="number" class="form-control" v-model="formData.duration" required>
             </div>
           </form>
         </div>
@@ -129,7 +151,7 @@ onMounted(() => {
       </div>
     </div>
   </div>
-  <div v-if="show" class="modal-backdrop fade show"></div>
+  <div class="modal-backdrop fade show" v-if="show"></div>
 </template>
 
 <style scoped>

@@ -1,5 +1,5 @@
 <script setup>
-defineProps({
+const props = defineProps({
   columns: {
     type: Array,
     required: true
@@ -35,10 +35,22 @@ defineProps({
   showActions: {
     type: Boolean,
     default: true
+  },
+  loading: {
+    type: Boolean,
+    default: false
+  },
+  error: {
+    type: String,
+    default: ''
+  },
+  searchQuery: {
+    type: String,
+    default: ''
   }
 })
 
-defineEmits(['search', 'create', 'edit', 'delete', 'update:modelValue', 'page-change'])
+defineEmits(['search', 'create', 'edit', 'delete', 'update:modelValue', 'page-change', 'row-click'])
 
 const getCellValue = (item, column) => {
   if (column.formatter) {
@@ -51,72 +63,76 @@ const getCellValue = (item, column) => {
 <template>
   <div class="card">
     <div class="card-body">
-      <div class="d-flex justify-content-between align-items-center mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="input-group" style="max-width: 300px;">
           <span class="input-group-text">
             <i class="bi bi-search"></i>
           </span>
-          <input 
-            type="text" 
-            class="form-control" 
-            :placeholder="searchPlaceholder" 
-            :value="modelValue"
-            @input="$emit('update:modelValue', $event.target.value); $emit('search', $event.target.value)"
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Search..."
+            :value="searchQuery"
+            @input="$emit('update:searchQuery', $event.target.value); $emit('search', $event.target.value)"
           >
         </div>
-        <button v-if="showCreateButton" class="btn btn-primary" @click="$emit('create')">
-          <i class="bi bi-plus-lg me-2"></i>{{ createButtonText }}
-        </button>
+        <slot name="headerActions"></slot>
       </div>
 
-      <div class="table-responsive">
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th v-for="column in columns" :key="column.key">{{ column.label }}</th>
-              <th v-if="showActions">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="item in data" :key="item.id">
-              <td v-for="column in columns" :key="column.key">
-                {{ getCellValue(item, column) }}
-              </td>
-              <td v-if="showActions">
-                <slot name="actions" :item="item">
-                  <button class="btn btn-sm btn-outline-primary me-2" @click="$emit('edit', item)">
-                    <i class="bi bi-pencil"></i>
-                  </button>
-                  <button class="btn btn-sm btn-outline-danger" @click="$emit('delete', item)">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </slot>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div v-if="loading" class="text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
       </div>
 
-      <!-- Pagination -->
-      <nav v-if="totalPages > 1" class="mt-4">
-        <ul class="pagination justify-content-center">
-          <li class="page-item" :class="{ disabled: currentPage === 1 }">
-            <a class="page-link" href="#" @click.prevent="$emit('page-change', currentPage - 1)">
-              <i class="bi bi-chevron-left"></i>
-            </a>
-          </li>
-          <li v-for="page in totalPages" :key="page" 
-              class="page-item" 
-              :class="{ active: currentPage === page }">
-            <a class="page-link" href="#" @click.prevent="$emit('page-change', page)">{{ page }}</a>
-          </li>
-          <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-            <a class="page-link" href="#" @click.prevent="$emit('page-change', currentPage + 1)">
-              <i class="bi bi-chevron-right"></i>
-            </a>
-          </li>
-        </ul>
-      </nav>
+      <div v-else-if="error" class="alert alert-danger">
+        {{ error }}
+      </div>
+
+      <div v-else>
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th v-for="col in columns" :key="col.key">{{ col.label }}</th>
+                <th v-if="showActions">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in data" :key="index" @click="!showActions && $emit('row-click', item)" :class="{ 'cursor-pointer': !showActions }">
+                <td v-for="col in columns" :key="col.key">
+                  <slot :name="col.key" :item="item">
+                    {{ getCellValue(item, col) }}
+                  </slot>
+                </td>
+                <td v-if="showActions">
+                  <slot name="actions" :item="item"></slot>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div v-if="totalPages > 1" class="d-flex justify-content-center mt-4">
+          <nav>
+            <ul class="pagination">
+              <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                <a class="page-link" href="#" @click.prevent="$emit('page-change', currentPage - 1)">
+                  <i class="bi bi-chevron-left"></i>
+                </a>
+              </li>
+              <li v-for="page in totalPages" :key="page" class="page-item" :class="{ active: currentPage === page }">
+                <a class="page-link" href="#" @click.prevent="$emit('page-change', page)">{{ page }}</a>
+              </li>
+              <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                <a class="page-link" href="#" @click.prevent="$emit('page-change', currentPage + 1)">
+                  <i class="bi bi-chevron-right"></i>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -134,5 +150,13 @@ const getCellValue = (item, column) => {
 .page-item.disabled .page-link {
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.cursor-pointer:hover {
+  background-color: rgba(0, 0, 0, 0.02);
 }
 </style> 

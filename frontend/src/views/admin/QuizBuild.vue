@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import { useToast } from 'vue-toastification'
 import { Modal } from 'bootstrap'
+import QuizForm from '../../components/QuizForm.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -17,6 +18,7 @@ const questionModal = ref(null)
 const selectedQuestion = ref(null)
 const isEditMode = ref(false)
 const questionType = ref('mcq')
+const showQuizModal = ref(false)
 const formData = ref({
   type: 'mcq',
   question_text: '',
@@ -177,9 +179,47 @@ const validateForm = () => {
   return true
 }
 
+const handleEditQuiz = () => {
+  showQuizModal.value = true
+}
+
+const handleDeleteQuiz = async () => {
+  if (!confirm('Are you sure you want to delete this quiz?')) return
+
+  try {
+    const token = localStorage.getItem('adminToken')
+    await axios.delete(`http://localhost:5000/api/quizzes/${quiz.value.id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    toast.success('Quiz deleted successfully')
+    router.push('/admin/dashboard/quizzes')
+  } catch (err) {
+    toast.error('Failed to delete quiz')
+    console.error(err)
+  }
+}
+
+const handleQuizUpdate = async (formData) => {
+  try {
+    const token = localStorage.getItem('adminToken')
+    await axios.put(`http://localhost:5000/api/quizzes/${quiz.value.id}`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    toast.success('Quiz updated successfully')
+    showQuizModal.value = false
+    fetchQuiz()
+  } catch (err) {
+    toast.error('Failed to update quiz')
+    console.error(err)
+  }
+}
+
 onMounted(() => {
   fetchQuiz()
-  // Initialize Bootstrap modal
   questionModal.value = new Modal(document.getElementById('questionModal'))
 })
 </script>
@@ -191,11 +231,32 @@ onMounted(() => {
         <button class="btn btn-link text-dark me-3 p-0" @click="router.push('/admin/dashboard/quizzes')">
           <i class="bi bi-arrow-left fs-4"></i>
         </button>
-        <h2 class="mb-0">{{ quiz?.name }}</h2>
+        <div>
+          <h2 class="mb-1">{{ quiz?.name }}</h2>
+          <div class="d-flex align-items-center text-muted">
+            <div class="me-3">
+              <i class="bi bi-book me-1"></i>
+              {{ quiz?.chapter?.subject?.name }}
+            </div>
+            <div class="me-3">
+              <i class="bi bi-journal-text me-1"></i>
+              {{ quiz?.chapter?.name }}
+            </div>
+            <div>
+              <i class="bi bi-clock me-1"></i>
+              {{ quiz?.duration }} minutes
+            </div>
+          </div>
+        </div>
       </div>
-      <button class="btn btn-primary" @click="handleCreateQuestion">
-        <i class="bi bi-plus-lg me-2"></i>Add Question
-      </button>
+      <div>
+        <button class="btn btn-outline-primary me-2" @click="handleEditQuiz">
+          <i class="bi bi-pencil me-2"></i>Edit Quiz
+        </button>
+        <button class="btn btn-outline-danger" @click="handleDeleteQuiz">
+          <i class="bi bi-trash me-2"></i>Delete Quiz
+        </button>
+      </div>
     </div>
 
     <div v-if="loading" class="text-center">
@@ -358,6 +419,15 @@ onMounted(() => {
         </div>
       </div>
     </div>
+
+    <!-- Quiz Form Modal -->
+    <QuizForm
+      :show="showQuizModal"
+      :quiz="quiz"
+      :is-edit="true"
+      @close="showQuizModal = false"
+      @submit="handleQuizUpdate"
+    />
   </div>
 </template>
 
