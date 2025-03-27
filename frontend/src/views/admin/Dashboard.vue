@@ -41,6 +41,9 @@ onMounted(() => {
               <router-link class="nav-link" to="/admin/dashboard/chapters" active-class="active">Chapters</router-link>
             </li>
             <li class="nav-item">
+              <router-link class="nav-link" to="/admin/dashboard/students" active-class="active">Students</router-link>
+            </li>
+            <li class="nav-item">
               <router-link class="nav-link" to="/admin/dashboard/stats" active-class="active">Stats</router-link>
             </li>
           </ul>

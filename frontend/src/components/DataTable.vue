@@ -27,6 +27,14 @@ defineProps({
   totalPages: {
     type: Number,
     required: true
+  },
+  showCreateButton: {
+    type: Boolean,
+    default: true
+  },
+  showActions: {
+    type: Boolean,
+    default: true
   }
 })
 
@@ -56,7 +64,7 @@ const getCellValue = (item, column) => {
             @input="$emit('update:modelValue', $event.target.value); $emit('search', $event.target.value)"
           >
         </div>
-        <button class="btn btn-primary" @click="$emit('create')">
+        <button v-if="showCreateButton" class="btn btn-primary" @click="$emit('create')">
           <i class="bi bi-plus-lg me-2"></i>{{ createButtonText }}
         </button>
       </div>
@@ -66,7 +74,7 @@ const getCellValue = (item, column) => {
           <thead>
             <tr>
               <th v-for="column in columns" :key="column.key">{{ column.label }}</th>
-              <th>Actions</th>
+              <th v-if="showActions">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -74,7 +82,7 @@ const getCellValue = (item, column) => {
               <td v-for="column in columns" :key="column.key">
                 {{ getCellValue(item, column) }}
               </td>
-              <td>
+              <td v-if="showActions">
                 <slot name="actions" :item="item">
                   <button class="btn btn-sm btn-outline-primary me-2" @click="$emit('edit', item)">
                     <i class="bi bi-pencil"></i>
