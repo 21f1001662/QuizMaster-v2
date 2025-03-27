@@ -215,15 +215,26 @@ onMounted(() => {
         </div>
 
         <div v-else class="list-group">
-          <div v-for="(question, index) in questions" :key="question.id" class="list-group-item">
-            <div class="d-flex justify-content-between align-items-center">
+          <div v-for="(question, index) in questions" :key="question.id" class="list-group-item border-0 mb-4">
+            <div class="d-flex justify-content-between align-items-start mb-3">
               <div>
-                <h5 class="mb-1">Question {{ index + 1 }}</h5>
-                <p class="mb-1">{{ question.question_details.question_text }}</p>
-                <small class="text-muted">
-                  Type: {{ question.type.toUpperCase() }} | 
-                  Marks: +{{ question.question_details.correct_marks }}/-{{ Math.abs(question.question_details.incorrect_marks) }}
-                </small>
+                <div class="d-flex align-items-center mb-2">
+                  <span class="badge bg-primary me-2">Question {{ index + 1 }}</span>
+                  <span class="badge" :class="question.type === 'mcq' ? 'bg-info' : 'bg-success'">
+                    {{ question.type.toUpperCase() }}
+                  </span>
+                </div>
+                <h5 class="mb-2">{{ question.question_details.question_text }}</h5>
+                <div class="text-muted small">
+                  <span class="me-3">
+                    <i class="bi bi-check-circle-fill text-success me-1"></i>
+                    +{{ question.question_details.correct_marks }} marks
+                  </span>
+                  <span>
+                    <i class="bi bi-x-circle-fill text-danger me-1"></i>
+                    {{ question.question_details.incorrect_marks }} marks
+                  </span>
+                </div>
               </div>
               <div>
                 <button class="btn btn-sm btn-outline-primary me-2" @click="handleEditQuestion(question)">
@@ -232,6 +243,37 @@ onMounted(() => {
                 <button class="btn btn-sm btn-outline-danger" @click="handleDeleteQuestion(question)">
                   <i class="bi bi-trash"></i>
                 </button>
+              </div>
+            </div>
+
+            <!-- MCQ Options -->
+            <div v-if="question.type === 'mcq'" class="ms-4">
+              <div v-for="(option, optIndex) in question.question_details.options" 
+                   :key="optIndex"
+                   class="d-flex align-items-center mb-2">
+                <div class="form-check me-2">
+                  <input type="radio" 
+                         class="form-check-input" 
+                         :checked="option.is_correct"
+                         disabled>
+                </div>
+                <div class="flex-grow-1 p-2 rounded" 
+                     :class="option.is_correct ? 'bg-success bg-opacity-10' : 'bg-light'">
+                  {{ option.text }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Numeric Answer Range -->
+            <div v-else class="ms-4">
+              <div class="d-flex align-items-center">
+                <i class="bi bi-arrow-left-right me-2"></i>
+                <span class="text-muted">
+                  Answer should be between 
+                  <strong>{{ question.question_details.answer_lower_bound }}</strong> 
+                  and 
+                  <strong>{{ question.question_details.answer_upper_bound }}</strong>
+                </span>
               </div>
             </div>
           </div>
@@ -326,5 +368,15 @@ onMounted(() => {
 
 .btn-link:hover {
   opacity: 0.7;
+}
+
+.list-group-item {
+  background-color: #fff;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.list-group-item:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 </style> 
