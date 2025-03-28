@@ -22,6 +22,13 @@ const quizDetails = ref(null)
 const selectedOption = ref(null)
 const numericAnswer = ref('')
 
+// Add new ref for confirmation dialog
+const showConfirmDialog = ref(false)
+
+// Add new refs for success popup
+const showSuccessPopup = ref(false)
+const quizScore = ref(0)
+
 // Fetch quiz details and start attempt
 const startQuiz = async () => {
   try {
@@ -156,23 +163,23 @@ const submitAnswer = async () => {
 // Navigation
 const goToQuestion = async (index) => {
   if (index === currentQuestionIndex.value) return
-  
-  // Save current answer before navigating
-  if (questions.value[currentQuestionIndex.value].is_attempted) {
-    await submitAnswer()
-  }
-  
   await fetchQuestion(index)
 }
 
 const nextQuestion = async () => {
   if (currentQuestionIndex.value < questions.value.length - 1) {
+    // Save current answer before navigating
+    await submitAnswer()
     await goToQuestion(currentQuestionIndex.value + 1)
+  } else {
+    showConfirmDialog.value = true
   }
 }
 
 const previousQuestion = async () => {
   if (currentQuestionIndex.value > 0) {
+    // Save current answer before navigating
+    await submitAnswer()
     await goToQuestion(currentQuestionIndex.value - 1)
   }
 }
@@ -192,18 +199,24 @@ const submitQuiz = async () => {
     )
 
     clearInterval(timer.value)
-    
-    // Show success modal with score
-    toast.success(`Quiz completed! Your score: ${response.data.score}`)
-    
-    // Redirect after a short delay
-    setTimeout(() => {
-      router.push('/student/dashboard/quizzes')
-    }, 2000)
+    quizScore.value = response.data.score
+    showSuccessPopup.value = true
   } catch (err) {
     toast.error('Failed to submit quiz')
     console.error(err)
   }
+}
+
+// Add new function for final submit
+const handleFinalSubmit = async () => {
+  showConfirmDialog.value = false
+  await submitAnswer()
+  await submitQuiz()
+}
+
+// Add new function for home navigation
+const goToHome = () => {
+  router.push('/student/dashboard/quizzes')
 }
 
 onMounted(() => {
@@ -317,12 +330,56 @@ onUnmounted(() => {
               
               <button
                 class="btn btn-primary"
+                :disabled="currentQuestionIndex === questions.length - 1 && currentQuestionIndex !== questions.length - 1"
                 @click="nextQuestion"
-                :disabled="currentQuestionIndex === questions.length - 1"
               >
-                Next<i class="bi bi-arrow-right ms-2"></i>
+                {{ currentQuestionIndex === questions.length - 1 ? 'Final Submit' : 'Submit and Next' }}
+                <i class="bi bi-arrow-right ms-2"></i>
               </button>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Dialog -->
+  <div v-if="showConfirmDialog" class="modal-backdrop show" style="display: block;"></div>
+  <div v-if="showConfirmDialog" class="modal show" style="display: block;">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirm Submission</h5>
+          <button type="button" class="btn-close" @click="showConfirmDialog = false"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to submit the quiz? This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" @click="showConfirmDialog = false">Cancel</button>
+          <button type="button" class="btn btn-primary" @click="handleFinalSubmit">Submit Quiz</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Popup -->
+  <div v-if="showSuccessPopup" class="modal-backdrop show" style="display: block;"></div>
+  <div v-if="showSuccessPopup" class="modal show" style="display: block;">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content success-modal">
+        <div class="modal-body text-center p-5">
+          <div class="success-emoji mb-4">🎉</div>
+          <h4 class="mb-3">Congratulations!</h4>
+          <p class="text-muted mb-4">You have successfully attempted the quiz.</p>
+          <div class="score-display">
+            <div class="score-label">Your Score</div>
+            <div class="score-value">{{ quizScore }}</div>
+          </div>
+          <div class="mt-4">
+            <button class="btn btn-primary btn-lg home-button" @click="goToHome">
+              <i class="bi bi-house-door me-2"></i>Back to Quizzes
+            </button>
           </div>
         </div>
       </div>
@@ -500,5 +557,126 @@ onUnmounted(() => {
 .btn-danger:hover {
   background: #bb2d3b;
   border-color: #b02a37;
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1055;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-dialog {
+  margin: 0 auto;
+  max-width: 500px;
+  width: 100%;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  border-bottom: 1px solid #dee2e6;
+  padding: 1rem 1.5rem;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  border-top: 1px solid #dee2e6;
+  padding: 1rem 1.5rem;
+}
+
+.success-modal {
+  border: none;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.success-emoji {
+  font-size: 4rem;
+  line-height: 1;
+  animation: bounce 1s infinite;
+}
+
+.score-display {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 0 auto;
+  max-width: 200px;
+}
+
+.score-label {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.score-value {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #198754;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Update button styles */
+.btn-primary:disabled {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.home-button {
+  padding: 0.8rem 2rem;
+  font-size: 1.1rem;
+  background: rgba(13, 110, 253, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(13, 110, 253, 0.2);
+  transition: all 0.3s ease;
+  color: white;
+}
+
+.home-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(13, 110, 253, 0.3);
+  background: rgba(13, 110, 253, 1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.home-button:active {
+  transform: translateY(0);
+  background: rgba(13, 110, 253, 0.95);
 }
 </style> 
