@@ -12,6 +12,7 @@ class Quiz(db.Model):
     remarks = db.Column(db.Text)
     instructions = db.Column(db.Text)
     total_questions = db.Column(db.Integer, default=0)  # Set default to 0
+    total_score = db.Column(db.Float, default=0.0)  # Total possible score for the quiz
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -38,6 +39,7 @@ class Quiz(db.Model):
             'remarks': self.remarks,
             'instructions': self.instructions,
             'total_questions': self.total_questions,
+            'total_score': self.total_score,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat(),
             'questions': [question.to_dict() for question in self.questions]
@@ -53,6 +55,7 @@ class Quiz(db.Model):
             'remarks': self.remarks,
             'instructions': self.instructions,
             'total_questions': self.total_questions,
+            'total_score': self.total_score,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat(),
             'questions': [question.to_dict_student() for question in self.questions]

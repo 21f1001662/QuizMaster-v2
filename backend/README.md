@@ -15,7 +15,7 @@ A Flask-based backend for the QuizMaster application with JWT authentication and
 1. Create a virtual environment:
 ```bash
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  
 ```
 
 2. Install dependencies:
@@ -32,20 +32,6 @@ pip install -r requirements.txt
 flask run
 ```
 
-## API Endpoints
-
-### Authentication
-
-- POST `/auth/register` - Register a new user
-- POST `/auth/login` - User login
-- POST `/auth/admin/login` - Admin login
-
-### User
-
-- GET `/user/me` - Get current user profile (Protected)
-- GET `/user/admin/profile` - Get admin profile (Admin only)
-- GET `/user/protected` - Test user protection (Protected)
-- GET `/user/admin/protected` - Test admin protection (Admin only)
 
 ## Authentication
 
@@ -60,4 +46,44 @@ The application uses SQLite with SQLAlchemy ORM. The database file will be creat
 
 ## Admin Account
 
-An admin account is automatically created during the first run with credentials specified in the `.env` file. 
+An admin account is automatically created during the first run with credentials specified in the `.env` file.
+
+## Database Migrations
+
+### Setup
+1. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+### Migration Commands
+
+#### Initialize Migrations (First Time Only)
+```bash
+flask db init
+```
+
+#### Create New Migration
+```bash
+flask db migrate -m "Description of changes"
+```
+
+#### Apply Migrations
+```bash
+flask db upgrade
+```
+
+#### Rollback Last Migration
+```bash
+flask db downgrade
+```
+
+#### View Migration History
+```bash
+flask db history
+```
+
+#### View Current Migration Version
+```bash
+flask db current
+```

@@ -203,8 +203,9 @@ def create_question(quiz_id):
         )
     
     db.session.add(question)
-    # Increment total questions count
+    # Increment total questions count and update total score
     quiz.total_questions += 1
+    quiz.total_score += data['correct_marks']  # Add correct marks to total score
     db.session.commit()
     
     return jsonify(question.to_dict()), 201
@@ -215,6 +216,13 @@ def create_question(quiz_id):
 def update_question(quiz_id, question_id):
     question = Question.query.filter_by(id=question_id, quiz_id=quiz_id).first_or_404()
     data = request.get_json()
+    
+    # Store old correct marks for updating total score
+    old_correct_marks = 0
+    if question.type == 'mcq':
+        old_correct_marks = question.mcq_question.correct_marks
+    else:
+        old_correct_marks = question.numeric_question.correct_marks
     
     if question.type == 'mcq':
         mcq = question.mcq_question
@@ -248,6 +256,11 @@ def update_question(quiz_id, question_id):
         if 'incorrect_marks' in data:
             numeric.incorrect_marks = data['incorrect_marks']
     
+    # Update quiz total score if correct marks changed
+    if 'correct_marks' in data:
+        quiz = question.quiz
+        quiz.total_score = quiz.total_score - old_correct_marks + data['correct_marks']
+    
     db.session.commit()
     return jsonify(question.to_dict()), 200
 
@@ -258,24 +271,22 @@ def delete_question(quiz_id, question_id):
     question = Question.query.filter_by(id=question_id, quiz_id=quiz_id).first_or_404()
     quiz = question.quiz
     
-    # Delete related records based on question type
+    # Get correct marks before deletion for updating total score
+    correct_marks = 0
     if question.type == 'mcq':
-        # Delete all options first
-        Option.query.filter_by(mcq_question_id=question.mcq_question_id).delete()
-        # Delete the MCQ question
-        MCQQuestion.query.filter_by(id=question.mcq_question_id).delete()
-    else:  # numeric question
-        # Delete the numeric question
-        NumericQuestion.query.filter_by(id=question.numeric_question_id).delete()
+        correct_marks = question.mcq_question.correct_marks
+    else:
+        correct_marks = question.numeric_question.correct_marks
     
-    # Decrement total questions count
+    # Update quiz total score and question count
+    quiz.total_score -= correct_marks
     quiz.total_questions -= 1
     
-    # Finally delete the question record
+    # Delete the question (cascade will handle related records)
     db.session.delete(question)
     db.session.commit()
     
-    return jsonify({'message': 'Question and related records deleted successfully'}), 200
+    return jsonify({'message': 'Question deleted successfully'}), 200
 
 @quiz_bp.route('/student/quizzes', methods=['GET'])
 @jwt_required()

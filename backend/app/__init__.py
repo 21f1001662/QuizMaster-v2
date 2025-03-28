@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
+from flask_migrate import Migrate
 from dotenv import load_dotenv
 from datetime import timedelta
 import os
@@ -12,6 +13,7 @@ load_dotenv()
 # Initialize extensions
 db = SQLAlchemy()
 jwt = JWTManager()
+migrate = Migrate()
 
 def create_app():
     app = Flask(__name__)
@@ -26,6 +28,7 @@ def create_app():
     # Initialize extensions with app
     db.init_app(app)
     jwt.init_app(app)
+    migrate.init_app(app, db)  # Initialize Flask-Migrate
     CORS(app, resources={r"/*": {"origins": ["http://localhost:5173"]}})  # Enable CORS for all routes
     
     # Import and register blueprints
