@@ -1,75 +1,66 @@
 <template>
-  <div class="min-h-screen bg-gray-100">
-    <nav class="bg-white shadow-sm">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-          <div class="flex">
-            <div class="flex-shrink-0 flex items-center">
-              <h1 class="text-xl font-bold text-gray-900">Student Dashboard</h1>
-            </div>
-            <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-              <router-link
-                to="/student/dashboard/quizzes"
-                class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                active-class="border-indigo-500 text-gray-900"
-              >
-                Upcoming Quizzes
-              </router-link>
-              <router-link
-                to="/student/dashboard/quizzes/completed"
-                class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                active-class="border-indigo-500 text-gray-900"
-              >
-                Completed Quizzes
-              </router-link>
-              <router-link
-                to="/student/dashboard/stats"
-                class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-                active-class="border-indigo-500 text-gray-900"
-              >
-                Statistics
-              </router-link>
-            </div>
-          </div>
-          <div class="flex items-center">
-            <button
-              @click="handleLogout"
-              class="ml-4 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Logout
-            </button>
-          </div>
+  <div class="min-vh-100 bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+      <div class="container">
+        <router-link class="navbar-brand text-primary fw-bold" to="/student/dashboard">
+          Student Panel
+        </router-link>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav mx-auto">
+            <li class="nav-item">
+              <router-link class="nav-link" to="/student/dashboard/quizzes" active-class="active">Upcoming Quizzes</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/student/dashboard/quizzes/completed" active-class="active">Completed Quizzes</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/student/dashboard/stats" active-class="active">Stats</router-link>
+            </li>
+          </ul>
+          <button @click="handleLogout" class="btn btn-link text-danger p-0" title="Logout">
+            <i class="bi bi-box-arrow-right fs-5"></i>
+          </button>
         </div>
       </div>
     </nav>
 
-    <div class="py-10">
-      <main>
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-          <router-view></router-view>
-        </div>
-      </main>
-    </div>
+    <main class="container py-4">
+      <router-view></router-view>
+    </main>
   </div>
 </template>
 
-<script>
+<script setup>
 import { useRouter } from 'vue-router'
+import { onMounted } from 'vue'
 
-export default {
-  name: 'StudentDashboard',
-  setup() {
-    const router = useRouter()
+const router = useRouter()
 
-    const handleLogout = () => {
-      localStorage.removeItem('studentToken')
-      localStorage.removeItem('studentUser')
-      router.push('/student/login')
-    }
-
-    return {
-      handleLogout
-    }
-  }
+const handleLogout = () => {
+  localStorage.removeItem('studentToken')
+  localStorage.removeItem('studentUser')
+  router.push('/student/login')
 }
-</script> 
+
+onMounted(() => {
+  const token = localStorage.getItem('studentToken')
+  if (!token) {
+    router.push('/student/login')
+  }
+})
+</script>
+
+<style scoped>
+.nav-link.active {
+  color: var(--bs-primary) !important;
+  font-weight: 500;
+}
+
+.btn-link:hover {
+  opacity: 0.8;
+}
+</style> 
