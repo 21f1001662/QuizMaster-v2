@@ -218,6 +218,10 @@ const handleQuizUpdate = async (formData) => {
   }
 }
 
+const handleAddQuestion = () => {
+  handleCreateQuestion()
+}
+
 onMounted(() => {
   fetchQuiz()
   questionModal.value = new Modal(document.getElementById('questionModal'))
@@ -232,7 +236,9 @@ onMounted(() => {
           <i class="bi bi-arrow-left fs-4"></i>
         </button>
         <div>
-          <h2 class="mb-1">{{ quiz?.name }}</h2>
+          <div class="d-flex align-items-center mb-1">
+            <h2 class="mb-0">{{ quiz?.name }}</h2>
+          </div>
           <div class="d-flex align-items-center text-muted">
             <div class="me-3">
               <i class="bi bi-book me-1"></i>
@@ -249,12 +255,11 @@ onMounted(() => {
           </div>
         </div>
       </div>
-      <div>
-        <button class="btn btn-outline-primary me-2" @click="handleEditQuiz">
-          <i class="bi bi-pencil me-2"></i>Edit Quiz
-        </button>
-        <button class="btn btn-outline-danger" @click="handleDeleteQuiz">
-          <i class="bi bi-trash me-2"></i>Delete Quiz
+      <div class="d-flex align-items-center">
+        <i class="bi bi-pencil text-primary me-3 cursor-pointer hover-opacity" @click="handleEditQuiz"></i>
+        <i class="bi bi-trash text-danger me-3 cursor-pointer hover-opacity" @click="handleDeleteQuiz"></i>
+        <button class="btn btn-primary" @click="handleAddQuestion">
+          <i class="bi bi-plus-lg me-2"></i>Add Question
         </button>
       </div>
     </div>
@@ -448,5 +453,13 @@ onMounted(() => {
 
 .list-group-item:hover {
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.hover-opacity {
+  transition: opacity 0.2s ease;
+}
+
+.hover-opacity:hover {
+  opacity: 0.7;
 }
 </style> 
