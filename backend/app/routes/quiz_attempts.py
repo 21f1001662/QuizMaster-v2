@@ -1,9 +1,11 @@
 from flask import Blueprint, request, jsonify
 from app.models.quiz import Quiz, Question, Attempt, Response
 from app.models.user import User
+from app.models.subject import Chapter, Subject
 from app import db
 from datetime import datetime, timedelta
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from sqlalchemy import desc
 
 quiz_attempts = Blueprint('quiz_attempts', __name__)
 
@@ -173,14 +175,67 @@ def respond_to_question(attempt_id, question_id):
     
     return jsonify(response.to_dict())
 
-@quiz_attempts.route('/attempts/<int:attempt_id>', methods=['GET'])
+@quiz_attempts.route('/attempts', methods=['GET'])
 @jwt_required()
-def get_attempt_details(attempt_id):
+def get_attempt_details():
     user_id = int(get_jwt_identity())
     
-    # Get attempt and verify ownership
-    attempt = Attempt.query.get_or_404(attempt_id)
-    if attempt.user_id != user_id:
-        return jsonify({'error': 'Unauthorized'}), 403
+    # Get query parameters
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    sort_by = request.args.get('sort_by', 'created_at')
+    sort_order = request.args.get('sort_order', 'desc')
+    search = request.args.get('search', '')
     
-    return jsonify(attempt.to_dict()) 
+    # Base query with joins
+    query = Attempt.query.join(Quiz).join(Chapter).join(Subject).filter(Attempt.user_id == user_id)
+    
+    # Apply search filter if provided
+    if search:
+        query = query.filter(Quiz.name.ilike(f'%{search}%'))
+    
+    # Apply sorting
+    if sort_order == 'desc':
+        query = query.order_by(desc(getattr(Attempt, sort_by)))
+    else:
+        query = query.order_by(getattr(Attempt, sort_by))
+    
+    # Apply pagination
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    attempts = pagination.items
+    
+    # Prepare response with detailed attempt information
+    attempts_data = []
+    for attempt in attempts:
+        attempt_dict = attempt.to_dict()
+        # Add quiz details
+        attempt_dict['quiz'] = {
+            'id': attempt.quiz.id,
+            'name': attempt.quiz.name,
+            'date_of_quiz': attempt.quiz.date_of_quiz.isoformat(),
+            'duration': attempt.quiz.duration,
+            'total_questions': attempt.quiz.total_questions,
+            'total_score': attempt.quiz.total_score,
+            'chapter': {
+                'id': attempt.quiz.chapter.id,
+                'name': attempt.quiz.chapter.name,
+                'description': attempt.quiz.chapter.description,
+                'subject': {
+                    'id': attempt.quiz.chapter.subject.id,
+                    'name': attempt.quiz.chapter.subject.name,
+                    'description': attempt.quiz.chapter.subject.description
+                }
+            }
+        }
+        attempts_data.append(attempt_dict)
+    
+    # Prepare response
+    response = {
+        'attempts': attempts_data,
+        'page': page,
+        'per_page': per_page,
+        'total_pages': pagination.pages,
+        'total_items': pagination.total
+    }
+    
+    return jsonify(response) 
