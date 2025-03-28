@@ -344,6 +344,7 @@ def get_attempt_responses(attempt_id):
         'score': attempt.score,
         'started_at': attempt.started_at.isoformat(),
         'completed_at': attempt.completed_at.isoformat() if attempt.completed_at else None,
+        'quiz': attempt.quiz.to_dict(),  # Add quiz object using to_dict() method
         'responses': responses_data
     }
     
