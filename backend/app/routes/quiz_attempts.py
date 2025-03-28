@@ -348,4 +348,79 @@ def get_attempt_responses(attempt_id):
         'responses': responses_data
     }
     
+    return jsonify(response)
+
+@quiz_attempts.route('/stats', methods=['GET'])
+@jwt_required()
+def get_student_stats():
+    user_id = int(get_jwt_identity())
+    current_time = datetime.utcnow()
+    
+    # Get all attempts for the user
+    attempts = Attempt.query.filter_by(user_id=user_id).all()
+    
+    # Calculate total quizzes attempted
+    total_quizzes_attempted = len(attempts)
+    
+    # Calculate average score percentage
+    total_score = sum(attempt.score for attempt in attempts)
+    total_possible_score = sum(attempt.quiz.total_score for attempt in attempts)
+    average_score_percentage = (total_score / total_possible_score * 100) if total_possible_score > 0 else 0
+    
+    # Get upcoming quizzes (quizzes that haven't started yet)
+    upcoming_quizzes = Quiz.query.filter(
+        Quiz.date_of_quiz > current_time
+    ).order_by(Quiz.date_of_quiz).all()
+    
+    # Get recent performance (last 5 completed quizzes)
+    recent_attempts = Attempt.query.filter(
+        Attempt.user_id == user_id,
+        Attempt.status == 'completed'
+    ).order_by(Attempt.completed_at.desc()).limit(5).all()
+    
+    recent_performance = []
+    for attempt in recent_attempts:
+        score_percentage = (attempt.score / attempt.quiz.total_score * 100) if attempt.quiz.total_score > 0 else 0
+        recent_performance.append({
+            'quiz_name': attempt.quiz.name,
+            'date': attempt.completed_at.isoformat(),
+            'score_percentage': score_percentage
+        })
+    
+    # Calculate subject-wise performance
+    subject_performance = {}
+    for attempt in attempts:
+        if attempt.status == 'completed':
+            subject = attempt.quiz.chapter.subject
+            if subject.id not in subject_performance:
+                subject_performance[subject.id] = {
+                    'subject_name': subject.name,
+                    'total_score': 0,
+                    'total_possible_score': 0,
+                    'quizzes_taken': 0
+                }
+            
+            subject_performance[subject.id]['total_score'] += attempt.score
+            subject_performance[subject.id]['total_possible_score'] += attempt.quiz.total_score
+            subject_performance[subject.id]['quizzes_taken'] += 1
+    
+    # Convert subject performance to list and calculate percentages
+    subject_performance_list = []
+    for subject_id, data in subject_performance.items():
+        average_percentage = (data['total_score'] / data['total_possible_score'] * 100) if data['total_possible_score'] > 0 else 0
+        subject_performance_list.append({
+            'subject_name': data['subject_name'],
+            'average_percentage': average_percentage,
+            'quizzes_taken': data['quizzes_taken']
+        })
+    
+    # Prepare final response
+    response = {
+        'total_quizzes_attempted': total_quizzes_attempted,
+        'average_score_percentage': average_score_percentage,
+        'total_upcoming_quizzes': len(upcoming_quizzes),
+        'recent_performance': recent_performance,
+        'subject_performance': subject_performance_list
+    }
+    
     return jsonify(response) 
