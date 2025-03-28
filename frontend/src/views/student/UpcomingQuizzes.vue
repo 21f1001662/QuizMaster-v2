@@ -119,7 +119,7 @@ watch([searchQuery, selectedChapter, selectedSubject], () => {
 
 // Start quiz
 const startQuiz = (quizId) => {
-  router.push(`/quiz/${quizId}`)
+  router.push(`/student/dashboard/quizzes/${quizId}/attempt`)
 }
 
 // Format date

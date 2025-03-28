@@ -14,6 +14,7 @@ import StudentDashboard from '../views/student/Dashboard.vue'
 import UpcomingQuizzes from '../views/student/UpcomingQuizzes.vue'
 import CompletedQuizzes from '../views/student/CompletedQuizzes.vue'
 import StudentStats from '../views/student/Stats.vue'
+import QuizAttempt from '../views/student/QuizAttempt.vue'
 import { validateAdminToken, validateStudentToken } from '../utils/auth'
 
 const routes = [
@@ -165,6 +166,11 @@ const routes = [
         path: 'quizzes/completed',
         name: 'CompletedQuizzes',
         component: CompletedQuizzes
+      },
+      {
+        path: 'quizzes/:id/attempt',
+        name: 'QuizAttempt',
+        component: QuizAttempt
       },
       {
         path: 'stats',
