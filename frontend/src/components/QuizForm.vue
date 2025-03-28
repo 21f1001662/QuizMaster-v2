@@ -25,7 +25,7 @@ const loading = ref(false)
 
 const formData = ref({
   name: '',
-  description: '',
+  instructions: '',
   chapter_id: '',
   date_of_quiz: '',
   duration: 30
@@ -55,7 +55,7 @@ watch(() => props.quiz, (newQuiz) => {
   if (newQuiz) {
     formData.value = {
       name: newQuiz.name,
-      description: newQuiz.description || '',
+      instructions: newQuiz.instructions || '',
       chapter_id: newQuiz.chapter_id,
       date_of_quiz: newQuiz.date_of_quiz ? newQuiz.date_of_quiz.slice(0, 16) : '',
       duration: newQuiz.duration
@@ -73,7 +73,7 @@ watch(() => props.show, (newShow) => {
 const resetForm = () => {
   formData.value = {
     name: '',
-    description: '',
+    instructions: '',
     chapter_id: '',
     date_of_quiz: '',
     duration: 30
@@ -99,6 +99,7 @@ onMounted(() => {
     const formattedDate = props.quiz.date_of_quiz ? props.quiz.date_of_quiz.slice(0, 16) : ''
     formData.value = {
       ...props.quiz,
+      instructions: props.quiz.instructions || '',
       date_of_quiz: formattedDate
     }
   }
@@ -120,8 +121,8 @@ onMounted(() => {
               <input type="text" class="form-control" v-model="formData.name" required>
             </div>
             <div class="mb-3">
-              <label class="form-label">Description</label>
-              <textarea class="form-control" v-model="formData.description" rows="2"></textarea>
+              <label class="form-label">Instructions</label>
+              <textarea class="form-control" v-model="formData.instructions" rows="2"></textarea>
             </div>
             <div class="mb-3">
               <label class="form-label">Chapter <span class="text-danger">*</span></label>
