@@ -186,9 +186,26 @@ def get_attempt_details():
     sort_by = request.args.get('sort_by', 'created_at')
     sort_order = request.args.get('sort_order', 'desc')
     search = request.args.get('search', '')
+    quiz_id = request.args.get('quiz_id', type=int)
+    chapter_id = request.args.get('chapter_id', type=int)
+    attempt_id = request.args.get('attempt_id', type=int)
+    subject_id = request.args.get('subject_id', type=int)  # New subject_id filter
     
     # Base query with joins
     query = Attempt.query.join(Quiz).join(Chapter).join(Subject).filter(Attempt.user_id == user_id)
+    
+    # Apply filters if provided
+    if quiz_id:
+        query = query.filter(Attempt.quiz_id == quiz_id)
+    
+    if chapter_id:
+        query = query.filter(Quiz.chapter_id == chapter_id)
+    
+    if attempt_id:
+        query = query.filter(Attempt.id == attempt_id)
+    
+    if subject_id:
+        query = query.filter(Chapter.subject_id == subject_id)
     
     # Apply search filter if provided
     if search:
@@ -232,10 +249,12 @@ def get_attempt_details():
     # Prepare response
     response = {
         'attempts': attempts_data,
-        'page': page,
-        'per_page': per_page,
-        'total_pages': pagination.pages,
-        'total_items': pagination.total
+        'pagination': {
+            'page': page,
+            'per_page': per_page,
+            'total_pages': pagination.pages,
+            'total_items': pagination.total
+        }
     }
     
     return jsonify(response) 
