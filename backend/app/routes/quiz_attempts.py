@@ -23,6 +23,7 @@ def start_quiz(quiz_id):
     # Check if quiz is currently active
     current_time = datetime.utcnow()
     print(current_time)
+    print(quiz.date_of_quiz)
     if current_time < quiz.date_of_quiz:
         return jsonify({'error': 'Quiz has not started yet'}), 400
     

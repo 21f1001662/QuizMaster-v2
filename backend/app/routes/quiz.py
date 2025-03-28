@@ -5,7 +5,7 @@ from app.models.subject import Chapter
 from app import db
 from app.utils.helpers import admin_required
 from sqlalchemy import or_
-from datetime import datetime
+from datetime import datetime, timedelta
 
 quiz_bp = Blueprint('quiz', __name__)
 
@@ -344,4 +344,25 @@ def get_student_quizzes():
         'current_page': page,
         'sort_by': sort_by,
         'sort': sort
-    }), 200 
+    }), 200
+
+@quiz_bp.route('/student/questions/<int:question_id>', methods=['GET'])
+@jwt_required()
+def get_student_question(question_id):
+    question = Question.query.get_or_404(question_id)
+    
+    # Check if the question belongs to a quiz that is currently active
+    quiz = question.quiz
+    current_time = datetime.utcnow()
+    
+    if current_time < quiz.date_of_quiz:
+        return jsonify({'message': 'Quiz has not started yet'}), 403
+    
+    print(current_time)
+    print(quiz.date_of_quiz)
+    print(quiz.date_of_quiz + timedelta(minutes=quiz.duration))
+    
+    if current_time > (quiz.date_of_quiz + timedelta(minutes=quiz.duration)):
+        return jsonify({'message': 'Quiz has ended'}), 403
+    
+    return jsonify(question.to_dict_student()), 200 
