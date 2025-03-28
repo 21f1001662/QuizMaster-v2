@@ -358,9 +358,9 @@ def get_student_question(question_id):
     if current_time < quiz.date_of_quiz:
         return jsonify({'message': 'Quiz has not started yet'}), 403
     
-    print(current_time)
-    print(quiz.date_of_quiz)
-    print(quiz.date_of_quiz + timedelta(minutes=quiz.duration))
+    # print(current_time)
+    # print(quiz.date_of_quiz)
+    # print(quiz.date_of_quiz + timedelta(minutes=quiz.duration))
     
     if current_time > (quiz.date_of_quiz + timedelta(minutes=quiz.duration)):
         return jsonify({'message': 'Quiz has ended'}), 403
