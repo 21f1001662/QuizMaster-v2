@@ -257,4 +257,94 @@ def get_attempt_details():
         }
     }
     
+    return jsonify(response)
+
+@quiz_attempts.route('/attempts/<int:attempt_id>/responses', methods=['GET'])
+@jwt_required()
+def get_attempt_responses(attempt_id):
+    user_id = int(get_jwt_identity())
+    
+    # Get attempt and verify ownership
+    attempt = Attempt.query.get_or_404(attempt_id)
+    if attempt.user_id != user_id:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    # Get all responses for this attempt with their questions
+    responses = Response.query.filter_by(attempt_id=attempt_id).all()
+    
+    # Prepare detailed response data
+    responses_data = []
+    for response in responses:
+        question = response.question
+        response_dict = {
+            'id': response.id,
+            'is_attempted': response.is_attempted,
+            'is_correct': response.is_correct,
+            'created_at': response.created_at.isoformat(),
+            'updated_at': response.updated_at.isoformat(),
+            'question': {
+                'id': question.id,
+                'type': question.type,
+                'created_at': question.created_at.isoformat(),
+                'updated_at': question.updated_at.isoformat()
+            }
+        }
+        
+        # Add question details based on type
+        if question.type == 'mcq':
+            mcq_question = question.mcq_question
+            response_dict['question']['details'] = {
+                'id': mcq_question.id,
+                'question_text': mcq_question.question_text,
+                'correct_marks': mcq_question.correct_marks,
+                'incorrect_marks': mcq_question.incorrect_marks,
+                'options': [{
+                    'id': option.id,
+                    'text': option.text,
+                    'is_correct': option.is_correct
+                } for option in mcq_question.options]
+            }
+            
+            # Find selected option
+            selected_option = next(
+                (opt for opt in mcq_question.options if opt.id == response.mcq_question_answer),
+                None
+            )
+            
+            response_dict['answer'] = {
+                'option_id': response.mcq_question_answer,
+                'selected_option': {
+                    'id': selected_option.id,
+                    'text': selected_option.text,
+                    'is_correct': selected_option.is_correct
+                } if selected_option else None
+            }
+        else:  # numeric question
+            numeric_question = question.numeric_question
+            response_dict['question']['details'] = {
+                'id': numeric_question.id,
+                'question_text': numeric_question.question_text,
+                'answer_lower_bound': numeric_question.answer_lower_bound,
+                'answer_upper_bound': numeric_question.answer_upper_bound,
+                'correct_marks': numeric_question.correct_marks,
+                'incorrect_marks': numeric_question.incorrect_marks
+            }
+            response_dict['answer'] = {
+                'value': response.numeric_question_answer
+            }
+        
+        responses_data.append(response_dict)
+    
+    # Prepare final response
+    response = {
+        'attempt_id': attempt_id,
+        'quiz_id': attempt.quiz_id,
+        'user_id': attempt.user_id,
+        'status': attempt.status,
+        'score': attempt.score,
+        'started_at': attempt.started_at.isoformat(),
+        'completed_at': attempt.completed_at.isoformat() if attempt.completed_at else None,
+        'responses': responses_data
+    }
+    
     return jsonify(response) 
