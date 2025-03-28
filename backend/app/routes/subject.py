@@ -199,6 +199,8 @@ def update_chapter(chapter_id):
         chapter.name = data['name']
     if 'description' in data:
         chapter.description = data['description']
+    if 'subject_id' in data:
+        chapter.subject_id = data['subject_id']
     
     db.session.commit()
     return jsonify(chapter.to_dict()), 200
