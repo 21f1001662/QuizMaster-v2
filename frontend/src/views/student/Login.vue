@@ -37,6 +37,9 @@
                 {{ loading ? 'Signing in...' : 'Sign in' }}
               </button>
             </form>
+            <div class="text-center mt-3">
+              New user? <router-link to="/student/register">Register here</router-link>
+            </div>
           </div>
         </div>
       </div>

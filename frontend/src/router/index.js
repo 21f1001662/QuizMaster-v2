@@ -9,6 +9,7 @@ import Stats from '../views/admin/Stats.vue'
 import QuizBuild from '../views/admin/QuizBuild.vue'
 import Home from '../views/Home.vue'
 import StudentLogin from '../views/student/Login.vue'
+import StudentRegister from '../views/student/Register.vue'
 import StudentDashboard from '../views/student/Dashboard.vue'
 import UpcomingQuizzes from '../views/student/UpcomingQuizzes.vue'
 import CompletedQuizzes from '../views/student/CompletedQuizzes.vue'
@@ -100,6 +101,26 @@ const routes = [
     path: '/student/login',
     name: 'StudentLogin',
     component: StudentLogin,
+    beforeEnter: async (to, from, next) => {
+      const studentToken = localStorage.getItem('studentToken')
+      if (studentToken) {
+        const isValid = await validateStudentToken(studentToken)
+        if (isValid) {
+          next('/student/dashboard/quizzes')
+        } else {
+          localStorage.removeItem('studentToken')
+          localStorage.removeItem('studentUser')
+          next()
+        }
+      } else {
+        next()
+      }
+    }
+  },
+  {
+    path: '/student/register',
+    name: 'StudentRegister',
+    component: StudentRegister,
     beforeEnter: async (to, from, next) => {
       const studentToken = localStorage.getItem('studentToken')
       if (studentToken) {
