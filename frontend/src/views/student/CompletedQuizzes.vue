@@ -24,6 +24,11 @@ const totalPages = ref(1)
 const totalItems = ref(0)
 const perPage = ref(10)
 
+// Add new refs for responses popup
+const showResponsesPopup = ref(false)
+const selectedAttempt = ref(null)
+const responsesLoading = ref(false)
+
 // Fetch subjects for filter dropdown
 const fetchSubjects = async () => {
   try {
@@ -135,9 +140,33 @@ const formatDuration = (minutes) => {
   return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`
 }
 
-// View responses
-const viewResponses = (attemptId) => {
-  router.push(`/student/dashboard/quizzes/responses/${attemptId}`)
+// Update viewResponses function
+const viewResponses = async (attemptId) => {
+  try {
+    responsesLoading.value = true
+    const token = localStorage.getItem('studentToken')
+    const response = await axios.get(`http://localhost:5000/api/attempts/${attemptId}/responses`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    selectedAttempt.value = response.data
+    showResponsesPopup.value = true
+  } catch (err) {
+    toast.error('Failed to fetch responses')
+    console.error(err)
+  } finally {
+    responsesLoading.value = false
+  }
+}
+
+// Add helper functions for responses
+const getOptionLetter = (index) => {
+  return String.fromCharCode(65 + index)
+}
+
+const formatNumericAnswer = (value) => {
+  return Number(value).toFixed(2)
 }
 
 onMounted(() => {
@@ -288,6 +317,110 @@ onMounted(() => {
         </div>
       </div>
     </div>
+
+    <!-- Responses Popup -->
+    <div v-if="showResponsesPopup" class="modal-backdrop show" style="display: block;"></div>
+    <div v-if="showResponsesPopup" class="modal show" style="display: block;">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content responses-modal">
+          <div class="modal-header border-0">
+            <h5 class="modal-title">Quiz Responses</h5>
+            <button type="button" class="btn-close" @click="showResponsesPopup = false"></button>
+          </div>
+          
+          <div class="modal-body">
+            <!-- Loading State -->
+            <div v-if="responsesLoading" class="text-center py-5">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+
+            <!-- Responses Content -->
+            <div v-else>
+              <!-- Score Summary -->
+              <div class="score-summary mb-4">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div>
+                    <h6 class="mb-1">Final Score</h6>
+                    <div class="score-value">{{ selectedAttempt?.score }}</div>
+                  </div>
+                  <div class="text-end">
+                    <h6 class="mb-1">Completion Date</h6>
+                    <div class="text-muted">{{ formatDate(selectedAttempt?.completed_at) }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Questions List -->
+              <div class="questions-list">
+                <div v-for="(response, index) in selectedAttempt?.responses" :key="response.id" class="question-card mb-4">
+                  <div class="question-header d-flex align-items-center mb-3">
+                    <div class="question-number me-3">
+                      <span class="badge bg-primary">Q{{ index + 1 }}</span>
+                    </div>
+                    <div class="question-marks">
+                      <span class="badge" :class="{
+                        'bg-success': response.is_correct,
+                        'bg-danger': !response.is_correct
+                      }">
+                        {{ response.is_correct ? '+' + response.question.details.correct_marks : response.question.details.incorrect_marks }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="question-text mb-3">
+                    {{ response.question.details.question_text }}
+                  </div>
+
+                  <!-- MCQ Options -->
+                  <div v-if="response.question.type === 'mcq'" class="options-list">
+                    <div
+                      v-for="(option, optIndex) in response.question.details.options"
+                      :key="option.id"
+                      class="option-item"
+                      :class="{
+                        'selected': response.answer.option_id === option.id,
+                        'correct': option.is_correct,
+                        'incorrect': response.answer.option_id === option.id && !option.is_correct
+                      }"
+                    >
+                      <div class="option-circle">
+                        {{ getOptionLetter(optIndex) }}
+                      </div>
+                      <div class="option-text">{{ option.text }}</div>
+                      <div class="option-status ms-auto">
+                        <i v-if="option.is_correct" class="bi bi-check-circle-fill text-success"></i>
+                        <i v-else-if="response.answer.option_id === option.id" class="bi bi-x-circle-fill text-danger"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Numeric Answer -->
+                  <div v-else class="numeric-answer">
+                    <div class="answer-box">
+                      <div class="answer-label">Your Answer</div>
+                      <div class="answer-value">{{ formatNumericAnswer(response.answer.value) }}</div>
+                    </div>
+                    <div class="answer-range">
+                      <div class="range-label">Correct Range</div>
+                      <div class="range-value">
+                        {{ formatNumericAnswer(response.question.details.answer_lower_bound) }} - 
+                        {{ formatNumericAnswer(response.question.details.answer_upper_bound) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-secondary" @click="showResponsesPopup = false">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -383,5 +516,167 @@ onMounted(() => {
 .pagination .page-item.disabled .page-link {
   color: #6c757d;
   pointer-events: none;
+}
+
+.responses-modal {
+  border: none;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.modal-header {
+  padding: 1.5rem;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  padding: 1.5rem;
+}
+
+.score-summary {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 12px;
+}
+
+.score-value {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #198754;
+}
+
+.question-card {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.question-header {
+  display: flex;
+  align-items: center;
+}
+
+.question-number .badge {
+  font-size: 1rem;
+  padding: 0.5em 1em;
+}
+
+.question-marks .badge {
+  font-size: 1rem;
+  padding: 0.5em 1em;
+}
+
+.question-text {
+  font-size: 1.1rem;
+  color: #2c3e50;
+  line-height: 1.6;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.option-item.selected {
+  border-color: #0d6efd;
+  background: #e7f1ff;
+}
+
+.option-item.correct {
+  border-color: #198754;
+  background: #e8f5e9;
+}
+
+.option-item.incorrect {
+  border-color: #dc3545;
+  background: #fce8e8;
+}
+
+.option-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  font-weight: 500;
+}
+
+.option-item.selected .option-circle {
+  background: #0d6efd;
+  color: #fff;
+}
+
+.option-item.correct .option-circle {
+  background: #198754;
+  color: #fff;
+}
+
+.option-item.incorrect .option-circle {
+  background: #dc3545;
+  color: #fff;
+}
+
+.option-text {
+  flex: 1;
+}
+
+.option-status {
+  font-size: 1.2rem;
+}
+
+.numeric-answer {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.answer-box, .answer-range {
+  flex: 1;
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.answer-label, .range-label {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+}
+
+.answer-value {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.range-value {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #198754;
+}
+
+.btn-close {
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.btn-close:hover {
+  opacity: 1;
 }
 </style>
