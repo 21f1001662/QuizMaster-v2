@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useToast } from 'vue-toastification'
 import axios from 'axios'
 import debounce from 'lodash/debounce'
@@ -28,6 +28,42 @@ const perPage = ref(10)
 const showResponsesPopup = ref(false)
 const selectedAttempt = ref(null)
 const responsesLoading = ref(false)
+
+// Add computed properties for response summary
+const responseSummary = computed(() => {
+  if (!selectedAttempt.value?.responses) return null
+
+  const responses = selectedAttempt.value.responses
+  const total = responses.length
+  const correct = responses.filter(r => r.is_correct).length
+  const incorrect = responses.filter(r => !r.is_correct && r.is_attempted).length
+  const notAttempted = responses.filter(r => !r.is_attempted).length
+
+  const correctMarks = responses.reduce((sum, r) => sum + (r.is_correct ? r.question.details.correct_marks : 0), 0)
+  const incorrectMarks = responses.reduce((sum, r) => sum + (!r.is_correct && r.is_attempted ? r.question.details.incorrect_marks : 0), 0)
+
+  return {
+    total,
+    correct,
+    incorrect,
+    notAttempted,
+    correctMarks,
+    incorrectMarks
+  }
+})
+
+// Add computed property for score percentage
+const scorePercentage = computed(() => {
+  if (!selectedAttempt.value) return 0
+  return (selectedAttempt.value.score / selectedAttempt.value.quiz.total_score) * 100
+})
+
+// Add computed property for score color
+const scoreColor = computed(() => {
+  if (scorePercentage.value < 35) return '#dc3545' // red
+  if (scorePercentage.value < 70) return '#ffc107' // yellow
+  return '#198754' // green
+})
 
 // Fetch subjects for filter dropdown
 const fetchSubjects = async () => {
@@ -343,7 +379,9 @@ onMounted(() => {
                 <div class="d-flex align-items-center justify-content-between">
                   <div>
                     <h6 class="mb-1">Final Score</h6>
-                    <div class="score-value">{{ selectedAttempt?.score }}</div>
+                    <div class="score-value" :style="{ color: scoreColor }">
+                      {{ selectedAttempt?.score }} / {{ selectedAttempt?.quiz.total_score }}
+                    </div>
                   </div>
                   <div class="text-end">
                     <h6 class="mb-1">Completion Date</h6>
@@ -352,24 +390,74 @@ onMounted(() => {
                 </div>
               </div>
 
+              <!-- Response Summary -->
+              <div class="response-summary mb-4">
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <div class="summary-card correct">
+                      <div class="summary-icon">✅</div>
+                      <div class="summary-content">
+                        <div class="summary-label">Correct</div>
+                        <div class="summary-value">{{ responseSummary?.correct }}/{{ responseSummary?.total }}</div>
+                        <div class="summary-marks">+{{ responseSummary?.correctMarks }} marks</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="summary-card incorrect">
+                      <div class="summary-icon">❌</div>
+                      <div class="summary-content">
+                        <div class="summary-label">Incorrect</div>
+                        <div class="summary-value">{{ responseSummary?.incorrect }}/{{ responseSummary?.total }}</div>
+                        <div class="summary-marks">{{ responseSummary?.incorrectMarks }} marks</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="summary-card not-attempted">
+                      <div class="summary-icon">⏭️</div>
+                      <div class="summary-content">
+                        <div class="summary-label">Not Attempted</div>
+                        <div class="summary-value">{{ responseSummary?.notAttempted }}/{{ responseSummary?.total }}</div>
+                        <div class="summary-marks">0 marks</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <!-- Questions List -->
               <div class="questions-list">
                 <div v-for="(response, index) in selectedAttempt?.responses" :key="response.id" class="question-card mb-4">
-                  <div class="question-header d-flex align-items-center mb-3">
-                    <div class="question-number me-3">
-                      <span class="badge bg-primary">Q{{ index + 1 }}</span>
-                    </div>
-                    <div class="question-marks">
-                      <span class="badge" :class="{
-                        'bg-success': response.is_correct,
-                        'bg-danger': !response.is_correct
-                      }">
-                        {{ response.is_correct ? '+' + response.question.details.correct_marks : response.question.details.incorrect_marks }}
-                      </span>
+                  <!-- Question Status Badge -->
+                  <div class="question-status" :class="{
+                    'correct': response.is_correct,
+                    'incorrect': !response.is_correct && response.is_attempted,
+                    'not-attempted': !response.is_attempted
+                  }">
+                    <i :class="{
+                      'bi bi-check-circle-fill': response.is_correct,
+                      'bi bi-x-circle-fill': !response.is_correct && response.is_attempted,
+                      'bi bi-dash-circle-fill': !response.is_attempted
+                    }"></i>
+                    {{ response.is_correct ? 'Correct' : (!response.is_attempted ? 'Not Attempted' : 'Incorrect') }}
+                  </div>
+
+                  <!-- Question Header -->
+                  <div class="question-header">
+                    <div class="question-number">Question {{ index + 1 }}</div>
+                    <div class="question-marks" :class="{
+                      'correct': response.is_correct,
+                      'incorrect': !response.is_correct && response.is_attempted,
+                      'not-attempted': !response.is_attempted
+                    }">
+                      {{ response.is_correct ? '+' + response.question.details.correct_marks : 
+                         (!response.is_attempted ? '0' : response.question.details.incorrect_marks) }} marks
                     </div>
                   </div>
 
-                  <div class="question-text mb-3">
+                  <!-- Question Text -->
+                  <div class="question-text">
                     {{ response.question.details.question_text }}
                   </div>
 
@@ -545,7 +633,7 @@ onMounted(() => {
 .score-value {
   font-size: 2rem;
   font-weight: 600;
-  color: #198754;
+  transition: color 0.3s ease;
 }
 
 .question-card {
@@ -553,27 +641,81 @@ onMounted(() => {
   border: 1px solid #dee2e6;
   border-radius: 12px;
   padding: 1.5rem;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.question-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.question-status {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.question-status.correct {
+  background: #e8f5e9;
+  color: #198754;
+}
+
+.question-status.incorrect {
+  background: #fce8e8;
+  color: #dc3545;
+}
+
+.question-status.not-attempted {
+  background: #e9ecef;
+  color: #6c757d;
 }
 
 .question-header {
   display: flex;
   align-items: center;
+  margin-bottom: 1.5rem;
+  padding-right: 120px;
 }
 
-.question-number .badge {
-  font-size: 1rem;
-  padding: 0.5em 1em;
+.question-number {
+  background: #f8f9fa;
+  color: #6c757d;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  margin-right: 1rem;
 }
 
-.question-marks .badge {
-  font-size: 1rem;
-  padding: 0.5em 1em;
+.question-marks {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.question-marks.correct {
+  color: #198754;
+}
+
+.question-marks.incorrect {
+  color: #dc3545;
+}
+
+.question-marks.not-attempted {
+  color: #6c757d;
 }
 
 .question-text {
   font-size: 1.1rem;
   color: #2c3e50;
   line-height: 1.6;
+  margin-bottom: 1.5rem;
 }
 
 .options-list {
@@ -678,5 +820,117 @@ onMounted(() => {
 
 .btn-close:hover {
   opacity: 1;
+}
+
+.response-summary {
+  margin-top: 1.5rem;
+}
+
+.summary-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.summary-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 70%;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  transition: all 0.3s ease;
+}
+
+.summary-card:hover::before {
+  width: 6px;
+  height: 85%;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.summary-card.correct::before {
+  background: #198754;
+}
+
+.summary-card.incorrect::before {
+  background: #dc3545;
+}
+
+.summary-card.not-attempted::before {
+  background: #6c757d;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.summary-icon {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #f8f9fa;
+}
+
+.summary-card.correct .summary-icon {
+  background: #e8f5e9;
+}
+
+.summary-card.incorrect .summary-icon {
+  background: #fce8e8;
+}
+
+.summary-card.not-attempted .summary-icon {
+  background: #e9ecef;
+}
+
+.summary-content {
+  flex: 1;
+}
+
+.summary-label {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-bottom: 0.25rem;
+}
+
+.summary-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.25rem;
+}
+
+.summary-marks {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.summary-card.correct .summary-marks {
+  color: #198754;
+}
+
+.summary-card.incorrect .summary-marks {
+  color: #dc3545;
+}
+
+.summary-card.not-attempted .summary-marks {
+  color: #6c757d;
 }
 </style>
