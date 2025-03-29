@@ -7,6 +7,10 @@ from app.utils.helpers import admin_required
 from app.utils.generative_ai import generate_mcq_question, generate_numeric_question
 from sqlalchemy import or_
 from datetime import datetime, timedelta
+from app.utils.cache import (
+    cache_get, cache_set, clear_quizzes_cache, clear_question_cache,
+    get_quizzes_cache_key, get_question_cache_key
+)
 
 quiz_bp = Blueprint('quiz', __name__)
 
@@ -38,6 +42,9 @@ def create_quiz():
     
     db.session.add(quiz)
     db.session.commit()
+    
+    # Clear student quizzes cache
+    clear_quizzes_cache()
     
     # Trigger notification task
     from app.tasks import notify_users_new_quiz
@@ -138,6 +145,10 @@ def update_quiz(quiz_id):
         quiz.instructions = data['instructions']
     
     db.session.commit()
+    
+    # Clear student quizzes cache
+    clear_quizzes_cache()
+    
     return jsonify(quiz.to_dict()), 200
 
 @quiz_bp.route('/quizzes/<int:quiz_id>', methods=['DELETE'])
@@ -158,6 +169,9 @@ def delete_quiz(quiz_id):
     # Delete the quiz (this will cascade delete questions, options, etc.)
     db.session.delete(quiz)
     db.session.commit()
+    
+    # Clear student quizzes cache
+    clear_quizzes_cache()
     
     return jsonify({'message': 'Quiz and all associated data deleted successfully'}), 200
 
@@ -225,6 +239,9 @@ def create_question(quiz_id):
     quiz.total_score += data['correct_marks']  # Add correct marks to total score
     db.session.commit()
     
+    # Clear student quizzes cache since total_questions changed
+    clear_quizzes_cache()
+    
     return jsonify(question.to_dict()), 201
 
 @quiz_bp.route('/quizzes/<int:quiz_id>/questions/<int:question_id>', methods=['PUT'])
@@ -279,6 +296,11 @@ def update_question(quiz_id, question_id):
         quiz.total_score = quiz.total_score - old_correct_marks + data['correct_marks']
     
     db.session.commit()
+    
+    # Clear both question and quizzes cache
+    clear_question_cache(question_id)
+    clear_quizzes_cache()
+    
     return jsonify(question.to_dict()), 200
 
 @quiz_bp.route('/quizzes/<int:quiz_id>/questions/<int:question_id>', methods=['DELETE'])
@@ -303,6 +325,10 @@ def delete_question(quiz_id, question_id):
     db.session.delete(question)
     db.session.commit()
     
+    # Clear both question and quizzes cache
+    clear_question_cache(question_id)
+    clear_quizzes_cache()
+    
     return jsonify({'message': 'Question deleted successfully'}), 200
 
 @quiz_bp.route('/student/quizzes', methods=['GET'])
@@ -311,7 +337,7 @@ def get_student_quizzes():
     # Get query parameters with defaults
     quiz_id = request.args.get('quiz_id', type=int)
     chapter_id = request.args.get('chapter_id', type=int)
-    subject_id = request.args.get('subject_id', type=int)  # Add subject_id parameter
+    subject_id = request.args.get('subject_id', type=int)
     name = request.args.get('name', type=str)
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
@@ -319,6 +345,12 @@ def get_student_quizzes():
     date_ub = request.args.get('date_ub', type=str)
     sort_by = request.args.get('sort_by', 'date_of_quiz')  # Default sort by date
     sort = request.args.get('sort', 'asc').lower()  # Default ascending order
+    
+    # Try to get from cache
+    cache_key = get_quizzes_cache_key(page, per_page, sort_by, sort, date_lb, date_ub, chapter_id, subject_id, name)
+    cached_data = cache_get(cache_key)
+    if cached_data:
+        return jsonify(cached_data), 200
     
     # Validate sort_by parameter
     valid_sort_fields = ['date_of_quiz', 'name', 'duration', 'total_questions']
@@ -368,18 +400,30 @@ def get_student_quizzes():
     # Apply pagination
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     
-    return jsonify({
+    # Prepare response data
+    response_data = {
         'quizzes': [quiz.to_dict_student() for quiz in pagination.items],
         'total': pagination.total,
         'pages': pagination.pages,
         'current_page': page,
         'sort_by': sort_by,
         'sort': sort
-    }), 200
+    }
+    
+    # Store in cache
+    cache_set(cache_key, response_data)
+    
+    return jsonify(response_data), 200
 
 @quiz_bp.route('/student/questions/<int:question_id>', methods=['GET'])
 @jwt_required()
 def get_student_question(question_id):
+    # Try to get from cache
+    cache_key = get_question_cache_key(question_id)
+    cached_data = cache_get(cache_key)
+    if cached_data:
+        return jsonify(cached_data), 200
+    
     question = Question.query.get_or_404(question_id)
     
     # Check if the quiz has started
@@ -392,7 +436,13 @@ def get_student_question(question_id):
     if current_time > (quiz.date_of_quiz + timedelta(minutes=quiz.duration)):
         return jsonify({'message': 'Quiz has ended'}), 403
     
-    return jsonify(question.to_dict_student()), 200
+    # Prepare response data
+    response_data = question.to_dict_student()
+    
+    # Store in cache with a shorter timeout (1 minute) since this is time-sensitive
+    cache_set(cache_key, response_data, timeout=60)
+    
+    return jsonify(response_data), 200
 
 @quiz_bp.route('/quizzes/<int:quiz_id>/ai/generate', methods=['POST'])
 @jwt_required()
@@ -492,6 +542,9 @@ def generate_ai_questions(quiz_id):
     quiz.total_questions += len(generated_questions)
     quiz.total_score += len(generated_questions) * data['correct_marks']
     db.session.commit()
+    
+    # Clear student quizzes cache since total_questions changed
+    clear_quizzes_cache()
     
     return jsonify({
         'message': f'Successfully generated {len(generated_questions)} questions',

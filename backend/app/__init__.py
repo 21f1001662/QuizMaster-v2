@@ -25,6 +25,11 @@ def create_app():
     app.config['JWT_SECRET_KEY'] = os.getenv('SECRET_KEY')
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=24)  # Set token expiry to 24 hours
     
+    # Redis configuration
+    app.config['REDIS_HOST'] = os.getenv('REDIS_HOST', 'localhost')
+    app.config['REDIS_PORT'] = int(os.getenv('REDIS_PORT', 6379))
+    app.config['REDIS_DB'] = int(os.getenv('REDIS_DB', 0))
+    
     # Initialize extensions with app
     db.init_app(app)
     jwt.init_app(app)

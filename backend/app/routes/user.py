@@ -5,6 +5,7 @@ from app import db
 from app.utils.helpers import admin_required
 from datetime import datetime
 from sqlalchemy import or_
+from app.utils.cache import cache_get, cache_set, clear_profile_cache, get_profile_cache_key
 
 user_bp = Blueprint('user', __name__)
 
@@ -12,8 +13,21 @@ user_bp = Blueprint('user', __name__)
 @jwt_required()
 def get_profile():
     current_user_id = int(get_jwt_identity())
+    
+    # Try to get from cache
+    cache_key = get_profile_cache_key(current_user_id)
+    cached_data = cache_get(cache_key)
+    if cached_data:
+        return jsonify(cached_data), 200
+    
+    # If not in cache, get from database
     user = User.query.get_or_404(current_user_id)
-    return jsonify(user.to_dict()), 200
+    user_data = user.to_dict()
+    
+    # Store in cache
+    cache_set(cache_key, user_data)
+    
+    return jsonify(user_data), 200
 
 @user_bp.route('/profile', methods=['PUT'])
 @jwt_required()
@@ -34,6 +48,10 @@ def update_profile():
         user.qualification = data['qualification']
     
     db.session.commit()
+    
+    # Clear user's profile cache
+    clear_profile_cache(current_user_id)
+    
     return jsonify(user.to_dict()), 200
 
 @user_bp.route('/users', methods=['GET'])
