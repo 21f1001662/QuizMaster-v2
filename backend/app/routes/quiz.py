@@ -364,7 +364,7 @@ def get_student_question(question_id):
     
     # Check if the question belongs to a quiz that is currently active
     quiz = question.quiz
-    current_time = datetime.utcnow()
+    current_time = datetime.now()
     
     if current_time < quiz.date_of_quiz:
         return jsonify({'message': 'Quiz has not started yet'}), 403

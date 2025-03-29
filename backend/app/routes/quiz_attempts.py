@@ -22,15 +22,20 @@ def start_quiz(quiz_id):
     if existing_attempt:
         return jsonify({'error': 'You have already attempted this quiz'}), 400
     
-    # Check if quiz is currently active
-    current_time = datetime.utcnow()
-    print(current_time)
-    print(quiz.date_of_quiz)
-    if current_time < quiz.date_of_quiz:
-        return jsonify({'error': 'Quiz has not started yet'}), 400
+    # Check if quiz is currently active using local time
+    current_time = datetime.now()  # This will use local time
+    quiz_start_time = quiz.date_of_quiz
+    quiz_end_time = quiz.date_of_quiz + timedelta(minutes=quiz.duration)
     
-    if current_time > quiz.date_of_quiz + timedelta(minutes=quiz.duration):
-        return jsonify({'error': 'Quiz has ended'}), 400
+    if current_time < quiz_start_time:
+        return jsonify({
+            'error': 'Quiz has not started yet'
+        }), 400
+    
+    if current_time > quiz_end_time:
+        return jsonify({
+            'error': 'Quiz has ended'
+        }), 400
     
     # Create new attempt
     attempt = Attempt(
@@ -71,7 +76,7 @@ def submit_quiz(attempt_id):
     
     # Check if time limit exceeded
     quiz = attempt.quiz
-    if datetime.utcnow() > quiz.date_of_quiz + timedelta(minutes=quiz.duration):
+    if datetime.now() > quiz.date_of_quiz + timedelta(minutes=quiz.duration):
         return jsonify({'error': 'Time limit exceeded'}), 400
     
     # Process all questions and calculate score
@@ -118,7 +123,7 @@ def submit_quiz(attempt_id):
     # Update attempt status and score
     attempt.status = 'completed'
     attempt.score = total_score
-    attempt.completed_at = datetime.utcnow()
+    attempt.completed_at = datetime.now()
     
     db.session.commit()
     return jsonify(attempt.to_dict())
@@ -139,7 +144,7 @@ def respond_to_question(attempt_id, question_id):
     
     # Check if quiz time is still valid
     quiz = attempt.quiz
-    current_time = datetime.utcnow()
+    current_time = datetime.now()
     if current_time > quiz.date_of_quiz + timedelta(minutes=quiz.duration):
         attempt.status = 'completed'  # Auto-complete if time exceeded
         attempt.completed_at = current_time
@@ -354,7 +359,7 @@ def get_attempt_responses(attempt_id):
 @jwt_required()
 def get_student_stats():
     user_id = int(get_jwt_identity())
-    current_time = datetime.utcnow()
+    current_time = datetime.now()
     
     # Get all attempts for the user
     attempts = Attempt.query.filter_by(user_id=user_id).all()
