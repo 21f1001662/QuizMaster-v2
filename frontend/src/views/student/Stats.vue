@@ -46,10 +46,15 @@ const subjectChartOptions = {
   plugins: {
     legend: {
       position: 'top',
+      align: 'center',
+      labels: {
+        boxWidth: 12,
+        usePointStyle: true,
+        pointStyle: 'rectRounded'
+      }
     },
     title: {
-      display: true,
-      text: 'Subject-wise Performance'
+      display: false
     }
   },
   scales: {
@@ -60,6 +65,14 @@ const subjectChartOptions = {
         callback: function(value) {
           return value + '%'
         }
+      },
+      grid: {
+        display: true
+      }
+    },
+    x: {
+      grid: {
+        display: true
       }
     }
   }
@@ -195,16 +208,21 @@ onMounted(() => {
     <!-- Subject Performance -->
     <div class="row mb-4">
       <div class="col-md-8">
-        <div class="chart-card">
-          <Bar 
-            v-if="!loading" 
-            :data="subjectChartData" 
-            :options="subjectChartOptions"
-            :height="300"
-          />
-          <div v-else class="d-flex align-items-center justify-content-center h-100">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Loading...</span>
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title mb-4">Subject-wise Performance</h5>
+            <div class="chart-container">
+              <Bar 
+                v-if="!loading" 
+                :data="subjectChartData" 
+                :options="subjectChartOptions"
+                :height="300"
+              />
+              <div v-else class="d-flex align-items-center justify-content-center h-100">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
