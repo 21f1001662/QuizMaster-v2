@@ -432,7 +432,7 @@ def get_student_stats():
     
     return jsonify(response)
 
-@quiz_attempts.route('/quizzes/<int:quiz_id>/report/csv', methods=['GET'])
+@quiz_attempts.route('/quizzes/<int:quiz_id>/report/csv', methods=['POST'])
 @jwt_required()
 def get_quiz_attempt_csv(quiz_id):
     user_id = get_jwt_identity()
