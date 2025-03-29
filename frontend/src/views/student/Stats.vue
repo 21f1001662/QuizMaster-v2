@@ -15,21 +15,15 @@ const stats = ref(null)
 const subjectChartData = ref({
   labels: [],
   datasets: [{
-    label: 'Average Score (%)',
-    data: [],
+    label: 'Average Percentage',
     backgroundColor: [
-      '#0d6efd', // Primary Blue
-      '#198754', // Success Green
-      '#ffc107', // Warning Yellow
-      '#dc3545', // Danger Red
-      '#6f42c1', // Purple
-      '#0dcaf0', // Info Blue
-      '#fd7e14', // Orange
-      '#20c997', // Teal
-      '#e83e8c', // Pink
-      '#6610f2'  // Indigo
+      'rgba(54, 162, 235, 0.6)',
+      'rgba(255, 99, 132, 0.6)',
+      'rgba(75, 192, 192, 0.6)',
+      'rgba(255, 206, 86, 0.6)',
+      'rgba(153, 102, 255, 0.6)'
     ],
-    borderRadius: 6
+    data: []
   }]
 })
 
@@ -51,20 +45,21 @@ const subjectChartOptions = {
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      display: false
+      position: 'top',
+    },
+    title: {
+      display: true,
+      text: 'Subject-wise Performance'
     }
   },
   scales: {
     y: {
       beginAtZero: true,
       max: 100,
-      grid: {
-        display: false
-      }
-    },
-    x: {
-      grid: {
-        display: false
+      ticks: {
+        callback: function(value) {
+          return value + '%'
+        }
       }
     }
   }
@@ -130,55 +125,68 @@ onMounted(() => {
 
 <template>
   <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2>Performance Statistics</h2>
-      <div class="d-flex gap-3">
-        <div class="text-center">
-          <div class="h4 mb-0">{{ stats?.total_quizzes_attempted || 0 }}</div>
-          <div class="text-muted small">Quizzes Attempted</div>
-        </div>
-        <div class="text-center">
-          <div class="h4 mb-0">{{ stats?.total_upcoming_quizzes || 0 }}</div>
-          <div class="text-muted small">Upcoming Quizzes</div>
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-icon bg-primary">
+            <i class="bi bi-pencil-square"></i>
+          </div>
+          <div class="stat-details">
+            <h3>{{ stats?.total_quizzes_attempted || 0 }}</h3>
+            <p>Quizzes Attempted</p>
+          </div>
         </div>
       </div>
-    </div>
-
-    <!-- Overall Performance -->
-    <div class="card mb-4">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="flex-grow-1">
-            <h6 class="text-muted mb-1">Overall Performance</h6>
-            <div class="h3 mb-0">{{ (stats?.average_score_percentage || 0).toFixed(2) }}%</div>
+      
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-icon bg-info">
+            <i class="bi bi-calendar-event"></i>
           </div>
-          <div class="progress-circle" :style="{ 
-            '--progress': `${(stats?.average_score_percentage || 0).toFixed(2)}%`,
-            '--color': stats?.average_score_percentage >= 70 ? '#198754' : 
-                      stats?.average_score_percentage >= 35 ? '#ffc107' : '#dc3545'
-          }">
-            <svg viewBox="0 0 36 36">
-              <path d="M18 2.0845
-                a 15.9155 15.9155 0 0 1 0 31.831
-                a 15.9155 15.9155 0 0 1 0 -31.831"
-                fill="none"
-                stroke="#e9ecef"
-                stroke-width="3"
-              />
-              <path d="M18 2.0845
-                a 15.9155 15.9155 0 0 1 0 31.831
-                a 15.9155 15.9155 0 0 1 0 -31.831"
-                fill="none"
-                stroke="var(--color)"
-                stroke-width="3"
-                :stroke-dasharray="`${(stats?.average_score_percentage || 0).toFixed(2)}, 100`"
-                stroke-dashoffset="0"
-              />
-            </svg>
-            <div class="progress-emoji">
-              {{ stats?.average_score_percentage >= 70 ? '🎉' : 
-                 stats?.average_score_percentage >= 35 ? '👍' : '😢' }}
+          <div class="stat-details">
+            <h3>{{ stats?.total_upcoming_quizzes || 0 }}</h3>
+            <p>Upcoming Quizzes</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <div class="progress-circle" :style="{ 
+              '--progress': `${(stats?.average_score_percentage || 0).toFixed(1)}%`,
+              '--color': stats?.average_score_percentage >= 70 ? '#198754' : 
+                        stats?.average_score_percentage >= 35 ? '#f9c924' : '#dc3545'
+            }">
+              <svg viewBox="0 0 36 36">
+                <path 
+                  d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#e9ecef"
+                  stroke-width="3"
+                />
+                <path 
+                  d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="var(--color)"
+                  stroke-width="3"
+                  :stroke-dasharray="`${stats?.average_score_percentage || 0}, 100`"
+                />
+              </svg>
+              <div class="progress-emoji">
+                {{ stats?.average_score_percentage >= 70 ? '🎉' : 
+                   stats?.average_score_percentage >= 35 ? '👍' : '😢' }}
+              </div>
             </div>
+          </div>
+          <div class="stat-details">
+            <h3>{{ (stats?.average_score_percentage || 0).toFixed(1) }}%</h3>
+            <p>Overall Performance</p>
           </div>
         </div>
       </div>
@@ -187,16 +195,16 @@ onMounted(() => {
     <!-- Subject Performance -->
     <div class="row mb-4">
       <div class="col-md-8">
-        <div class="card h-100">
-          <div class="card-body">
-            <h5 class="card-title mb-4">Subject-wise Performance</h5>
-            <div class="chart-container" style="height: 300px;">
-              <Bar v-if="!loading" :data="subjectChartData" :options="subjectChartOptions" />
-              <div v-else class="d-flex align-items-center justify-content-center h-100">
-                <div class="spinner-border text-primary" role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
-              </div>
+        <div class="chart-card">
+          <Bar 
+            v-if="!loading" 
+            :data="subjectChartData" 
+            :options="subjectChartOptions"
+            :height="300"
+          />
+          <div v-else class="d-flex align-items-center justify-content-center h-100">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
             </div>
           </div>
         </div>
@@ -329,8 +337,8 @@ onMounted(() => {
 
 .progress-circle {
   position: relative;
-  width: 100px;
-  height: 100px;
+  width: 48px;
+  height: 48px;
 }
 
 .progress-circle svg {
@@ -347,8 +355,17 @@ onMounted(() => {
   stroke-linecap: round;
 }
 
-.progress-text {
-  display: none;
+.progress-emoji {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.stat-icon .progress-circle {
+  margin: 0;
 }
 
 .chart-container {
@@ -357,12 +374,45 @@ onMounted(() => {
   height: 300px;
 }
 
-.progress-emoji {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 2rem;
-  z-index: 1;
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-icon i {
+  font-size: 1.5rem;
+  color: white;
+}
+
+.stat-details h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.stat-details p {
+  color: #6c757d;
+  margin: 0;
+  font-size: 0.9rem;
 }
 </style>
