@@ -19,20 +19,27 @@ const isEditMode = ref(false)
 const router = useRouter()
 
 const columns = [
-  { key: 'name', label: 'Name' },
+  { 
+    key: 'name', 
+    label: 'Name',
+    icon: 'bi bi-journal-text'
+  },
   { 
     key: 'chapter', 
     label: 'Subject',
+    icon: 'bi bi-book',
     formatter: (item) => item.chapter?.subject?.name || '-'
   },
   { 
     key: 'chapter', 
     label: 'Chapter',
+    icon: 'bi bi-bookmark',
     formatter: (item) => item.chapter?.name || '-'
   },
   { 
     key: 'date_of_quiz', 
     label: 'Date',
+    icon: 'bi bi-calendar3',
     formatter: (item) => {
       if (!item.date_of_quiz) return '-'
       const date = new Date(item.date_of_quiz)
@@ -46,11 +53,22 @@ const columns = [
       })
     }
   },
-  { key: 'duration', label: 'Duration (mins)' },
-  { key: 'total_questions', label: 'Questions' },
+  { 
+    key: 'duration', 
+    label: 'Duration',
+    icon: 'bi bi-clock',
+    formatter: (item) => `${item.duration} mins`
+  },
+  { 
+    key: 'total_questions', 
+    label: 'Questions',
+    icon: 'bi bi-question-circle',
+    formatter: (item) => item.total_questions || '0'
+  },
   { 
     key: 'created_at', 
     label: 'Created At',
+    icon: 'bi bi-calendar-check',
     formatter: (item) => {
       if (!item.created_at) return '-'
       const date = new Date(item.created_at)

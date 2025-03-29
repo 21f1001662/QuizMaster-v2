@@ -17,11 +17,20 @@ const selectedSubject = ref(null)
 const isEditMode = ref(false)
 
 const columns = [
-  { key: 'name', label: 'Name' },
-  { key: 'description', label: 'Description' },
+  { 
+    key: 'name', 
+    label: 'Name',
+    icon: 'bi bi-book'
+  },
+  { 
+    key: 'description', 
+    label: 'Description',
+    icon: 'bi bi-text-paragraph'
+  },
   { 
     key: 'created_at', 
     label: 'Created At',
+    icon: 'bi bi-calendar-check',
     formatter: (item) => {
       if (!item.created_at) return '-'
       const date = new Date(item.created_at)

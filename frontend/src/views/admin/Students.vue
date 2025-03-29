@@ -15,16 +15,26 @@ const totalPages = ref(1)
 const searchTimeout = ref(null)
 
 const columns = [
-  { key: 'full_name', label: 'Name' },
-  { key: 'username', label: 'Username' },
+  { 
+    key: 'full_name', 
+    label: 'Name',
+    icon: 'bi bi-person'
+  },
+  { 
+    key: 'username', 
+    label: 'Username',
+    icon: 'bi bi-person-circle'
+  },
   { 
     key: 'qualification', 
     label: 'Qualification',
+    icon: 'bi bi-mortarboard',
     formatter: (item) => item.qualification || '-'
   },
   { 
     key: 'dob', 
     label: 'Date of Birth',
+    icon: 'bi bi-calendar-heart',
     formatter: (item) => {
       if (!item.dob) return '-'
       const date = new Date(item.dob)
@@ -38,6 +48,7 @@ const columns = [
   { 
     key: 'created_at', 
     label: 'Registered On',
+    icon: 'bi bi-calendar-check',
     formatter: (item) => {
       if (!item.created_at) return '-'
       const date = new Date(item.created_at)

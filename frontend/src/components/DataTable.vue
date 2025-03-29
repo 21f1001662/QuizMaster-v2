@@ -94,7 +94,12 @@ const getCellValue = (item, column) => {
           <table class="table table-hover">
             <thead>
               <tr>
-                <th v-for="col in columns" :key="col.key">{{ col.label }}</th>
+                <th v-for="col in columns" :key="col.key" :class="{ 'fw-bold': col.key === 'name' }">
+                  <div class="d-flex align-items-center">
+                    <i v-if="col.icon" :class="col.icon" class="me-2"></i>
+                    {{ col.label }}
+                  </div>
+                </th>
                 <th v-if="showActions">Actions</th>
               </tr>
             </thead>
@@ -141,6 +146,25 @@ const getCellValue = (item, column) => {
 .table th {
   background-color: #f8f9fa;
   border-bottom: 2px solid #dee2e6;
+  font-weight: bold;
+  color: #6c757d;
+}
+
+.table th.fw-bold {
+  font-weight: bold !important;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+.card {
+  border: none;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.card-body {
+  padding: 1.5rem;
 }
 
 .page-link {
@@ -158,5 +182,19 @@ const getCellValue = (item, column) => {
 
 .cursor-pointer:hover {
   background-color: rgba(0, 0, 0, 0.02);
+}
+
+.input-group-text {
+  background-color: #f8f9fa;
+  border-right: none;
+}
+
+.input-group .form-control {
+  border-left: none;
+}
+
+.input-group .form-control:focus {
+  border-color: #dee2e6;
+  box-shadow: none;
 }
 </style> 
