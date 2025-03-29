@@ -44,10 +44,19 @@ def create_app():
     app.register_blueprint(quiz_bp, url_prefix='/api')
     app.register_blueprint(quiz_attempts, url_prefix='/api')
     
-    # Create database tables
+    # Create database tables and test Gemini AI
     with app.app_context():
         db.create_all()
         create_admin()
+        
+        # # Test Gemini AI
+        # from app.utils.generative_ai import generate_sample_json
+        # sample_json = generate_sample_json()
+        # if sample_json:
+        #     print("Successfully generated sample JSON using Gemini AI:")
+        #     print(sample_json)
+        # else:
+        #     print("Failed to generate sample JSON using Gemini AI")
     
     return app
 

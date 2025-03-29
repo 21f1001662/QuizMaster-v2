@@ -4,6 +4,7 @@ from app.models.quiz import Quiz, Question, MCQQuestion, NumericQuestion, Option
 from app.models.subject import Chapter
 from app import db
 from app.utils.helpers import admin_required
+from app.utils.generative_ai import generate_mcq_question, generate_numeric_question
 from sqlalchemy import or_
 from datetime import datetime, timedelta
 
@@ -362,18 +363,121 @@ def get_student_quizzes():
 def get_student_question(question_id):
     question = Question.query.get_or_404(question_id)
     
-    # Check if the question belongs to a quiz that is currently active
+    # Check if the quiz has started
     quiz = question.quiz
-    current_time = datetime.now()
-    
+    current_time = datetime.utcnow()
     if current_time < quiz.date_of_quiz:
         return jsonify({'message': 'Quiz has not started yet'}), 403
     
-    # print(current_time)
-    # print(quiz.date_of_quiz)
-    # print(quiz.date_of_quiz + timedelta(minutes=quiz.duration))
-    
+    # Check if the quiz has ended
     if current_time > (quiz.date_of_quiz + timedelta(minutes=quiz.duration)):
         return jsonify({'message': 'Quiz has ended'}), 403
     
-    return jsonify(question.to_dict_student()), 200 
+    return jsonify(question.to_dict_student()), 200
+
+@quiz_bp.route('/quizzes/<int:quiz_id>/ai/generate', methods=['POST'])
+@jwt_required()
+@admin_required
+def generate_ai_questions(quiz_id):
+    quiz = Quiz.query.get_or_404(quiz_id)
+    data = request.get_json()
+    
+    # Validate required fields
+    required_fields = ['num_questions', 'question_type', 'correct_marks', 'incorrect_marks', 'context']
+    if not all(field in data for field in required_fields):
+        return jsonify({'message': 'Missing required fields'}), 400
+    
+    if data['question_type'] not in ['mcq', 'numeric']:
+        return jsonify({'message': 'Invalid question type'}), 400
+    
+    # Get existing questions to avoid duplicates
+    existing_questions = ""
+    if data['question_type'] == 'mcq':
+        existing_questions = " ".join([q.mcq_question.question_text for q in quiz.questions if q.type == 'mcq'])
+    else:
+        existing_questions = " ".join([q.numeric_question.question_text for q in quiz.questions if q.type == 'numeric'])
+    
+    print(existing_questions)
+    print(data['context'])
+    # return jsonify({'message': 'Existing questions retrieved successfully', 'existing_questions': existing_questions}), 200
+    generated_questions = []
+    for _ in range(data['num_questions']):
+        try:
+            if data['question_type'] == 'mcq':
+                question_data = generate_mcq_question(existing_questions, context=data['context'])
+                if not question_data:
+                    continue
+                
+                # Create MCQ question
+                mcq = MCQQuestion(
+                    question_text=question_data['question_text'],
+                    correct_marks=data['correct_marks'],
+                    incorrect_marks=data['incorrect_marks']
+                )
+                db.session.add(mcq)
+                db.session.flush()
+                
+                # Add options
+                for option_data in question_data['options']:
+                    option = Option(
+                        mcq_question_id=mcq.id,
+                        text=option_data['text'],
+                        is_correct=option_data['is_correct']
+                    )
+                    db.session.add(option)
+                
+                question = Question(
+                    quiz_id=quiz_id,
+                    type='mcq',
+                    mcq_question_id=mcq.id
+                )
+            else:
+                question_data = generate_numeric_question(existing_questions, context=data['context'])
+                
+                if not question_data:
+                    continue
+                
+                # Create numeric question
+                numeric = NumericQuestion(
+                    question_text=question_data['question_text'],
+                    answer_lower_bound=question_data['answer_lower_bound'],
+                    answer_upper_bound=question_data['answer_upper_bound'],
+                    correct_marks=data['correct_marks'],
+                    incorrect_marks=data['incorrect_marks']
+                )
+                
+                print(numeric)
+                db.session.add(numeric)
+                db.session.flush()
+                
+                question = Question(
+                    quiz_id=int(quiz_id),
+                    type='numeric',
+                    numeric_question_id=int(numeric.id)
+                )
+            
+            db.session.add(question)
+            generated_questions.append({
+                'id': question.id,
+                'question_text': question_data['question_text'],
+                'type': question.type,
+                'correct_marks': data['correct_marks'],
+                'incorrect_marks': data['incorrect_marks']
+            })
+            
+            # Update existing questions string for next iteration
+            existing_questions += " " + question_data['question_text']
+            
+        except Exception as e:
+            print(f"Error generating question: {str(e)}")
+            continue
+    
+    # Update quiz total questions and score
+    quiz.total_questions += len(generated_questions)
+    quiz.total_score += len(generated_questions) * data['correct_marks']
+    db.session.commit()
+    
+    return jsonify({
+        'message': f'Successfully generated {len(generated_questions)} questions',
+        'questions': generated_questions
+    }), 201 
