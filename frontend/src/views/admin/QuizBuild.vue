@@ -361,10 +361,10 @@ onMounted(() => {
                 </div>
               </div>
               <div>
-                <button class="btn btn-sm btn-outline-primary me-2" @click="handleEditQuestion(question)">
+                <button class="btn btn-sm btn-link text-primary me-2" @click="handleEditQuestion(question)">
                   <i class="bi bi-pencil"></i>
                 </button>
-                <button class="btn btn-sm btn-outline-danger" @click="handleDeleteQuestion(question)">
+                <button class="btn btn-sm btn-link text-danger" @click="handleDeleteQuestion(question)">
                   <i class="bi bi-trash"></i>
                 </button>
               </div>
@@ -577,8 +577,23 @@ onMounted(() => {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
+.btn-link {
+  text-decoration: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
 .btn-link:hover {
-  opacity: 0.7;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.btn-link.text-primary:hover {
+  color: #0b5ed7 !important;
+}
+
+.btn-link.text-danger:hover {
+  color: #bb2d3b !important;
 }
 
 .list-group-item {

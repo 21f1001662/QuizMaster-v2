@@ -75,7 +75,7 @@ const fetchQuizzes = async () => {
       page: currentPage.value,
       per_page: perPage.value,
       sort_by: 'date_of_quiz',
-      sort: 'ASC',
+      sort: 'DESC',
       date_lb: new Date().toISOString().split('T')[0], // Only show future quizzes
       date_ub: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0]
     }
@@ -135,16 +135,24 @@ const formatDate = (dateString) => {
 
 // Format duration
 const formatDuration = (minutes) => {
-  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(minutes / (24 * 60))
+  const hours = Math.floor((minutes % (24 * 60)) / 60)
   const mins = minutes % 60
-  return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`
+
+  if (days > 0) {
+    return `${days}d ${hours}h ${mins}m`
+  } else if (hours > 0) {
+    return `${hours}h ${mins}m`
+  } else {
+    return `${mins}m`
+  }
 }
 
-// Get chapter display name
-const getChapterDisplayName = (chapterId) => {
+// Get subject display name
+const getSubjectDisplayName = (chapterId) => {
   const chapter = chapters.value.find(c => c.id === chapterId)
   if (!chapter) return ''
-  return chapter.name
+  return chapter.subject.name
 }
 
 onMounted(() => {
@@ -218,7 +226,7 @@ onMounted(() => {
           <div class="card-body d-flex flex-column">
             <div class="mb-3">
               <h5 class="card-title mb-1">{{ quiz.name }}</h5>
-              <span class="text-primary badge bg-light">{{ getChapterDisplayName(quiz.chapter_id) }}</span>
+              <span class="text-primary badge bg-light ms-0">{{ getSubjectDisplayName(quiz.chapter_id) }}</span>
             </div>
             <p class="card-text text-muted small mb-4 description">{{ quiz.instructions }}</p>
             
@@ -304,6 +312,7 @@ onMounted(() => {
   font-size: 0.75rem;
   padding: 0.5em 0.8em;
   font-weight: 500;
+  margin-left: 0 !important;
 }
 
 .btn-primary {

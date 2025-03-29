@@ -17,7 +17,18 @@ const subjectChartData = ref({
   datasets: [{
     label: 'Average Score (%)',
     data: [],
-    backgroundColor: '#0d6efd',
+    backgroundColor: [
+      '#0d6efd', // Primary Blue
+      '#198754', // Success Green
+      '#ffc107', // Warning Yellow
+      '#dc3545', // Danger Red
+      '#6f42c1', // Purple
+      '#0dcaf0', // Info Blue
+      '#fd7e14', // Orange
+      '#20c997', // Teal
+      '#e83e8c', // Pink
+      '#6610f2'  // Indigo
+    ],
     borderRadius: 6
   }]
 })
@@ -99,10 +110,11 @@ const fetchStats = async () => {
     subjectChartData.value.labels = response.data.subject_performance.map(s => s.subject_name)
     subjectChartData.value.datasets[0].data = response.data.subject_performance.map(s => Number(s.average_percentage.toFixed(2)))
 
+    // Reverse the arrays to show latest points on the right
     performanceChartData.value.labels = response.data.recent_performance.map(p => 
       new Date(p.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-    )
-    performanceChartData.value.datasets[0].data = response.data.recent_performance.map(p => Number(p.score_percentage.toFixed(2)))
+    ).reverse()
+    performanceChartData.value.datasets[0].data = response.data.recent_performance.map(p => Number(p.score_percentage.toFixed(2))).reverse()
   } catch (err) {
     toast.error('Failed to fetch statistics')
     console.error(err)
@@ -159,10 +171,14 @@ onMounted(() => {
                 fill="none"
                 stroke="var(--color)"
                 stroke-width="3"
-                stroke-dasharray="var(--progress), 100"
+                :stroke-dasharray="`${(stats?.average_score_percentage || 0).toFixed(2)}, 100`"
+                stroke-dashoffset="0"
               />
             </svg>
-            <div class="progress-text">{{ (stats?.average_score_percentage || 0).toFixed(2) }}%</div>
+            <div class="progress-emoji">
+              {{ stats?.average_score_percentage >= 70 ? '🎉' : 
+                 stats?.average_score_percentage >= 35 ? '👍' : '😢' }}
+            </div>
           </div>
         </div>
       </div>
@@ -313,31 +329,40 @@ onMounted(() => {
 
 .progress-circle {
   position: relative;
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
 }
 
 .progress-circle svg {
   transform: rotate(-90deg);
+  width: 100%;
+  height: 100%;
 }
 
 .progress-circle path {
   transition: stroke-dasharray 0.5s ease;
 }
 
+.progress-circle path:last-child {
+  stroke-linecap: round;
+}
+
 .progress-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--color);
+  display: none;
 }
 
 .chart-container {
   position: relative;
   margin: auto;
   height: 300px;
+}
+
+.progress-emoji {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  z-index: 1;
 }
 </style>

@@ -146,21 +146,29 @@ const getCellValue = (item, column) => {
 .table th {
   background-color: #f8f9fa;
   border-bottom: 2px solid #dee2e6;
-  font-weight: bold;
+  font-weight: 600;
   color: #6c757d;
+  padding: 1rem;
+  white-space: nowrap;
 }
 
 .table th.fw-bold {
-  font-weight: bold !important;
+  font-weight: 600 !important;
 }
 
 .table td {
   vertical-align: middle;
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+  white-space: nowrap;
 }
 
 .card {
   border: none;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  background: #fff;
+  overflow: hidden;
 }
 
 .card-body {
@@ -169,32 +177,119 @@ const getCellValue = (item, column) => {
 
 .page-link {
   cursor: pointer;
+  border: none;
+  padding: 0.5rem 1rem;
+  margin: 0 0.25rem;
+  border-radius: 6px;
+  color: #0d6efd;
+  transition: all 0.2s ease;
+}
+
+.page-link:hover {
+  background-color: #e9ecef;
+  color: #0d6efd;
+}
+
+.page-item.active .page-link {
+  background-color: #0d6efd;
+  color: #fff;
 }
 
 .page-item.disabled .page-link {
   cursor: not-allowed;
   opacity: 0.6;
+  color: #6c757d;
 }
 
 .cursor-pointer {
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .cursor-pointer:hover {
-  background-color: rgba(0, 0, 0, 0.02);
+  background-color: #f8f9fa;
 }
 
 .input-group-text {
   background-color: #f8f9fa;
   border-right: none;
+  border-radius: 8px 0 0 8px;
 }
 
 .input-group .form-control {
   border-left: none;
+  border-radius: 0 8px 8px 0;
 }
 
 .input-group .form-control:focus {
   border-color: #dee2e6;
   box-shadow: none;
+}
+
+.table-responsive {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table thead th:first-child {
+  border-top-left-radius: 12px;
+}
+
+.table thead th:last-child {
+  border-top-right-radius: 12px;
+}
+
+.table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 12px;
+}
+
+.table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 12px;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.btn-primary {
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(13, 110, 253, 0.2);
+}
+
+.btn-sm {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.875rem;
+  border-radius: 6px;
+}
+
+.btn-outline-primary {
+  border-width: 2px;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(13, 110, 253, 0.1);
+}
+
+.btn-outline-danger {
+  border-width: 2px;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-danger:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.1);
 }
 </style> 

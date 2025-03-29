@@ -29,6 +29,17 @@ const showConfirmDialog = ref(false)
 const showSuccessPopup = ref(false)
 const quizScore = ref(0)
 
+// Add new ref for show more state
+const showFullInstructions = ref(false)
+
+// Add method to get truncated text
+const getTruncatedInstructions = (text) => {
+  if (!text) return ''
+  const words = text.split(' ')
+  if (words.length <= 5) return text
+  return showFullInstructions.value ? text : words.slice(0, 5).join(' ') + '...'
+}
+
 // Fetch quiz details and start attempt
 const startQuiz = async () => {
   try {
@@ -50,8 +61,22 @@ const startQuiz = async () => {
     quizDetails.value = response.data
     await fetchQuestion(0)
     
-    // Start timer (assuming 60 minutes duration)
-    timeLeft.value = 60 * 60 // in seconds
+    // Calculate elapsed time and remaining duration
+    const startedAt = new Date(response.data.quiz.date_of_quiz).getTime()
+    const now = new Date().getTime()
+    const elapsedSeconds = Math.floor((now - startedAt) / 1000)
+    const totalDurationSeconds = response.data.quiz.duration * 60
+    
+    // Set remaining time, ensuring it doesn't go negative
+    timeLeft.value = Math.max(0, totalDurationSeconds - elapsedSeconds)
+    
+    // If time already expired, auto-submit
+    if (timeLeft.value === 0) {
+      await submitQuiz()
+      toast.warning('Quiz duration has expired!')
+      return
+    }
+    
     startTimer()
   } catch (err) {
     if (err.response?.data?.error) {
@@ -68,19 +93,32 @@ const startQuiz = async () => {
 
 // Timer functionality
 const startTimer = () => {
-  timer.value = setInterval(() => {
+  timer.value = setInterval(async () => {
     if (timeLeft.value > 0) {
       timeLeft.value--
     } else {
-      submitQuiz()
+      clearInterval(timer.value)
+      await submitQuiz()
+      toast.warning('Time is up! Quiz submitted automatically.')
     }
   }, 1000)
 }
 
+// Format time function
 const formatTime = computed(() => {
-  const minutes = Math.floor(timeLeft.value / 60)
-  const seconds = timeLeft.value % 60
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`
+  const totalSeconds = timeLeft.value
+  const days = Math.floor(totalSeconds / (24 * 60 * 60))
+  const hours = Math.floor((totalSeconds % (24 * 60 * 60)) / (60 * 60))
+  const minutes = Math.floor((totalSeconds % (60 * 60)) / 60)
+  const seconds = totalSeconds % 60
+
+  if (days > 0) {
+    return `${days}d ${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`
+  } else if (hours > 0) {
+    return `${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`
+  } else {
+    return `${minutes.toString().padStart(2, '0')}m ${seconds.toString().padStart(2, '0')}s`
+  }
 })
 
 // Fetch question details
@@ -245,8 +283,18 @@ onUnmounted(() => {
       <div class="quiz-header mb-4">
         <div class="row align-items-center">
           <div class="col-md-6">
-            <h2 class="mb-1">{{ quizDetails?.quiz?.name }}</h2>
-            <p class="text-muted mb-0">{{ quizDetails?.quiz?.instructions }}</p>
+            <h2 class="mb-1" style="font-size: 1.5rem;">{{ quizDetails?.quiz?.name }}</h2>
+            <div class="text-muted mb-0">
+              <p class="d-inline" style="font-size: 0.8rem;">{{ getTruncatedInstructions(quizDetails?.quiz?.instructions) }}</p>
+              <button 
+                v-if="quizDetails?.quiz?.instructions && quizDetails.quiz.instructions.split(' ').length > 5"
+                class="btn btn-link btn-sm text-primary p-0 ms-1"
+                style="font-size: 0.8rem;"
+                @click="showFullInstructions = !showFullInstructions"
+              >
+                {{ showFullInstructions ? 'Show Less' : 'Show More' }}
+              </button>
+            </div>
           </div>
           <div class="col-md-6 text-md-end">
             <div class="timer-badge">
