@@ -93,3 +93,43 @@ def send_quiz_notification(quiz_name, chapter_name, subject_name, receiver_email
     except Exception as e:
         print(f"Error sending quiz notification: {str(e)}")
         return False 
+    
+def send_inactive_user_notification(user_name, receiver_email):
+    try:
+        # Email configuration
+        sender_email = os.getenv('GMAIL_USERNAME')
+        sender_password = os.getenv('GMAIL_PASSWORD')
+        
+        # Create message
+        message = MIMEMultipart()
+        message["From"] = sender_email
+        message["To"] = receiver_email
+        message["Subject"] = "Daily Login Reminder"
+        
+        # Email body
+        body = f"""
+        Dear {user_name},
+
+        We noticed you haven't logged in today. Come back to continue your learning journey!
+        
+        Best regards,
+        QuizMaster
+        """
+        
+        message.attach(MIMEText(body, "plain"))
+        
+        # Create SMTP session
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()
+            server.login(sender_email, sender_password)
+            
+            # Send email
+            text = message.as_string()
+            server.sendmail(sender_email, receiver_email, text)
+        
+        print(f"Inactive user notification sent successfully to {receiver_email}")
+        return True
+    
+    except Exception as e:
+        print(f"Error sending inactive user notification: {str(e)}")
+        return False

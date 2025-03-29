@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from app.models.user import User
+from app.models.login_tracking import DailyLogin
 from app.utils.helpers import hash_password, check_password
 from app import db
 from datetime import datetime
@@ -72,6 +73,9 @@ def login():
     if user.is_admin:
         return jsonify({'message': 'Invalid User'}), 403
     
+    # Record the login
+    DailyLogin.record_login(user.id)
+    
     access_token = create_access_token(identity=str(user.id))
     return jsonify({
         'access_token': access_token,
@@ -89,6 +93,9 @@ def admin_login():
     
     if not user or not check_password(data['password'], user.password):
         return jsonify({'message': 'Invalid admin credentials'}), 401
+    
+    # Record the login for admin as well
+    DailyLogin.record_login(user.id)
     
     access_token = create_access_token(identity=str(user.id))
     return jsonify({
