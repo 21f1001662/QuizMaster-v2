@@ -49,14 +49,12 @@ def create_app():
         db.create_all()
         create_admin()
         
-        # # Test Gemini AI
-        # from app.utils.generative_ai import generate_sample_json
-        # sample_json = generate_sample_json()
-        # if sample_json:
-        #     print("Successfully generated sample JSON using Gemini AI:")
-        #     print(sample_json)
-        # else:
-        #     print("Failed to generate sample JSON using Gemini AI")
+        # Test email sending
+        from app.utils.email import send_test_email
+        if send_test_email():
+            print("Test email sent successfully")
+        else:
+            print("Failed to send test email")
     
     return app
 
