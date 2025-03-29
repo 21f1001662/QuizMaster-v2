@@ -24,7 +24,22 @@ const columns = [
     label: 'Subject',
     formatter: (item) => item.subject?.name || '-'
   },
-  { key: 'created_at', label: 'Created At' }
+  { 
+    key: 'created_at', 
+    label: 'Created At',
+    formatter: (item) => {
+      if (!item.created_at) return '-'
+      const date = new Date(item.created_at)
+      return date.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      })
+    }
+  }
 ]
 
 // Debounce function

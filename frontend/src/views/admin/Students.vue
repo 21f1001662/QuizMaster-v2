@@ -25,12 +25,28 @@ const columns = [
   { 
     key: 'dob', 
     label: 'Date of Birth',
-    formatter: (item) => item.dob ? new Date(item.dob).toLocaleDateString() : '-'
+    formatter: (item) => {
+      if (!item.dob) return '-'
+      const date = new Date(item.dob)
+      return date.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      })
+    }
   },
   { 
     key: 'created_at', 
     label: 'Registered On',
-    formatter: (item) => new Date(item.created_at).toLocaleDateString()
+    formatter: (item) => {
+      if (!item.created_at) return '-'
+      const date = new Date(item.created_at)
+      return date.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      })
+    }
   }
 ]
 

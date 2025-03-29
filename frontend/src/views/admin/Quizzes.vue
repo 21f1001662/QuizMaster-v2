@@ -30,10 +30,40 @@ const columns = [
     label: 'Chapter',
     formatter: (item) => item.chapter?.name || '-'
   },
-  { key: 'date_of_quiz', label: 'Date' },
+  { 
+    key: 'date_of_quiz', 
+    label: 'Date',
+    formatter: (item) => {
+      if (!item.date_of_quiz) return '-'
+      const date = new Date(item.date_of_quiz)
+      return date.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      })
+    }
+  },
   { key: 'duration', label: 'Duration (mins)' },
   { key: 'total_questions', label: 'Questions' },
-  { key: 'created_at', label: 'Created At' }
+  { 
+    key: 'created_at', 
+    label: 'Created At',
+    formatter: (item) => {
+      if (!item.created_at) return '-'
+      const date = new Date(item.created_at)
+      return date.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      })
+    }
+  }
 ]
 
 // Debounce function
