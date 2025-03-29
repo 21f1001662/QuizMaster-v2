@@ -2,10 +2,11 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from app.models.quiz import Quiz, Question, MCQQuestion, NumericQuestion, Option, Attempt, Response
 from app.models.subject import Chapter, Subject
+from app.models.user import User
 from app import db
 from app.utils.helpers import admin_required
 from app.utils.generative_ai import generate_mcq_question, generate_numeric_question
-from sqlalchemy import or_
+from sqlalchemy import or_, func, desc, distinct
 from datetime import datetime, timedelta
 from app.utils.cache import (
     cache_get, cache_set, clear_quizzes_cache, clear_question_cache,
@@ -549,4 +550,118 @@ def generate_ai_questions(quiz_id):
     return jsonify({
         'message': f'Successfully generated {len(generated_questions)} questions',
         'questions': generated_questions
-    }), 201 
+    }), 201
+
+@quiz_bp.route('/admin/stats', methods=['GET'])
+@jwt_required()
+@admin_required
+def get_admin_stats():
+    try:
+        # Get total users (excluding admin)
+        total_users = User.query.filter_by(is_admin=False).count()
+        
+        # Get total quizzes
+        total_quizzes = Quiz.query.count()
+        
+        # Get total attempts
+        total_attempts = Attempt.query.count()
+        
+        # Calculate subject-wise average scores
+        subject_stats = db.session.query(
+            Subject.id,
+            Subject.name,
+            func.count(distinct(Attempt.id)).label('total_attempts'),
+            func.avg(Attempt.score).label('avg_score'),
+            func.avg(Quiz.total_score).label('avg_total_score')
+        ).join(
+            Chapter, Subject.id == Chapter.subject_id
+        ).join(
+            Quiz, Chapter.id == Quiz.chapter_id
+        ).join(
+            Attempt, Quiz.id == Attempt.quiz_id
+        ).filter(
+            Attempt.status == 'completed'
+        ).group_by(
+            Subject.id, Subject.name
+        ).all()
+        
+        subject_wise_scores = []
+        for stat in subject_stats:
+            avg_percentage = (stat.avg_score / stat.avg_total_score * 100) if stat.avg_total_score > 0 else 0
+            subject_wise_scores.append({
+                'subject_id': stat.id,
+                'subject_name': stat.name,
+                'total_attempts': stat.total_attempts,
+                'average_score': round(stat.avg_score, 2),
+                'average_percentage': round(avg_percentage, 2)
+            })
+        
+        # Calculate total average score percentage
+        overall_stats = db.session.query(
+            func.avg(Attempt.score).label('avg_score'),
+            func.avg(Quiz.total_score).label('avg_total_score')
+        ).join(
+            Quiz, Quiz.id == Attempt.quiz_id
+        ).filter(
+            Attempt.status == 'completed'
+        ).first()
+        
+        total_average_percentage = 0
+        if overall_stats.avg_total_score:
+            total_average_percentage = (overall_stats.avg_score / overall_stats.avg_total_score * 100)
+        
+        # Get top 5 attempted quizzes
+        top_quizzes = db.session.query(
+            Quiz.id,
+            Quiz.name,
+            Chapter.name.label('chapter_name'),
+            Subject.name.label('subject_name'),
+            func.count(Attempt.id).label('attempt_count'),
+            func.avg(Attempt.score).label('avg_score'),
+            Quiz.total_score
+        ).join(
+            Chapter, Quiz.chapter_id == Chapter.id
+        ).join(
+            Subject, Chapter.subject_id == Subject.id
+        ).join(
+            Attempt, Quiz.id == Attempt.quiz_id
+        ).filter(
+            Attempt.status == 'completed'
+        ).group_by(
+            Quiz.id,
+            Quiz.name,
+            Chapter.name,
+            Subject.name,
+            Quiz.total_score
+        ).order_by(
+            desc('attempt_count')
+        ).limit(5).all()
+        
+        top_attempted_quizzes = []
+        for quiz in top_quizzes:
+            avg_percentage = (quiz.avg_score / quiz.total_score * 100) if quiz.total_score > 0 else 0
+            top_attempted_quizzes.append({
+                'quiz_id': quiz.id,
+                'quiz_name': quiz.name,
+                'chapter_name': quiz.chapter_name,
+                'subject_name': quiz.subject_name,
+                'total_attempts': quiz.attempt_count,
+                'average_score': round(quiz.avg_score, 2),
+                'total_score': quiz.total_score,
+                'average_percentage': round(avg_percentage, 2)
+            })
+        
+        return jsonify({
+            'total_users': total_users,
+            'total_quizzes': total_quizzes,
+            'total_attempts': total_attempts,
+            'subject_wise_scores': subject_wise_scores,
+            'total_average_percentage': round(total_average_percentage, 2),
+            'top_attempted_quizzes': top_attempted_quizzes
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'error': 'Failed to fetch admin stats',
+            'message': str(e)
+        }), 500 
