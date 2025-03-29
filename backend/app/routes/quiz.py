@@ -397,8 +397,6 @@ def generate_ai_questions(quiz_id):
     else:
         existing_questions = " ".join([q.numeric_question.question_text for q in quiz.questions if q.type == 'numeric'])
     
-    print(existing_questions)
-    print(data['context'])
     # return jsonify({'message': 'Existing questions retrieved successfully', 'existing_questions': existing_questions}), 200
     generated_questions = []
     for _ in range(data['num_questions']):
@@ -446,7 +444,6 @@ def generate_ai_questions(quiz_id):
                     incorrect_marks=data['incorrect_marks']
                 )
                 
-                print(numeric)
                 db.session.add(numeric)
                 db.session.flush()
                 
