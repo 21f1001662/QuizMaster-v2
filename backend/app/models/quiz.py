@@ -225,7 +225,7 @@ class Attempt(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
-            'quiz_id': self.quiz_id,
+            'quiz': self.quiz.to_dict_student(),  # Include quiz details
             'user_id': self.user_id,
             'score': self.score,
             'status': self.status,

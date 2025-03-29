@@ -1,0 +1,14 @@
+Quiz name,Subject name,Chapter name,Total Questions,Score,Max score,Attempted on
+Area and Perimeter Quiz,Maths,Area & Perimeter,10,30.0,40.0,2025-03-30 01:04:58
+
+Qn No,Question text,Question type,Your answer,Correct answer
+1,A square garden has sides of length 2.45 meters.  What is its perimeter in meters?,numeric,9.8,Range: 9.8 to 9.81
+2,A rectangular playground is 3 meters long and 3.27 meters wide.  What is its area in square meters? Round your answer to two decimal places.,numeric,9.91,Range: 9.8 to 9.81
+3,A small square picture frame has sides of 1.56 meters. What is its area in square meters?,numeric,2.43,Range: 2.4336 to 2.4337
+4,A rectangular classroom has a length of 5 meters and a width of 2 meters.  What is its perimeter in meters?,numeric,14.0,Range: 13.9 to 14.1
+5,A tiny square sticker has sides of 1.5 cm. What is its area in square centimeters?,numeric,2.25,Range: 2.24 to 2.25
+6,Which country is famous for the Taj Mahal?,mcq,India,India
+7,A rectangular garden is 5 meters long and 3 meters wide.  What is its perimeter?,mcq,16 meters,16 meters
+8,A square-shaped playground has sides of 6 meters each. What is the total distance around the playground?,mcq,24 meters,24 meters
+9,"A farmer has a rectangular field.  It's 10 steps long and 5 steps wide. If each step is 1 meter, what is the perimeter of the field?",mcq,30 meters,30 meters
+10,"A classroom is shaped like a rectangle. It's 10 steps long and 5 steps wide. If each step is 1 meter, what is the perimeter of the classroom?",mcq,30 meters,30 meters

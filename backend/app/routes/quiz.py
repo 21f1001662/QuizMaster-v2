@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from app.models.quiz import Quiz, Question, MCQQuestion, NumericQuestion, Option, Attempt, Response
-from app.models.subject import Chapter
+from app.models.subject import Chapter, Subject
 from app import db
 from app.utils.helpers import admin_required
 from app.utils.generative_ai import generate_mcq_question, generate_numeric_question
@@ -311,6 +311,7 @@ def get_student_quizzes():
     # Get query parameters with defaults
     quiz_id = request.args.get('quiz_id', type=int)
     chapter_id = request.args.get('chapter_id', type=int)
+    subject_id = request.args.get('subject_id', type=int)  # Add subject_id parameter
     name = request.args.get('name', type=str)
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
@@ -328,8 +329,8 @@ def get_student_quizzes():
     if sort not in ['asc', 'desc']:
         return jsonify({'message': 'Invalid sort. Must be either "asc" or "desc"'}), 400
     
-    # Base query
-    query = Quiz.query
+    # Base query with joins
+    query = Quiz.query.join(Quiz.chapter).join(Chapter.subject)
     
     # Apply date range filters if provided
     if date_lb:
@@ -348,9 +349,11 @@ def get_student_quizzes():
     
     # Apply filters
     if quiz_id:
-        query = query.filter_by(id=quiz_id)
+        query = query.filter(Quiz.id == quiz_id)
     if chapter_id:
-        query = query.filter_by(chapter_id=chapter_id)
+        query = query.filter(Quiz.chapter_id == chapter_id)
+    if subject_id:
+        query = query.filter(Chapter.subject_id == subject_id)
     if name:
         # Fuzzy search on quiz name
         query = query.filter(Quiz.name.ilike(f'%{name}%'))

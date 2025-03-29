@@ -59,7 +59,7 @@ def start_quiz(quiz_id):
     db.session.commit()
     return jsonify(attempt.to_dict()), 201
 
-# To-Do: Implement queue for quiz submission
+# To-Do: Instead of directly submitting the quiz, to create a celery task to submit the quiz
 @quiz_attempts.route('/attempts/<int:attempt_id>/submit', methods=['POST'])
 @jwt_required()
 def submit_quiz(attempt_id):
@@ -78,8 +78,8 @@ def submit_quiz(attempt_id):
     
     # Check if time limit exceeded
     quiz = attempt.quiz
-    if datetime.now() > quiz.date_of_quiz + timedelta(minutes=quiz.duration):
-        return jsonify({'error': 'Time limit exceeded'}), 400
+    # if datetime.now() > quiz.date_of_quiz + timedelta(minutes=quiz.duration):
+    #     return jsonify({'error': 'Time limit exceeded'}), 400
     
     # Process all questions and calculate score
     total_score = 0
