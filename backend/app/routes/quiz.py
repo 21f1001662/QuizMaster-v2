@@ -39,6 +39,10 @@ def create_quiz():
     db.session.add(quiz)
     db.session.commit()
     
+    # Trigger notification task
+    from app.tasks import notify_users_new_quiz
+    notify_users_new_quiz.delay(quiz.id)
+    
     return jsonify(quiz.to_dict()), 201
 
 @quiz_bp.route('/quizzes', methods=['GET'])

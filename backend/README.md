@@ -2,6 +2,12 @@
 
 A Flask-based backend for the QuizMaster application with JWT authentication and role-based access control.
 
+## Prerequisites
+
+- Python 3.8+
+- Redis server
+- SQLite3
+
 ## Features
 
 - User and Admin authentication
@@ -12,26 +18,41 @@ A Flask-based backend for the QuizMaster application with JWT authentication and
 
 ## Setup
 
-1. Create a virtual environment:
+1. Clone the repository
+2. Create a virtual environment:
 ```bash
 python -m venv venv
-source venv/bin/activate  
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-2. Install dependencies:
+3. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Configure environment variables:
-- Copy `.env.example` to `.env`
-- Update the variables in `.env` as needed
+4. Set up environment variables:
+   - Copy `.env.example` to `.env`
+   - Update the variables in `.env` with your values
 
-4. Run the application:
+## Running the Application
+
+1. Start Redis server (if not already running):
+```bash
+sudo service redis-server start  # On Linux
+# On Windows, start Redis server from the installed service
+```
+
+2. Start Celery worker (in a new terminal):
+```bash
+celery -A app.tasks worker --loglevel=info
+```
+
+3. Start the Flask application (in another terminal):
 ```bash
 flask run
 ```
 
+The application will be available at `http://localhost:5000`
 
 ## Authentication
 

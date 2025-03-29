@@ -20,6 +20,11 @@ def register():
     if User.query.filter_by(username=data['username']).first():
         return jsonify({'message': 'Username already exists'}), 400
     
+    # Check if email is provided and unique
+    if 'email' in data:
+        if User.query.filter_by(email=data['email']).first():
+            return jsonify({'message': 'Email already exists'}), 400
+    
     # Process optional fields
     dob = None
     if 'dob' in data:
@@ -33,6 +38,7 @@ def register():
         username=data['username'],
         password=hash_password(data['password']),
         full_name=data['full_name'],
+        email=data.get('email'),  # Optional email field
         dob=dob,
         qualification=data.get('qualification'),
         is_admin=False

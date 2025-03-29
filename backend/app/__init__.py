@@ -44,17 +44,14 @@ def create_app():
     app.register_blueprint(quiz_bp, url_prefix='/api')
     app.register_blueprint(quiz_attempts, url_prefix='/api')
     
-    # Create database tables and test Gemini AI
+    # Create database tables and initialize Celery
     with app.app_context():
         db.create_all()
         create_admin()
         
-        # Test email sending
-        from app.utils.email import send_test_email
-        if send_test_email():
-            print("Test email sent successfully")
-        else:
-            print("Failed to send test email")
+        # Initialize Celery
+        from app.tasks import celery
+        celery.conf.update(app.config)
     
     return app
 
