@@ -29,6 +29,31 @@ const showResponsesPopup = ref(false)
 const selectedAttempt = ref(null)
 const responsesLoading = ref(false)
 
+// Add new function to handle email report
+const sendEmailReport = async () => {
+  try {
+    const token = localStorage.getItem('studentToken')
+    const response = await axios.post(
+      `http://localhost:5000/api/quizzes/${selectedAttempt.value.quiz.id}/report/csv`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    toast.success(response.data.message)
+  } catch (err) {
+    if (err.response?.data?.error) {
+      toast.error(err.response.data.error)
+    } else {
+      toast.error('Failed to send email report')
+    }
+    console.error(err)
+  }
+}
+
 // Add computed properties for response summary
 const responseSummary = computed(() => {
   if (!selectedAttempt.value?.responses) return null
@@ -361,7 +386,15 @@ onMounted(() => {
         <div class="modal-content responses-modal">
           <div class="modal-header border-0">
             <h5 class="modal-title">Quiz Responses</h5>
-            <button type="button" class="btn-close" @click="showResponsesPopup = false"></button>
+            <div class="d-flex align-items-center gap-2 ms-auto">
+              <button 
+                class="btn btn-link email-report-btn" 
+                @click="sendEmailReport"
+              >
+                <i class="bi bi-envelope-open"></i>
+              </button>
+              <button type="button" class="btn-close" @click="showResponsesPopup = false"></button>
+            </div>
           </div>
           
           <div class="modal-body">
@@ -932,5 +965,52 @@ onMounted(() => {
 
 .summary-card.not-attempted .summary-marks {
   color: #6c757d;
+}
+
+.email-report-btn {
+  color: #6c757d;
+  padding: 0.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  margin-right: 0.5rem;
+}
+
+.email-report-btn:hover {
+  color: rgba(13, 110, 253, 0.8);
+  transform: translateY(-2px);
+}
+
+.email-report-btn i {
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.email-report-btn:hover i {
+  transform: scale(1.1);
+}
+
+.email-report-btn::after {
+  content: 'Send result to your email';
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: rgba(44, 62, 80, 0.9);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.email-report-btn:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(5px);
 }
 </style>

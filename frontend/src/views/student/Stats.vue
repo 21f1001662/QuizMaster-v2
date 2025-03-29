@@ -97,12 +97,12 @@ const fetchStats = async () => {
 
     // Update chart data
     subjectChartData.value.labels = response.data.subject_performance.map(s => s.subject_name)
-    subjectChartData.value.datasets[0].data = response.data.subject_performance.map(s => Number(s.average_percentage.toFixed(1)))
+    subjectChartData.value.datasets[0].data = response.data.subject_performance.map(s => Number(s.average_percentage.toFixed(2)))
 
     performanceChartData.value.labels = response.data.recent_performance.map(p => 
       new Date(p.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     )
-    performanceChartData.value.datasets[0].data = response.data.recent_performance.map(p => Number(p.score_percentage.toFixed(1)))
+    performanceChartData.value.datasets[0].data = response.data.recent_performance.map(p => Number(p.score_percentage.toFixed(2)))
   } catch (err) {
     toast.error('Failed to fetch statistics')
     console.error(err)
@@ -138,10 +138,10 @@ onMounted(() => {
         <div class="d-flex align-items-center">
           <div class="flex-grow-1">
             <h6 class="text-muted mb-1">Overall Performance</h6>
-            <div class="h3 mb-0">{{ (stats?.average_score_percentage || 0).toFixed(1) }}%</div>
+            <div class="h3 mb-0">{{ (stats?.average_score_percentage || 0).toFixed(2) }}%</div>
           </div>
           <div class="progress-circle" :style="{ 
-            '--progress': `${(stats?.average_score_percentage || 0).toFixed(1)}%`,
+            '--progress': `${(stats?.average_score_percentage || 0).toFixed(2)}%`,
             '--color': stats?.average_score_percentage >= 70 ? '#198754' : 
                       stats?.average_score_percentage >= 35 ? '#ffc107' : '#dc3545'
           }">
@@ -162,7 +162,7 @@ onMounted(() => {
                 stroke-dasharray="var(--progress), 100"
               />
             </svg>
-            <div class="progress-text">{{ (stats?.average_score_percentage || 0).toFixed(1) }}%</div>
+            <div class="progress-text">{{ (stats?.average_score_percentage || 0).toFixed(2) }}%</div>
           </div>
         </div>
       </div>
@@ -207,7 +207,7 @@ onMounted(() => {
                         'bg-warning': subject.average_percentage >= 35 && subject.average_percentage < 70,
                         'bg-danger': subject.average_percentage < 35
                       }">
-                        {{ subject.average_percentage.toFixed(1) }}%
+                        {{ subject.average_percentage.toFixed(2) }}%
                       </span>
                     </td>
                     <td>{{ subject.quizzes_taken }}</td>
@@ -260,7 +260,7 @@ onMounted(() => {
                         'bg-warning': quiz.score_percentage >= 35 && quiz.score_percentage < 70,
                         'bg-danger': quiz.score_percentage < 35
                       }">
-                        {{ quiz.score_percentage.toFixed(1) }}%
+                        {{ quiz.score_percentage.toFixed(2) }}%
                       </span>
                     </td>
                   </tr>
