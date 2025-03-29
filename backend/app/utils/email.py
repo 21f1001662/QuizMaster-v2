@@ -133,3 +133,50 @@ def send_inactive_user_notification(user_name, receiver_email):
     except Exception as e:
         print(f"Error sending inactive user notification: {str(e)}")
         return False
+
+def send_quiz_report(quiz_name, receiver_email, receiver_name, csv_filepath):
+    try:
+        # Email configuration
+        sender_email = os.getenv('GMAIL_USERNAME')
+        sender_password = os.getenv('GMAIL_PASSWORD')
+        
+        # Create message
+        message = MIMEMultipart()
+        message["From"] = sender_email
+        message["To"] = receiver_email
+        message["Subject"] = f"Quiz Report: {quiz_name}"
+        
+        # Email body
+        body = f"""
+        Dear {receiver_name},
+
+        Please find attached your quiz report for {quiz_name}.
+
+        Best regards,
+        QuizMaster Team
+        """
+        
+        message.attach(MIMEText(body, "plain"))
+        
+        # Attach CSV file
+        from email.mime.application import MIMEApplication
+        with open(csv_filepath, 'rb') as f:
+            csv_attachment = MIMEApplication(f.read(), _subtype='csv')
+            csv_attachment.add_header('Content-Disposition', 'attachment', filename=os.path.basename(csv_filepath))
+            message.attach(csv_attachment)
+        
+        # Create SMTP session
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()
+            server.login(sender_email, sender_password)
+            
+            # Send email
+            text = message.as_string()
+            server.sendmail(sender_email, receiver_email, text)
+        
+        print(f"Quiz report sent successfully to {receiver_email}")
+        return True
+        
+    except Exception as e:
+        print(f"Error sending quiz report: {str(e)}")
+        return False

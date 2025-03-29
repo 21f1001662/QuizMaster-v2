@@ -6,6 +6,8 @@ from app import db
 from datetime import datetime, timedelta
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy import desc
+import os
+from app.tasks import send_quiz_report_email
 
 quiz_attempts = Blueprint('quiz_attempts', __name__)
 
@@ -428,4 +430,85 @@ def get_student_stats():
         'subject_performance': subject_performance_list
     }
     
-    return jsonify(response) 
+    return jsonify(response)
+
+@quiz_attempts.route('/quizzes/<int:quiz_id>/report/csv', methods=['GET'])
+@jwt_required()
+def get_quiz_attempt_csv(quiz_id):
+    user_id = get_jwt_identity()
+    
+    # Get the quiz attempt for this user
+    attempt = Attempt.query.filter_by(quiz_id=quiz_id, user_id=user_id).first()
+    if not attempt:
+        return jsonify({'error': 'You have not attempted this quiz'}), 400
+        
+    if attempt.status != 'completed':
+        return jsonify({'error': 'Quiz attempt is not completed'}), 400
+    
+    # Get quiz details
+    quiz = attempt.quiz
+    chapter = quiz.chapter
+    subject = chapter.subject
+    
+    # Create reports directory if it doesn't exist
+    reports_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'reports')
+    os.makedirs(reports_dir, exist_ok=True)
+    
+    # Generate filename using quiz name, user id and timestamp
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = f"quiz_report_{quiz.name.replace(' ', '_')}_{user_id}_{timestamp}.csv"
+    filepath = os.path.join(reports_dir, filename)
+    
+    # Generate CSV content
+    csv_content = []
+    
+    # Header row
+    header = "Quiz name,Subject name,Chapter name,Total Questions,Score,Max score,Attempted on\n"
+    csv_content.append(header)
+    
+    # Quiz summary row
+    summary = f"{quiz.name},{subject.name},{chapter.name},{quiz.total_questions},{attempt.score},{quiz.total_score},{attempt.completed_at.strftime('%Y-%m-%d %H:%M:%S')}\n"
+    csv_content.append(summary)
+    
+    # Empty row
+    csv_content.append("\n")
+    
+    # Responses header
+    responses_header = "Qn No,Question text,Question type,Your answer,Correct answer\n"
+    csv_content.append(responses_header)
+    
+    # Get all responses sorted by question ID
+    responses = Response.query.filter_by(attempt_id=attempt.id).join(Question).order_by(Question.id).all()
+    
+    for idx, response in enumerate(responses, 1):
+        question = response.question
+        question_text = question.mcq_question.question_text if question.type == 'mcq' else question.numeric_question.question_text
+        question_type = question.type
+        
+        if question.type == 'mcq':
+            your_answer = response.selected_option.text if response.selected_option else "Not attempted"
+            correct_option = next((opt.text for opt in question.mcq_question.options if opt.is_correct), "")
+            correct_answer = correct_option
+        else:  # numeric
+            your_answer = str(response.numeric_question_answer) if response.numeric_question_answer is not None else "Not attempted"
+            correct_answer = f"Range: {question.numeric_question.answer_lower_bound} to {question.numeric_question.answer_upper_bound}"
+        
+        # Escape any commas in text fields
+        question_text = f'"{question_text}"' if ',' in question_text else question_text
+        your_answer = f'"{your_answer}"' if ',' in str(your_answer) else your_answer
+        correct_answer = f'"{correct_answer}"' if ',' in str(correct_answer) else correct_answer
+        
+        response_row = f"{idx},{question_text},{question_type},{your_answer},{correct_answer}\n"
+        csv_content.append(response_row)
+    
+    # Write to file
+    with open(filepath, 'w', newline='') as f:
+        f.write("".join(csv_content))
+    
+    # Send email asynchronously using Celery
+    task = send_quiz_report_email.delay(quiz_id, user_id, filepath)
+    
+    return jsonify({
+        'message': 'Quiz report is being generated and will be sent to your email shortly',
+        'task_id': task.id
+    }) 

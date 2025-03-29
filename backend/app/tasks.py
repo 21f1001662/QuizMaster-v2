@@ -1,7 +1,7 @@
 from celery import Celery
-from app.utils.email import send_quiz_notification, send_inactive_user_notification
+from app.utils.email import send_quiz_notification, send_inactive_user_notification, send_quiz_report
 from app.models.user import User
-from app.models.quiz import Quiz
+from app.models.quiz import Quiz, Attempt
 from app.models.login_tracking import DailyLogin
 from app import db, create_app
 import os
@@ -112,4 +112,37 @@ def check_inactive_users():
             return f"Checked {len(users)} users, found {len(inactive_users)} inactive users,"
             
     except Exception as e:
-        return f"Error checking inactive users: {str(e)}" 
+        return f"Error checking inactive users: {str(e)}"
+
+@celery.task
+def send_quiz_report_email(quiz_id, user_id, csv_filepath):
+    try:
+        # Create Flask application context
+        app = create_app()
+        
+        with app.app_context():
+            # Get quiz and user details
+            quiz = Quiz.query.get(quiz_id)
+            user = User.query.get(user_id)
+            
+            if not quiz or not user:
+                return f"Quiz or User not found: quiz_id={quiz_id}, user_id={user_id}"
+            
+            if not user.email:
+                return f"User {user_id} does not have an email address"
+            
+            # Send email with report
+            success = send_quiz_report(
+                quiz_name=quiz.name,
+                receiver_email=user.email,
+                receiver_name=user.full_name,
+                csv_filepath=csv_filepath
+            )
+            
+            if success:
+                return f"Quiz report sent successfully to {user.email}"
+            else:
+                return f"Failed to send quiz report to {user.email}"
+            
+    except Exception as e:
+        return f"Error sending quiz report: {str(e)}" 
