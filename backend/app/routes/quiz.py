@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
-from app.models.quiz import Quiz, Question, MCQQuestion, NumericQuestion, Option
+from app.models.quiz import Quiz, Question, MCQQuestion, NumericQuestion, Option, Attempt, Response
 from app.models.subject import Chapter
 from app import db
 from app.utils.helpers import admin_required
@@ -141,9 +141,21 @@ def update_quiz(quiz_id):
 @admin_required
 def delete_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
+    
+    # Delete all attempts and responses for this quiz
+    attempts = Attempt.query.filter_by(quiz_id=quiz_id).all()
+    
+    for attempt in attempts:
+        # Delete all responses for this attempt
+        Response.query.filter_by(attempt_id=attempt.id).delete()
+        # Delete the attempt
+        db.session.delete(attempt)
+    
+    # Delete the quiz (this will cascade delete questions, options, etc.)
     db.session.delete(quiz)
     db.session.commit()
-    return jsonify({'message': 'Quiz deleted successfully'}), 200
+    
+    return jsonify({'message': 'Quiz and all associated data deleted successfully'}), 200
 
 # Question Routes
 @quiz_bp.route('/quizzes/<int:quiz_id>/questions', methods=['POST'])
@@ -365,7 +377,7 @@ def get_student_question(question_id):
     
     # Check if the quiz has started
     quiz = question.quiz
-    current_time = datetime.utcnow()
+    current_time = datetime.now()
     if current_time < quiz.date_of_quiz:
         return jsonify({'message': 'Quiz has not started yet'}), 403
     
