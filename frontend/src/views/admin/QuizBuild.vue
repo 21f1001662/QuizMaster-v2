@@ -15,10 +15,12 @@ const questions = ref([])
 const loading = ref(false)
 const error = ref(null)
 const questionModal = ref(null)
+const aiModal = ref(null)
 const selectedQuestion = ref(null)
 const isEditMode = ref(false)
 const questionType = ref('mcq')
 const showQuizModal = ref(false)
+const showAIModal = ref(false)
 const formData = ref({
   type: 'mcq',
   question_text: '',
@@ -28,6 +30,17 @@ const formData = ref({
   answer_lower_bound: 0,
   answer_upper_bound: 0
 })
+
+const aiFormData = ref({
+  context: '',
+  question_type: 'mcq',
+  num_questions: 5,
+  correct_marks: 4,
+  incorrect_marks: -1
+})
+
+const isGenerating = ref(false)
+const generatedQuestions = ref([])
 
 const fetchQuiz = async () => {
   try {
@@ -222,9 +235,48 @@ const handleAddQuestion = () => {
   handleCreateQuestion()
 }
 
+const handleCloseAIModal = () => {
+  aiModal.value.hide()
+  aiFormData.value = {
+    context: '',
+    question_type: 'mcq',
+    num_questions: 5,
+    correct_marks: 4,
+    incorrect_marks: -1
+  }
+}
+
+const handleGenerateQuestions = async () => {
+  if (!aiFormData.value.context) {
+    toast.error('Context is required')
+    return
+  }
+
+  try {
+    isGenerating.value = true
+    const token = localStorage.getItem('adminToken')
+    const response = await axios.post(`http://localhost:5000/api/quizzes/${route.params.id}/ai/generate`, aiFormData.value, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    
+    generatedQuestions.value = response.data.questions
+    toast.success(response.data.message)
+    aiModal.value.hide()
+    fetchQuiz()
+  } catch (err) {
+    toast.error('Failed to generate questions')
+    console.error(err)
+  } finally {
+    isGenerating.value = false
+  }
+}
+
 onMounted(() => {
   fetchQuiz()
   questionModal.value = new Modal(document.getElementById('questionModal'))
+  aiModal.value = new Modal(document.getElementById('aiModal'))
 })
 </script>
 
@@ -258,6 +310,12 @@ onMounted(() => {
       <div class="d-flex align-items-center">
         <i class="bi bi-pencil text-primary me-3 cursor-pointer hover-opacity" @click="handleEditQuiz"></i>
         <i class="bi bi-trash text-danger me-3 cursor-pointer hover-opacity" @click="handleDeleteQuiz"></i>
+        <button class="btn btn-outline-primary me-2 generate-ai-btn" @click="aiModal.show()">
+          <span class="btn-content">
+            <i class="bi bi-robot me-2"></i>Generate with AI
+          </span>
+          <span class="glass-reflection"></span>
+        </button>
         <button class="btn btn-primary" @click="handleAddQuestion">
           <i class="bi bi-plus-lg me-2"></i>Add Question
         </button>
@@ -433,6 +491,84 @@ onMounted(() => {
       @close="showQuizModal = false"
       @submit="handleQuizUpdate"
     />
+
+    <!-- AI Generation Modal -->
+    <div class="modal fade" id="aiModal" tabindex="-1" aria-labelledby="aiModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="aiModalLabel">Generate Questions with AI</h5>
+            <button type="button" class="btn-close" @click="handleCloseAIModal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Context</label>
+              <textarea 
+                class="form-control" 
+                v-model="aiFormData.context" 
+                rows="4" 
+                placeholder="Enter the context for question generation (e.g., 'gravitation related questions, easy')"
+              ></textarea>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Question Type</label>
+                <select class="form-select" v-model="aiFormData.question_type">
+                  <option value="mcq">Multiple Choice</option>
+                  <option value="numeric">Numeric</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Number of Questions</label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  v-model="aiFormData.num_questions" 
+                  min="1" 
+                  max="10"
+                >
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Correct Marks</label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  v-model="aiFormData.correct_marks" 
+                  min="0" 
+                  step="0.5"
+                >
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Incorrect Marks</label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  v-model="aiFormData.incorrect_marks" 
+                  max="0" 
+                  step="0.5"
+                >
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="handleCloseAIModal">Cancel</button>
+            <button 
+              type="button" 
+              class="btn btn-primary" 
+              @click="handleGenerateQuestions"
+              :disabled="isGenerating"
+            >
+              <span v-if="isGenerating" class="spinner-border spinner-border-sm me-2" role="status"></span>
+              {{ isGenerating ? 'Generating...' : 'Generate' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -461,5 +597,76 @@ onMounted(() => {
 
 .hover-opacity:hover {
   opacity: 0.7;
+}
+
+.btn-outline-primary {
+  border-width: 2px;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.spinner-border {
+  width: 1rem;
+  height: 1rem;
+}
+
+.generate-ai-btn {
+  position: relative;
+  overflow: hidden;
+  border-width: 2px;
+  background: linear-gradient(135deg, #10b981, #059669, #047857);
+  color: white;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+.generate-ai-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  color: white;
+  background: linear-gradient(135deg, #34d399, #10b981, #059669);
+}
+
+.generate-ai-btn .btn-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.generate-ai-btn .glass-reflection {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: reflection 3s infinite;
+  z-index: 2;
+}
+
+@keyframes reflection {
+  0% {
+    left: -100%;
+  }
+  20% {
+    left: 100%;
+  }
+  100% {
+    left: 100%;
+  }
 }
 </style> 
