@@ -47,7 +47,12 @@ sudo service redis-server start  # On Linux
 celery -A app.tasks worker --loglevel=info
 ```
 
-3. Start the Flask application (in another terminal):
+3. Start Celery Beat (in a new terminal):
+```bash  
+celery -A app.tasks beat --loglevel=info
+```
+
+4. Start the Flask application (in another terminal):
 ```bash
 flask run
 ```
