@@ -31,6 +31,23 @@
               </div>
 
               <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="bi bi-envelope"></i>
+                  </span>
+                  <input
+                    id="email"
+                    v-model="formData.email"
+                    type="email"
+                    class="form-control"
+                    required
+                    placeholder="Enter your email"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
                 <label for="full_name" class="form-label">Full Name</label>
                 <div class="input-group">
                   <span class="input-group-text">
@@ -112,6 +129,7 @@ const loading = ref(false)
 
 const formData = ref({
   username: '',
+  email: '',
   password: '',
   full_name: '',
   dob: '',
