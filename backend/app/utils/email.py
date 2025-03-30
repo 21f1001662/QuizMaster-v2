@@ -180,3 +180,57 @@ def send_quiz_report(quiz_name, receiver_email, receiver_name, csv_filepath):
     except Exception as e:
         print(f"Error sending quiz report: {str(e)}")
         return False
+
+def send_monthly_report(receiver_email, receiver_name, pdf_filepath, month_year):
+    try:
+        # Email configuration
+        sender_email = os.getenv('GMAIL_USERNAME')
+        sender_password = os.getenv('GMAIL_PASSWORD')
+        
+        # Create message
+        message = MIMEMultipart()
+        message["From"] = sender_email
+        message["To"] = receiver_email
+        message["Subject"] = f"Monthly Report - {month_year}"
+        
+        # Email body
+        body = f"""
+        Dear {receiver_name},
+
+        Please find attached the monthly report for {month_year}.
+
+        This report includes:
+        - Total quiz attempts
+        - New student registrations
+        - Average quiz scores
+        - Subject-wise performance analysis
+        - Top 5 attempted quizzes
+
+        Best regards,
+        QuizMaster Team
+        """
+        
+        message.attach(MIMEText(body, "plain"))
+        
+        # Attach PDF file
+        from email.mime.application import MIMEApplication
+        with open(pdf_filepath, 'rb') as f:
+            pdf_attachment = MIMEApplication(f.read(), _subtype='pdf')
+            pdf_attachment.add_header('Content-Disposition', 'attachment', filename=os.path.basename(pdf_filepath))
+            message.attach(pdf_attachment)
+        
+        # Create SMTP session
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()
+            server.login(sender_email, sender_password)
+            
+            # Send email
+            text = message.as_string()
+            server.sendmail(sender_email, receiver_email, text)
+        
+        print(f"Monthly report sent successfully to {receiver_email}")
+        return True
+        
+    except Exception as e:
+        print(f"Error sending monthly report: {str(e)}")
+        return False
