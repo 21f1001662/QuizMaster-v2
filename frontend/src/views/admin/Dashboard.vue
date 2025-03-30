@@ -22,8 +22,9 @@ onMounted(() => {
   <div class="min-vh-100 bg-light">
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
       <div class="container">
-        <router-link class="navbar-brand text-primary fw-bold" to="/admin/dashboard">
-          Admin Panel
+        <router-link class="navbar-brand d-flex align-items-center" to="/admin/dashboard">
+          <i class="bi bi-shield-lock me-2 text-primary"></i>
+          <span class="fw-bold">QuizMaster Admin</span>
         </router-link>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
           aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

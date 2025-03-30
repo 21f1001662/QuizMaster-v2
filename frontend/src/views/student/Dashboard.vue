@@ -2,8 +2,9 @@
   <div class="min-vh-100 bg-light">
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
       <div class="container">
-        <router-link class="navbar-brand text-primary fw-bold" to="/student/dashboard">
-          Student Panel
+        <router-link class="navbar-brand d-flex align-items-center" to="/student/dashboard/quizzes">
+          <i class="bi bi-journal-check me-2 text-primary"></i>
+          <span class="fw-bold">QuizMaster</span>
         </router-link>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
           aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,10 +36,11 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { onMounted } from 'vue'
 
 const router = useRouter()
+const route = useRoute()
 
 const handleLogout = () => {
   localStorage.removeItem('studentToken')
@@ -50,6 +52,12 @@ onMounted(() => {
   const token = localStorage.getItem('studentToken')
   if (!token) {
     router.push('/student/login')
+    return
+  }
+
+  // Redirect to quizzes page if we're on the dashboard root
+  if (route.path === '/student/dashboard') {
+    router.push('/student/dashboard/quizzes')
   }
 })
 </script>

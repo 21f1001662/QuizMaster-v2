@@ -1,65 +1,97 @@
 <template>
-  <div class="container">
-    <div class="row justify-content-center align-items-center min-vh-100">
-      <div class="col-md-6 col-lg-4">
-        <div class="card shadow">
-          <div class="card-body p-4">
-            <h2 class="text-center mb-4">Student Registration</h2>
-            <form @submit.prevent="handleRegister">
-              <div class="mb-3">
+  <div class="register-page">
+    <div class="container">
+      <div class="row justify-content-center align-items-center min-vh-100">
+        <div class="col-md-6 col-lg-4">
+          <div class="register-card">
+            <div class="text-center mb-4">
+              <div class="logo-container">
+                <i class="bi bi-journal-check logo-icon"></i>
+                <h1 class="logo-text">QuizMaster</h1>
+              </div>
+              <p class="text-muted">Create your account to get started.</p>
+            </div>
+            
+            <form @submit.prevent="handleRegister" class="register-form">
+              <div class="form-group">
                 <label for="username" class="form-label">Username</label>
-                <input
-                  id="username"
-                  v-model="formData.username"
-                  type="text"
-                  class="form-control"
-                  required
-                  placeholder="Choose a username"
-                />
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="bi bi-person"></i>
+                  </span>
+                  <input
+                    id="username"
+                    v-model="formData.username"
+                    type="text"
+                    class="form-control"
+                    required
+                    placeholder="Choose a username"
+                  />
+                </div>
               </div>
-              <div class="mb-3">
+
+              <div class="form-group">
                 <label for="full_name" class="form-label">Full Name</label>
-                <input
-                  id="full_name"
-                  v-model="formData.full_name"
-                  type="text"
-                  class="form-control"
-                  required
-                  placeholder="Enter your full name"
-                />
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="bi bi-person-badge"></i>
+                  </span>
+                  <input
+                    id="full_name"
+                    v-model="formData.full_name"
+                    type="text"
+                    class="form-control"
+                    required
+                    placeholder="Enter your full name"
+                  />
+                </div>
               </div>
-              <div class="mb-3">
+
+              <div class="form-group">
                 <label for="password" class="form-label">Password</label>
-                <input
-                  id="password"
-                  v-model="formData.password"
-                  type="password"
-                  class="form-control"
-                  required
-                  placeholder="Choose a password"
-                />
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="bi bi-lock"></i>
+                  </span>
+                  <input
+                    id="password"
+                    v-model="formData.password"
+                    type="password"
+                    class="form-control"
+                    required
+                    placeholder="Choose a password"
+                  />
+                </div>
               </div>
-              <div class="mb-3">
+
+              <div class="form-group">
                 <label for="dob" class="form-label">Date of Birth</label>
-                <input
-                  id="dob"
-                  v-model="formData.dob"
-                  type="date"
-                  class="form-control"
-                  required
-                />
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="bi bi-calendar"></i>
+                  </span>
+                  <input
+                    id="dob"
+                    v-model="formData.dob"
+                    type="date"
+                    class="form-control"
+                    required
+                  />
+                </div>
               </div>
+
               <button
                 type="submit"
-                class="btn btn-success w-100"
+                class="btn btn-primary w-100 register-btn"
                 :disabled="loading"
               >
                 <span v-if="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                {{ loading ? 'Registering...' : 'Register' }}
+                {{ loading ? 'Creating Account...' : 'Create Account' }}
               </button>
             </form>
-            <div class="text-center mt-3">
-              Already have an account? <router-link to="/student/login">Login here</router-link>
+
+            <div class="text-center mt-4">
+              <p class="mb-0">Already have an account? <router-link to="/student/login" class="login-link">Login here</router-link></p>
             </div>
           </div>
         </div>
@@ -103,22 +135,107 @@ const handleRegister = async () => {
 </script>
 
 <style scoped>
-.min-vh-100 {
+.register-page {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   min-height: 100vh;
 }
 
-.spinner-border {
-  display: inline-block;
-  width: 1rem;
-  height: 1rem;
-  border: 0.2em solid currentColor;
-  border-right-color: transparent;
-  border-radius: 50%;
-  animation: spinner-border .75s linear infinite;
+.register-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
 }
 
-.me-2 {
-  margin-right: 0.5rem;
+.register-card:hover {
+  transform: translateY(-5px);
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.logo-icon {
+  font-size: 2.5rem;
+  color: var(--bs-primary);
+}
+
+.logo-text {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  font-weight: 500;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.input-group-text {
+  background: #f8f9fa;
+  border-right: none;
+  color: #6c757d;
+}
+
+.form-control {
+  border-left: none;
+  padding: 0.75rem 1rem;
+}
+
+.form-control:focus {
+  border-color: #dee2e6;
+  box-shadow: none;
+}
+
+.input-group:focus-within {
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+.register-btn {
+  padding: 0.75rem;
+  font-weight: 500;
+  border-radius: 8px;
+  background: var(--bs-primary);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.register-btn:hover {
+  background: #0b5ed7;
+  transform: translateY(-2px);
+}
+
+.register-btn:disabled {
+  background: #6c757d;
+  transform: none;
+}
+
+.login-link {
+  color: var(--bs-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.login-link:hover {
+  color: #0b5ed7;
+}
+
+.spinner-border {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.15em;
 }
 
 @keyframes spinner-border {
