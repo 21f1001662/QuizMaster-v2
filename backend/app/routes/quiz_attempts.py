@@ -8,6 +8,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy import desc
 import os
 from app.tasks import send_quiz_report_email
+from app.utils.helpers import admin_required
 
 quiz_attempts = Blueprint('quiz_attempts', __name__)
 
@@ -185,7 +186,7 @@ def respond_to_question(attempt_id, question_id):
 @quiz_attempts.route('/attempts', methods=['GET'])
 @jwt_required()
 def get_attempt_details():
-    user_id = int(get_jwt_identity())
+    current_user_id = int(get_jwt_identity())
     
     # Get query parameters
     page = request.args.get('page', 1, type=int)
@@ -196,10 +197,20 @@ def get_attempt_details():
     quiz_id = request.args.get('quiz_id', type=int)
     chapter_id = request.args.get('chapter_id', type=int)
     attempt_id = request.args.get('attempt_id', type=int)
-    subject_id = request.args.get('subject_id', type=int)  # New subject_id filter
+    subject_id = request.args.get('subject_id', type=int)
+    user_id = request.args.get('user_id', type=int)  # New user_id parameter
+    
+    # Check if user is admin when user_id is provided
+    if user_id:
+        current_user = User.query.get(current_user_id)
+        if not current_user or not current_user.is_admin:
+            return jsonify({'error': 'Unauthorized access'}), 403
+        target_user_id = user_id
+    else:
+        target_user_id = current_user_id
     
     # Base query with joins
-    query = Attempt.query.join(Quiz).join(Chapter).join(Subject).filter(Attempt.user_id == user_id)
+    query = Attempt.query.join(Quiz).join(Chapter).join(Subject).filter(Attempt.user_id == target_user_id)
     
     # Apply filters if provided
     if quiz_id:
@@ -269,11 +280,21 @@ def get_attempt_details():
 @quiz_attempts.route('/attempts/<int:attempt_id>/responses', methods=['GET'])
 @jwt_required()
 def get_attempt_responses(attempt_id):
-    user_id = int(get_jwt_identity())
+    current_user_id = int(get_jwt_identity())
+    user_id = request.args.get('user_id', type=int)  # New user_id parameter
+    
+    # Check if user is admin when user_id is provided
+    if user_id:
+        current_user = User.query.get(current_user_id)
+        if not current_user or not current_user.is_admin:
+            return jsonify({'error': 'Unauthorized access'}), 403
+        target_user_id = user_id
+    else:
+        target_user_id = current_user_id
     
     # Get attempt and verify ownership
     attempt = Attempt.query.get_or_404(attempt_id)
-    if attempt.user_id != user_id:
+    if attempt.user_id != target_user_id:
         return jsonify({'error': 'Unauthorized'}), 403
     
     # Get all responses for this attempt with their questions
