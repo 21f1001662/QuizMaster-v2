@@ -1,0 +1,7 @@
+Quiz name,Subject name,Chapter name,Total Questions,Score,Max score,Attempted on
+Indian states and their capitals,General knowledge,Current Affairs,3,2.0,12.0,2025-03-30 16:54:28
+
+Qn No,Question text,Question type,Your answer,Correct answer
+1,Which Indian state has its capital city located on the banks of the Gomti River?,mcq,Madhya Pradesh,Uttar Pradesh
+2,Which Indian state's capital city is known as the 'City of Lakes'?,mcq,Bhopal,Bhopal
+3,"If the number of states in India is approximately 28 and each state has a capital, and we consider the average number of letters in the names of Indian state capitals to be around 11, what is the approximate total number of letters in all the state capitals, rounded to one decimal place?",numeric,300.0,Range: 307.9 to 308.1

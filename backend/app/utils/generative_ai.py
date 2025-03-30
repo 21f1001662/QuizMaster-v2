@@ -60,7 +60,8 @@ def generate_mcq_question(existing_questions: str = "", context: str = ""):
         
         # Generate the response
         response = model.generate_content(prompt)
-        response_text = response.text
+        # Get the response text from the first part
+        response_text = response.parts[0].text
         json_str = re.sub(r'```json\s*|\s*```', '', response_text).strip()
         
         # Parse the response as JSON
@@ -109,7 +110,8 @@ def generate_numeric_question(existing_questions: str = "", context: str = ""):
         
         # Generate the response
         response = model.generate_content(prompt)
-        response_text = response.text
+        # Get the response text from the first part
+        response_text = response.parts[0].text
         json_str = re.sub(r'```json\s*|\s*```', '', response_text).strip()
         
         # Parse the response as JSON
