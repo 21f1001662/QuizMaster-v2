@@ -146,10 +146,10 @@ onMounted(async () => {
 
         <div class="feature-card">
           <div class="feature-icon">
-            <i class="bi bi-shield-check text-primary"></i>
+            <i class="bi bi-download text-primary"></i>
           </div>
-          <h3>Enhanced Security</h3>
-          <p>Secure authentication and data protection for all users</p>
+          <h3>Install PWA</h3>
+          <p>Install QuizMaster on your device and access quizzes seamlessly</p>
         </div>
 
         <div class="feature-card">
@@ -457,7 +457,7 @@ onMounted(async () => {
 }
 
 .features-section {
-  padding: 8rem 2rem;
+  padding: 2rem 2rem;
   background: white;
 }
 
