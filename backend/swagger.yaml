@@ -1,0 +1,2607 @@
+openapi: 3.0.3
+info:
+  title: QuizMaster V2
+  description: >-
+    **API Doc for QuizMaster is an AI-powered quiz management system that allows
+    educators to generate and manage quizzes while enabling students to attempt
+    quizzes, track progress, and view performance analytics. The project
+    involves building a responsive web interface with automated question
+    generation, real-time assessments, and interactive learning features.**
+  version: 1.0.0
+  contact: {}
+servers:
+  - url: '{{host}}'
+  - url: http://localhost
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Register User
+      description: Register User
+      operationId: registerUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                full_name:
+                  type: string
+                  example: Shahbaz ali
+                password:
+                  type: string
+                  example: '123456789'
+                username:
+                  type: string
+                  example: shahbazali42
+            examples:
+              Register User:
+                value:
+                  full_name: Shahbaz ali
+                  password: '123456789'
+                  username: shahbazali42
+      responses:
+        '201':
+          description: Register User
+          headers:
+            Connection:
+              schema:
+                type: string
+                example: close
+            Content-Length:
+              schema:
+                type: string
+                example: '43'
+            Date:
+              schema:
+                type: string
+                example: Tue, 18 Mar 2025 09:10:14 GMT
+            Server:
+              schema:
+                type: string
+                example: Werkzeug/3.1.3 Python/3.12.3
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User registered successfully
+              examples:
+                Register User:
+                  value:
+                    message: User registered successfully
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login User
+      description: Login User
+      operationId: loginUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: '123456789'
+                username:
+                  type: string
+                  example: shahbaz42
+            examples:
+              Login User:
+                value:
+                  password: '123456789'
+                  username: shahbaz42
+      responses:
+        '200':
+          description: Sample Response
+          headers:
+            Connection:
+              schema:
+                type: string
+                example: close
+            Content-Length:
+              schema:
+                type: string
+                example: '499'
+            Date:
+              schema:
+                type: string
+                example: Tue, 18 Mar 2025 08:37:48 GMT
+            Server:
+              schema:
+                type: string
+                example: Werkzeug/3.1.3 Python/3.12.3
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: >-
+                      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MjI4NzA2OCwianRpIjoiMGM1NmRjYjEtMDFhNi00YTkwLWJkMDItYTk1Mzc4OWYzZGY4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MywibmJmIjoxNzQyMjg3MDY4LCJjc3JmIjoiOTQzNDFjMDctZDFhMy00ZTAxLWI3YjYtOWRiY2ZmZDJiOGQwIiwiZXhwIjoxNzQyMjg3OTY4fQ.fnT14lW7wV4Q4ArDezO1aY3T5F_XokKyh0R897JJcZc
+                  user:
+                    type: object
+                    properties:
+                      created_at:
+                        type: string
+                        example: '2025-03-18T04:57:07.928813'
+                      dob:
+                        nullable: true
+                        example: null
+                      full_name:
+                        type: string
+                        example: Shahbaz Ali
+                      id:
+                        type: number
+                        example: 3
+                      is_admin:
+                        type: boolean
+                        example: false
+                      qualification:
+                        nullable: true
+                        example: null
+                      username:
+                        type: string
+                        example: shahbaz42
+              examples:
+                Sample Response:
+                  value:
+                    access_token: >-
+                      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MjI4NzA2OCwianRpIjoiMGM1NmRjYjEtMDFhNi00YTkwLWJkMDItYTk1Mzc4OWYzZGY4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MywibmJmIjoxNzQyMjg3MDY4LCJjc3JmIjoiOTQzNDFjMDctZDFhMy00ZTAxLWI3YjYtOWRiY2ZmZDJiOGQwIiwiZXhwIjoxNzQyMjg3OTY4fQ.fnT14lW7wV4Q4ArDezO1aY3T5F_XokKyh0R897JJcZc
+                    user:
+                      created_at: '2025-03-18T04:57:07.928813'
+                      dob: null
+                      full_name: Shahbaz Ali
+                      id: 3
+                      is_admin: false
+                      qualification: null
+                      username: shahbaz42
+  /auth/admin/login:
+    post:
+      tags:
+        - Auth
+      summary: '[ Admin ] Login'
+      description: '[ Admin ] Login'
+      operationId: adminLogin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: admin123
+                username:
+                  type: string
+                  example: admin
+            examples:
+              '[ Admin ] Login':
+                value:
+                  password: admin123
+                  username: admin
+      responses:
+        '200':
+          description: Sample Response
+          headers:
+            Connection:
+              schema:
+                type: string
+                example: close
+            Content-Length:
+              schema:
+                type: string
+                example: '496'
+            Date:
+              schema:
+                type: string
+                example: Tue, 18 Mar 2025 09:09:40 GMT
+            Server:
+              schema:
+                type: string
+                example: Werkzeug/3.1.3 Python/3.12.3
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: >-
+                      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MjI4ODk4MCwianRpIjoiYmI1ZjY4N2ItYWNlMS00M2FmLTgxMjItZGMzYjkwNjY2MzI1IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MSwibmJmIjoxNzQyMjg4OTgwLCJjc3JmIjoiYmJjOTYzZDItMTY2OS00NGQ1LWFkMTItZTZkNzAyMGFhOGVkIiwiZXhwIjoxNzQyMjg5ODgwfQ.DeTcv_lzjEw0V3p0ZL4sM9RHr9vI_0pjyIuI23tURO4
+                  user:
+                    type: object
+                    properties:
+                      created_at:
+                        type: string
+                        example: '2025-03-18T04:53:31.181333'
+                      dob:
+                        nullable: true
+                        example: null
+                      full_name:
+                        type: string
+                        example: Administrator
+                      id:
+                        type: number
+                        example: 1
+                      is_admin:
+                        type: boolean
+                        example: true
+                      qualification:
+                        nullable: true
+                        example: null
+                      username:
+                        type: string
+                        example: admin
+              examples:
+                Sample Response:
+                  value:
+                    access_token: >-
+                      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MjI4ODk4MCwianRpIjoiYmI1ZjY4N2ItYWNlMS00M2FmLTgxMjItZGMzYjkwNjY2MzI1IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MSwibmJmIjoxNzQyMjg4OTgwLCJjc3JmIjoiYmJjOTYzZDItMTY2OS00NGQ1LWFkMTItZTZkNzAyMGFhOGVkIiwiZXhwIjoxNzQyMjg5ODgwfQ.DeTcv_lzjEw0V3p0ZL4sM9RHr9vI_0pjyIuI23tURO4
+                    user:
+                      created_at: '2025-03-18T04:53:31.181333'
+                      dob: null
+                      full_name: Administrator
+                      id: 1
+                      is_admin: true
+                      qualification: null
+                      username: admin
+  /auth/own:
+    get:
+      tags:
+        - Auth
+      summary: Get own user details
+      description: Get own user details
+      operationId: getOwnUserDetails
+      responses:
+        '200':
+          description: ''
+      security:
+        - bearerAuth: []
+  /user/profile:
+    get:
+      tags:
+        - Users
+      summary: profile
+      description: profile
+      operationId: profile
+      responses:
+        '200':
+          description: Sample Response
+          headers:
+            Connection:
+              schema:
+                type: string
+                example: close
+            Content-Length:
+              schema:
+                type: string
+                example: '149'
+            Date:
+              schema:
+                type: string
+                example: Tue, 18 Mar 2025 09:16:56 GMT
+            Server:
+              schema:
+                type: string
+                example: Werkzeug/3.1.3 Python/3.12.3
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  created_at:
+                    type: string
+                    example: '2025-03-18T04:57:07.928813'
+                  dob:
+                    nullable: true
+                    example: null
+                  full_name:
+                    type: string
+                    example: Shahbaz Ali
+                  id:
+                    type: number
+                    example: 3
+                  is_admin:
+                    type: boolean
+                    example: false
+                  qualification:
+                    nullable: true
+                    example: null
+                  username:
+                    type: string
+                    example: shahbaz42
+              examples:
+                Sample Response:
+                  value:
+                    created_at: '2025-03-18T04:57:07.928813'
+                    dob: null
+                    full_name: Shahbaz Ali
+                    id: 3
+                    is_admin: false
+                    qualification: null
+                    username: shahbaz42
+      security:
+        - bearerAuth: []
+  /user/users:
+    get:
+      tags:
+        - Users
+      summary: '[ Admin ] Get Users'
+      description: '[ Admin ] Get Users'
+      operationId: adminGetUsers
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+            example: Sbaz
+        - name: page
+          in: query
+          schema:
+            type: string
+            example: '1'
+        - name: per_page
+          in: query
+          schema:
+            type: string
+            example: '10'
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            example: created_at
+        - name: sort
+          in: query
+          schema:
+            type: string
+            example: desc
+      responses:
+        '200':
+          description: ''
+      security:
+        - bearerAuth: []
+  /api/subjects:
+    get:
+      tags:
+        - Admin
+        - Subject
+      summary: Get All Subjects
+      description: Get All Subjects
+      operationId: getAllSubjects
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: string
+            example: '1'
+        - name: per_page
+          in: query
+          schema:
+            type: string
+            example: '10'
+        - name: search
+          in: query
+          schema:
+            type: string
+            example: math
+        - name: subject_id
+          in: query
+          schema:
+            type: string
+            example: '2'
+      responses:
+        '200':
+          description: ''
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - Admin
+        - Subject
+      summary: Create a subject
+      description: Create a subject
+      operationId: createASubject
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  example: Advanced physics course covering algebra and calculus
+                name:
+                  type: string
+                  example: Physics
+            examples:
+              Create a subject:
+                value:
+                  description: Advanced physics course covering algebra and calculus
+                  name: Physics
+      responses:
+        '200':
+          description: ''
+      security:
+        - bearerAuth: []
+  /api/subjects/1:
+    put:
+      tags:
+        - Admin
+        - Subject
+      summary: Update Subject
+      description: Update Subject
+      operationId: updateSubject
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  example: Updated description for mathematics course
+                name:
+                  type: string
+                  example: Advanced Mathematics
+            examples:
+              Update Subject:
+                value:
+                  description: Updated description for mathematics course
+                  name: Advanced Mathematics
+      responses:
+        '200':
+          description: ''
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - Admin
+        - Subject
+      summary: Delete a subject
+      description: Delete a subject
+      operationId: deleteASubject
+      responses:
+        '200':
+          description: ''
+      security:
+        - bearerAuth: []
+  /api/subjects/1/chapters:
+    post:
+      tags:
+        - Admin
+        - Chapter
+      summary: Create a new Chapter
+      description: Create a new Chapter
+      operationId: createANewChapter
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  example: >-
+                    Introduction to vectors, matrices, and linear
+                    transformations
+                name:
+                  type: string
+                  example: Calculus
+            examples:
+              Create a new Chapter:
+                value:
+                  description: >-
+                    Introduction to vectors, matrices, and linear
+                    transformations
+                  name: Calculus
+      responses:
+        '200':
+          description: ''
+      security:
+        - bearerAuth: []
+  /api/chapters:
+    get:
+      tags:
+        - Admin
+        - Chapter
+      summary: Get all chapters
+      description: Get all chapters
+      operationId: getAllChapters
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: string
+            example: '1'
+        - name: per_page
+          in: query
+          schema:
+            type: string
+            example: '10'
+        - name: chapter_id
+          in: query
+          schema:
+            type: string
+            example: '1'
+        - name: subject_id
+          in: query
+          schema:
+            type: string
+            example: '2'
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            example: created_at
+        - name: sort
+          in: query
+          schema:
+            type: string
+            example: DESC
+      responses:
+        '200':
+          description: ''
+      security:
+        - bearerAuth: []
+  /api/chapters/1:
+    put:
+      tags:
+        - Admin
+        - Chapter
+      summary: Update a chapter
+      description: Update a chapter
+      operationId: updateAChapter
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  example: Updated chapter description
+                name:
+                  type: string
+                  example: Advanced Linear Algebra
+            examples:
+              Update a chapter:
+                value:
+                  description: Updated chapter description
+                  name: Advanced Linear Algebra
+      responses:
+        '200':
+          description: ''
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - Admin
+        - Chapter
+      summary: Delete a chapter
+      description: Delete a chapter
+      operationId: deleteAChapter
+      responses:
+        '200':
+          description: ''
+      security:
+        - bearerAuth: []
+  /api/quizzes/1/questions:
+    post:
+      tags:
+        - Admin
+        - Quiz
+        - Questions
+      summary: Add an MCQ question
+      description: Add an MCQ question
+      operationId: addAnMcqQuestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                correct_marks:
+                  type: number
+                  example: 4
+                incorrect_marks:
+                  type: number
+                  example: -1
+                options:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      is_correct:
+                        type: boolean
+                        example: false
+                      text:
+                        type: string
+                        example: Paris
+                  example:
+                    - is_correct: false
+                      text: Paris
+                    - is_correct: true
+                      text: New Delhi
+                    - is_correct: false
+                      text: Berlin
+                    - is_correct: false
+                      text: Madrid
+                question_text:
+                  type: string
+                  example: What is the capital of India?
+                type:
+                  type: string
+                  example: mcq
+            examples:
+              Add a numeric Question:
+                value: >-
+                  // {
+
+                  //     "type": "numeric",
+
+                  //     "question_text": "What is the value of pi (up to 2
+                  decimal places)?",
+
+                  //     "answer_lower_bound": 3.14,
+
+                  //     "answer_upper_bound": 3.15
+
+                  // }
+
+
+                  {
+                      "type": "numeric",
+                      "question_text": "What is the value of gravity (m/s²)?",
+                      "answer_lower_bound": 9.8,
+                      "answer_upper_bound": 9.81,
+                      "correct_marks": 4.0,
+                      "incorrect_marks": -1
+                  }
+              Add an MCQ question:
+                value:
+                  correct_marks: 4
+                  incorrect_marks: -1
+                  options:
+                    - is_correct: false
+                      text: Paris
+                    - is_correct: true
+                      text: New Delhi
+                    - is_correct: false
+                      text: Berlin
+                    - is_correct: false
+                      text: Madrid
+                  question_text: What is the capital of India?
+                  type: mcq
+      responses:
+        '200':
+          description: ''
+      security:
+        - bearerAuth: []
+  /api/quizzes/1/questions/1:
+    put:
+      tags:
+        - Admin
+        - Quiz
+        - Questions
+      summary: Update an MCQ question
+      description: Update an MCQ question
+      operationId: updateAnMcqQuestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                correct_marks:
+                  type: number
+                  example: 5
+                options:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      is_correct:
+                        type: boolean
+                        example: true
+                      text:
+                        type: string
+                        example: New Option 1
+                  example:
+                    - is_correct: true
+                      text: New Option 1
+                    - is_correct: false
+                      text: New Option 2
+                question_text:
+                  type: string
+                  example: Updated question text
+            examples:
+              Update an MCQ question:
+                value:
+                  correct_marks: 5
+                  options:
+                    - is_correct: true
+                      text: New Option 1
+                    - is_correct: false
+                      text: New Option 2
+                  question_text: Updated question text
+      responses:
+        '200':
+          description: ''
+      security:
+        - bearerAuth: []
+  /api/quizzes/1/questions/2:
+    put:
+      tags:
+        - Admin
+        - Quiz
+        - Questions
+      summary: Update a numeric Question
+      description: Update a numeric Question
+      operationId: updateANumericQuestion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                answer_lower_bound:
+                  type: number
+                  example: 9.8
+                answer_upper_bound:
+                  type: number
+                  example: 9.81
+                question_text:
+                  type: string
+                  example: What is the acceleration due to gravity on Earth (in m/s²)?
+            examples:
+              Update a numeric Question:
+                value:
+                  answer_lower_bound: 9.8
+                  answer_upper_bound: 9.81
+                  question_text: What is the acceleration due to gravity on Earth (in m/s²)?
+      responses:
+        '200':
+          description: ''
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - Admin
+        - Quiz
+        - Questions
+      summary: Delete a question
+      description: Delete a question
+      operationId: deleteAQuestion
+      responses:
+        '200':
+          description: ''
+      security:
+        - bearerAuth: []
+  /api/quizzes/17/ai/generate:
+    post:
+      tags:
+        - Admin
+        - Quiz
+        - Questions
+      summary: Generate MCQ question ai
+      description: Generate MCQ question ai
+      operationId: generateMcqQuestionAi
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                context:
+                  type: string
+                  example: Indian General Knowledge questions, easy
+                correct_marks:
+                  type: number
+                  example: 4
+                incorrect_marks:
+                  type: number
+                  example: -1
+                num_questions:
+                  type: number
+                  example: 2
+                question_type:
+                  type: string
+                  example: numeric
+            examples:
+              Generate MCQ question ai:
+                value:
+                  context: Indian General Knowledge questions, easy
+                  correct_marks: 4
+                  incorrect_marks: -1
+                  num_questions: 2
+                  question_type: numeric
+      responses:
+        '200':
+          description: ''
+      security:
+        - bearerAuth: []
+  /api/quizzes:
+    get:
+      tags:
+        - Admin
+        - Quiz
+      summary: Get All Quizzes
+      description: Get All Quizzes
+      operationId: getAllQuizzes
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: string
+            example: '1'
+        - name: per_page
+          in: query
+          schema:
+            type: string
+            example: '10'
+        - name: quiz_id
+          in: query
+          schema:
+            type: string
+            example: '1'
+        - name: chapter_id
+          in: query
+          schema:
+            type: string
+            example: '1'
+        - name: name
+          in: query
+          schema:
+            type: string
+            example: First
+      responses:
+        '200':
+          description: ''
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - Admin
+        - Quiz
+      summary: Create Quiz
+      description: Create Quiz
+      operationId: createQuiz
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                chapter_id:
+                  type: number
+                  example: 1
+                date_of_quiz:
+                  type: string
+                  example: '2024-03-20T14:00:00'
+                duration:
+                  type: number
+                  example: 60
+                instructions:
+                  type: string
+                  example: Answer all questions
+                name:
+                  type: string
+                  example: First Quiz
+                remarks:
+                  type: string
+                  example: Midterm quiz
+                total_questions:
+                  type: number
+                  example: 10
+            examples:
+              Create Quiz:
+                value:
+                  chapter_id: 1
+                  date_of_quiz: '2024-03-20T14:00:00'
+                  duration: 60
+                  instructions: Answer all questions
+                  name: First Quiz
+                  remarks: Midterm quiz
+                  total_questions: 10
+      responses:
+        '200':
+          description: ''
+      security:
+        - bearerAuth: []
+  /api/quizzes/1:
+    put:
+      tags:
+        - Admin
+        - Quiz
+      summary: Update a Quiz
+      description: Update a Quiz
+      operationId: updateAQuiz
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date_of_quiz:
+                  type: string
+                  example: '2024-03-20T14:00:00'
+                duration:
+                  type: number
+                  example: 90
+                instructions:
+                  type: string
+                  example: Updated Remarks
+                remarks:
+                  type: string
+                  example: Updated remarks
+            examples:
+              Update a Quiz:
+                value:
+                  date_of_quiz: '2024-03-20T14:00:00'
+                  duration: 90
+                  instructions: Updated Remarks
+                  remarks: Updated remarks
+      responses:
+        '200':
+          description: ''
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - Admin
+        - Quiz
+      summary: Delete a quiz
+      description: Delete a quiz
+      operationId: deleteAQuiz
+      responses:
+        '200':
+          description: ''
+      security:
+        - bearerAuth: []
+  /api/admin/stats:
+    get:
+      tags:
+        - Admin
+        - Quiz
+      summary: Admin Stats
+      description: Admin Stats
+      operationId: adminStats
+      responses:
+        '200':
+          description: ''
+      security:
+        - bearerAuth: []
+  /api/attempts:
+    get:
+      tags:
+        - Student
+        - Attempt
+      summary: Get User Attempts
+      description: Get User Attempts
+      operationId: getUserAttempts
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: string
+            example: '1'
+        - name: per_page
+          in: query
+          schema:
+            type: string
+            example: '10'
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            example: created_at
+        - name: sort_order
+          in: query
+          schema:
+            type: string
+            example: desc
+        - name: search
+          in: query
+          schema:
+            type: string
+            example: math
+        - name: quiz_id
+          in: query
+          schema:
+            type: string
+            example: '15'
+        - name: subject_id
+          in: query
+          schema:
+            type: string
+            example: '2'
+        - name: chapter_id
+          in: query
+          schema:
+            type: string
+            example: '1'
+        - name: user_id
+          in: query
+          schema:
+            type: string
+            example: '2'
+      responses:
+        '200':
+          description: success / success
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: http://localhost:5173
+            Connection:
+              schema:
+                type: string
+                example: close
+            Content-Length:
+              schema:
+                type: string
+                example: '1643'
+            Date:
+              schema:
+                type: string
+                example: Fri, 28 Mar 2025 21:13:54 GMT
+            Server:
+              schema:
+                type: string
+                example: Werkzeug/3.1.3 Python/3.12.3
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  attempts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        completed_at:
+                          type: string
+                          example: '2025-03-28T20:08:24.825508'
+                        created_at:
+                          type: string
+                          example: '2025-03-28T20:08:06.712748'
+                        id:
+                          type: number
+                          example: 1
+                        quiz:
+                          type: object
+                          properties:
+                            chapter:
+                              type: object
+                              properties:
+                                description:
+                                  type: string
+                                  example: Updated chapter description
+                                id:
+                                  type: number
+                                  example: 1
+                                name:
+                                  type: string
+                                  example: Advanced Linear Algebra.
+                                subject:
+                                  type: object
+                                  properties:
+                                    description:
+                                      type: string
+                                      example: Science III
+                                    id:
+                                      type: number
+                                      example: 2
+                                    name:
+                                      type: string
+                                      example: Science
+                            date_of_quiz:
+                              type: string
+                              example: '2025-03-28T18:30:00'
+                            duration:
+                              type: number
+                              example: 3600
+                            id:
+                              type: number
+                              example: 15
+                            name:
+                              type: string
+                              example: Physics
+                            total_questions:
+                              type: number
+                              example: 2
+                            total_score:
+                              type: number
+                              example: 8
+                        quiz_id:
+                          type: number
+                          example: 15
+                        responses:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              attempt_id:
+                                type: number
+                                example: 1
+                              created_at:
+                                type: string
+                                example: '2025-03-28T20:08:06.715518'
+                              id:
+                                type: number
+                                example: 1
+                              is_attempted:
+                                type: boolean
+                                example: true
+                              is_correct:
+                                type: boolean
+                                example: true
+                              mcq_question_answer:
+                                type: number
+                                nullable: true
+                                example: 18
+                              numeric_question_answer:
+                                type: number
+                                nullable: true
+                                example: null
+                              question_id:
+                                type: number
+                                example: 7
+                              updated_at:
+                                type: string
+                                example: '2025-03-28T20:08:24.824591'
+                          example:
+                            - attempt_id: 1
+                              created_at: '2025-03-28T20:08:06.715518'
+                              id: 1
+                              is_attempted: true
+                              is_correct: true
+                              mcq_question_answer: 18
+                              numeric_question_answer: null
+                              question_id: 7
+                              updated_at: '2025-03-28T20:08:24.824591'
+                            - attempt_id: 1
+                              created_at: '2025-03-28T20:08:06.715526'
+                              id: 2
+                              is_attempted: true
+                              is_correct: true
+                              mcq_question_answer: null
+                              numeric_question_answer: 3.14
+                              question_id: 8
+                              updated_at: '2025-03-28T20:08:24.826733'
+                        score:
+                          type: number
+                          example: 8
+                        started_at:
+                          type: string
+                          example: '2025-03-28T20:08:06.712743'
+                        status:
+                          type: string
+                          example: completed
+                        updated_at:
+                          type: string
+                          example: '2025-03-28T20:08:24.825889'
+                        user_id:
+                          type: number
+                          example: 2
+                    example:
+                      - completed_at: '2025-03-28T20:08:24.825508'
+                        created_at: '2025-03-28T20:08:06.712748'
+                        id: 1
+                        quiz:
+                          chapter:
+                            description: Updated chapter description
+                            id: 1
+                            name: Advanced Linear Algebra.
+                            subject:
+                              description: Science III
+                              id: 2
+                              name: Science
+                          date_of_quiz: '2025-03-28T18:30:00'
+                          duration: 3600
+                          id: 15
+                          name: Physics
+                          total_questions: 2
+                          total_score: 8
+                        quiz_id: 15
+                        responses:
+                          - attempt_id: 1
+                            created_at: '2025-03-28T20:08:06.715518'
+                            id: 1
+                            is_attempted: true
+                            is_correct: true
+                            mcq_question_answer: 18
+                            numeric_question_answer: null
+                            question_id: 7
+                            updated_at: '2025-03-28T20:08:24.824591'
+                          - attempt_id: 1
+                            created_at: '2025-03-28T20:08:06.715526'
+                            id: 2
+                            is_attempted: true
+                            is_correct: true
+                            mcq_question_answer: null
+                            numeric_question_answer: 3.14
+                            question_id: 8
+                            updated_at: '2025-03-28T20:08:24.826733'
+                        score: 8
+                        started_at: '2025-03-28T20:08:06.712743'
+                        status: completed
+                        updated_at: '2025-03-28T20:08:24.825889'
+                        user_id: 2
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: number
+                        example: 1
+                      per_page:
+                        type: number
+                        example: 10
+                      total_items:
+                        type: number
+                        example: 1
+                      total_pages:
+                        type: number
+                        example: 1
+              examples:
+                success:
+                  value:
+                    attempts:
+                      - completed_at: '2025-03-28T20:08:24.825508'
+                        created_at: '2025-03-28T20:08:06.712748'
+                        id: 1
+                        quiz:
+                          chapter:
+                            description: Updated chapter description
+                            id: 1
+                            name: Advanced Linear Algebra.
+                            subject:
+                              description: Science III
+                              id: 2
+                              name: Science
+                          date_of_quiz: '2025-03-28T18:30:00'
+                          duration: 3600
+                          id: 15
+                          name: Physics
+                          total_questions: 2
+                          total_score: 8
+                        quiz_id: 15
+                        responses:
+                          - attempt_id: 1
+                            created_at: '2025-03-28T20:08:06.715518'
+                            id: 1
+                            is_attempted: true
+                            is_correct: true
+                            mcq_question_answer: 18
+                            numeric_question_answer: null
+                            question_id: 7
+                            updated_at: '2025-03-28T20:08:24.824591'
+                          - attempt_id: 1
+                            created_at: '2025-03-28T20:08:06.715526'
+                            id: 2
+                            is_attempted: true
+                            is_correct: true
+                            mcq_question_answer: null
+                            numeric_question_answer: 3.14
+                            question_id: 8
+                            updated_at: '2025-03-28T20:08:24.826733'
+                        score: 8
+                        started_at: '2025-03-28T20:08:06.712743'
+                        status: completed
+                        updated_at: '2025-03-28T20:08:24.825889'
+                        user_id: 2
+                    pagination:
+                      page: 1
+                      per_page: 10
+                      total_items: 1
+                      total_pages: 1
+      security:
+        - bearerAuth: []
+  /api/attempts/1/responses:
+    get:
+      tags:
+        - Student
+        - Attempt
+      summary: Get Attempt Responses
+      description: Get Attempt Responses
+      operationId: getAttemptResponses
+      parameters:
+        - name: user_id
+          in: query
+          schema:
+            type: string
+            example: '2'
+      responses:
+        '200':
+          description: success / success
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: http://localhost:5173
+            Connection:
+              schema:
+                type: string
+                example: close
+            Content-Length:
+              schema:
+                type: string
+                example: '6672'
+            Date:
+              schema:
+                type: string
+                example: Fri, 28 Mar 2025 23:06:11 GMT
+            Server:
+              schema:
+                type: string
+                example: Werkzeug/3.1.3 Python/3.12.3
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  attempt_id:
+                    type: number
+                    example: 1
+                  completed_at:
+                    type: string
+                    example: '2025-03-28T20:08:24.825508'
+                  quiz:
+                    type: object
+                    properties:
+                      chapter:
+                        type: object
+                        properties:
+                          description:
+                            type: string
+                            example: Updated chapter description
+                          id:
+                            type: number
+                            example: 1
+                          name:
+                            type: string
+                            example: Advanced Linear Algebra.
+                          subject:
+                            type: object
+                            properties:
+                              description:
+                                type: string
+                                example: Science III
+                              id:
+                                type: number
+                                example: 2
+                              name:
+                                type: string
+                                example: Science
+                      created_at:
+                        type: string
+                        example: '2025-03-28T17:10:37.328950'
+                      date_of_quiz:
+                        type: string
+                        example: '2025-03-28T18:30:00'
+                      duration:
+                        type: number
+                        example: 3600
+                      id:
+                        type: number
+                        example: 15
+                      instructions:
+                        type: string
+                        example: asdfasdfasdf
+                      name:
+                        type: string
+                        example: Physics
+                      questions:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            created_at:
+                              type: string
+                              example: '2025-03-28T17:19:10.786601'
+                            id:
+                              type: number
+                              example: 7
+                            question_details:
+                              type: object
+                              properties:
+                                answer_lower_bound:
+                                  type: number
+                                  example: 3.13
+                                answer_upper_bound:
+                                  type: number
+                                  example: 3.15
+                                correct_marks:
+                                  type: number
+                                  example: 4
+                                created_at:
+                                  type: string
+                                  example: '2025-03-28T17:19:10.779727'
+                                id:
+                                  type: number
+                                  example: 5
+                                incorrect_marks:
+                                  type: number
+                                  example: -1
+                                options:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      created_at:
+                                        type: string
+                                        example: '2025-03-28T17:19:10.782089'
+                                      id:
+                                        type: number
+                                        example: 15
+                                      is_correct:
+                                        type: boolean
+                                        example: false
+                                      text:
+                                        type: string
+                                        example: '1'
+                                      updated_at:
+                                        type: string
+                                        example: '2025-03-28T17:19:10.782095'
+                                  example:
+                                    - created_at: '2025-03-28T17:19:10.782089'
+                                      id: 15
+                                      is_correct: false
+                                      text: '1'
+                                      updated_at: '2025-03-28T17:19:10.782095'
+                                    - created_at: '2025-03-28T17:19:10.782096'
+                                      id: 16
+                                      is_correct: false
+                                      text: '2'
+                                      updated_at: '2025-03-28T17:19:10.782098'
+                                    - created_at: '2025-03-28T17:19:10.782100'
+                                      id: 17
+                                      is_correct: false
+                                      text: '4'
+                                      updated_at: '2025-03-28T17:19:10.782102'
+                                    - created_at: '2025-03-28T17:19:10.782103'
+                                      id: 18
+                                      is_correct: true
+                                      text: '6'
+                                      updated_at: '2025-03-28T17:19:10.782105'
+                                question_text:
+                                  type: string
+                                  example: What is the atomic number of carbon?
+                                updated_at:
+                                  type: string
+                                  example: '2025-03-28T17:19:10.779732'
+                            quiz_id:
+                              type: number
+                              example: 15
+                            type:
+                              type: string
+                              example: mcq
+                            updated_at:
+                              type: string
+                              example: '2025-03-28T17:19:10.786605'
+                        example:
+                          - created_at: '2025-03-28T17:19:10.786601'
+                            id: 7
+                            question_details:
+                              correct_marks: 4
+                              created_at: '2025-03-28T17:19:10.779727'
+                              id: 5
+                              incorrect_marks: -1
+                              options:
+                                - created_at: '2025-03-28T17:19:10.782089'
+                                  id: 15
+                                  is_correct: false
+                                  text: '1'
+                                  updated_at: '2025-03-28T17:19:10.782095'
+                                - created_at: '2025-03-28T17:19:10.782096'
+                                  id: 16
+                                  is_correct: false
+                                  text: '2'
+                                  updated_at: '2025-03-28T17:19:10.782098'
+                                - created_at: '2025-03-28T17:19:10.782100'
+                                  id: 17
+                                  is_correct: false
+                                  text: '4'
+                                  updated_at: '2025-03-28T17:19:10.782102'
+                                - created_at: '2025-03-28T17:19:10.782103'
+                                  id: 18
+                                  is_correct: true
+                                  text: '6'
+                                  updated_at: '2025-03-28T17:19:10.782105'
+                              question_text: What is the atomic number of carbon?
+                              updated_at: '2025-03-28T17:19:10.779732'
+                            quiz_id: 15
+                            type: mcq
+                            updated_at: '2025-03-28T17:19:10.786605'
+                          - created_at: '2025-03-28T17:19:31.566322'
+                            id: 8
+                            question_details:
+                              answer_lower_bound: 3.13
+                              answer_upper_bound: 3.15
+                              correct_marks: 4
+                              created_at: '2025-03-28T17:19:31.562984'
+                              id: 3
+                              incorrect_marks: 0
+                              question_text: What is the value of pi?
+                              updated_at: '2025-03-28T17:19:31.562989'
+                            quiz_id: 15
+                            type: numeric
+                            updated_at: '2025-03-28T17:19:31.566332'
+                          - created_at: '2025-03-28T22:40:17.912585'
+                            id: 9
+                            question_details:
+                              correct_marks: 4
+                              created_at: '2025-03-28T22:40:17.905832'
+                              id: 6
+                              incorrect_marks: 0
+                              options:
+                                - created_at: '2025-03-28T22:40:30.489022'
+                                  id: 19
+                                  is_correct: true
+                                  text: mass x acceleration
+                                  updated_at: '2025-03-28T22:40:30.489026'
+                                - created_at: '2025-03-28T22:40:30.489028'
+                                  id: 20
+                                  is_correct: false
+                                  text: pressure
+                                  updated_at: '2025-03-28T22:40:30.489030'
+                                - created_at: '2025-03-28T22:40:30.489031'
+                                  id: 21
+                                  is_correct: false
+                                  text: pressure * time
+                                  updated_at: '2025-03-28T22:40:30.489033'
+                                - created_at: '2025-03-28T22:40:30.489034'
+                                  id: 22
+                                  is_correct: false
+                                  text: mass * speed of light
+                                  updated_at: '2025-03-28T22:40:30.489035'
+                              question_text: |-
+                                Complete the formula.
+                                Force = 
+                              updated_at: '2025-03-28T22:40:30.485836'
+                            quiz_id: 15
+                            type: mcq
+                            updated_at: '2025-03-28T22:40:17.912588'
+                          - created_at: '2025-03-28T22:41:09.208149'
+                            id: 10
+                            question_details:
+                              answer_lower_bound: 9
+                              answer_upper_bound: 11
+                              correct_marks: 4
+                              created_at: '2025-03-28T22:41:09.206367'
+                              id: 4
+                              incorrect_marks: -1
+                              question_text: What is the value of g ?
+                              updated_at: '2025-03-28T22:41:09.206371'
+                            quiz_id: 15
+                            type: numeric
+                            updated_at: '2025-03-28T22:41:09.208151'
+                      remarks:
+                        type: string
+                        example: ''
+                      total_questions:
+                        type: number
+                        example: 4
+                      total_score:
+                        type: number
+                        example: 16
+                      updated_at:
+                        type: string
+                        example: '2025-03-28T22:41:09.207614'
+                  quiz_id:
+                    type: number
+                    example: 15
+                  responses:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        answer:
+                          type: object
+                          properties:
+                            option_id:
+                              type: number
+                              example: 18
+                            selected_option:
+                              type: object
+                              properties:
+                                id:
+                                  type: number
+                                  example: 18
+                                is_correct:
+                                  type: boolean
+                                  example: true
+                                text:
+                                  type: string
+                                  example: '6'
+                            value:
+                              type: number
+                              example: 3.14
+                        created_at:
+                          type: string
+                          example: '2025-03-28T20:08:06.715518'
+                        id:
+                          type: number
+                          example: 1
+                        is_attempted:
+                          type: boolean
+                          example: true
+                        is_correct:
+                          type: boolean
+                          example: true
+                        question:
+                          type: object
+                          properties:
+                            created_at:
+                              type: string
+                              example: '2025-03-28T17:19:10.786601'
+                            details:
+                              type: object
+                              properties:
+                                answer_lower_bound:
+                                  type: number
+                                  example: 3.13
+                                answer_upper_bound:
+                                  type: number
+                                  example: 3.15
+                                correct_marks:
+                                  type: number
+                                  example: 4
+                                id:
+                                  type: number
+                                  example: 5
+                                incorrect_marks:
+                                  type: number
+                                  example: -1
+                                options:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      id:
+                                        type: number
+                                        example: 15
+                                      is_correct:
+                                        type: boolean
+                                        example: false
+                                      text:
+                                        type: string
+                                        example: '1'
+                                  example:
+                                    - id: 15
+                                      is_correct: false
+                                      text: '1'
+                                    - id: 16
+                                      is_correct: false
+                                      text: '2'
+                                    - id: 17
+                                      is_correct: false
+                                      text: '4'
+                                    - id: 18
+                                      is_correct: true
+                                      text: '6'
+                                question_text:
+                                  type: string
+                                  example: What is the atomic number of carbon?
+                            id:
+                              type: number
+                              example: 7
+                            type:
+                              type: string
+                              example: mcq
+                            updated_at:
+                              type: string
+                              example: '2025-03-28T17:19:10.786605'
+                        updated_at:
+                          type: string
+                          example: '2025-03-28T20:08:24.824591'
+                    example:
+                      - answer:
+                          option_id: 18
+                          selected_option:
+                            id: 18
+                            is_correct: true
+                            text: '6'
+                        created_at: '2025-03-28T20:08:06.715518'
+                        id: 1
+                        is_attempted: true
+                        is_correct: true
+                        question:
+                          created_at: '2025-03-28T17:19:10.786601'
+                          details:
+                            correct_marks: 4
+                            id: 5
+                            incorrect_marks: -1
+                            options:
+                              - id: 15
+                                is_correct: false
+                                text: '1'
+                              - id: 16
+                                is_correct: false
+                                text: '2'
+                              - id: 17
+                                is_correct: false
+                                text: '4'
+                              - id: 18
+                                is_correct: true
+                                text: '6'
+                            question_text: What is the atomic number of carbon?
+                          id: 7
+                          type: mcq
+                          updated_at: '2025-03-28T17:19:10.786605'
+                        updated_at: '2025-03-28T20:08:24.824591'
+                      - answer:
+                          value: 3.14
+                        created_at: '2025-03-28T20:08:06.715526'
+                        id: 2
+                        is_attempted: true
+                        is_correct: true
+                        question:
+                          created_at: '2025-03-28T17:19:31.566322'
+                          details:
+                            answer_lower_bound: 3.13
+                            answer_upper_bound: 3.15
+                            correct_marks: 4
+                            id: 3
+                            incorrect_marks: 0
+                            question_text: What is the value of pi?
+                          id: 8
+                          type: numeric
+                          updated_at: '2025-03-28T17:19:31.566332'
+                        updated_at: '2025-03-28T20:08:24.826733'
+                  score:
+                    type: number
+                    example: 8
+                  started_at:
+                    type: string
+                    example: '2025-03-28T20:08:06.712743'
+                  status:
+                    type: string
+                    example: completed
+                  user_id:
+                    type: number
+                    example: 2
+              examples:
+                success:
+                  value:
+                    attempt_id: 1
+                    completed_at: '2025-03-28T20:08:24.825508'
+                    quiz:
+                      chapter:
+                        description: Updated chapter description
+                        id: 1
+                        name: Advanced Linear Algebra.
+                        subject:
+                          description: Science III
+                          id: 2
+                          name: Science
+                      created_at: '2025-03-28T17:10:37.328950'
+                      date_of_quiz: '2025-03-28T18:30:00'
+                      duration: 3600
+                      id: 15
+                      instructions: asdfasdfasdf
+                      name: Physics
+                      questions:
+                        - created_at: '2025-03-28T17:19:10.786601'
+                          id: 7
+                          question_details:
+                            correct_marks: 4
+                            created_at: '2025-03-28T17:19:10.779727'
+                            id: 5
+                            incorrect_marks: -1
+                            options:
+                              - created_at: '2025-03-28T17:19:10.782089'
+                                id: 15
+                                is_correct: false
+                                text: '1'
+                                updated_at: '2025-03-28T17:19:10.782095'
+                              - created_at: '2025-03-28T17:19:10.782096'
+                                id: 16
+                                is_correct: false
+                                text: '2'
+                                updated_at: '2025-03-28T17:19:10.782098'
+                              - created_at: '2025-03-28T17:19:10.782100'
+                                id: 17
+                                is_correct: false
+                                text: '4'
+                                updated_at: '2025-03-28T17:19:10.782102'
+                              - created_at: '2025-03-28T17:19:10.782103'
+                                id: 18
+                                is_correct: true
+                                text: '6'
+                                updated_at: '2025-03-28T17:19:10.782105'
+                            question_text: What is the atomic number of carbon?
+                            updated_at: '2025-03-28T17:19:10.779732'
+                          quiz_id: 15
+                          type: mcq
+                          updated_at: '2025-03-28T17:19:10.786605'
+                        - created_at: '2025-03-28T17:19:31.566322'
+                          id: 8
+                          question_details:
+                            answer_lower_bound: 3.13
+                            answer_upper_bound: 3.15
+                            correct_marks: 4
+                            created_at: '2025-03-28T17:19:31.562984'
+                            id: 3
+                            incorrect_marks: 0
+                            question_text: What is the value of pi?
+                            updated_at: '2025-03-28T17:19:31.562989'
+                          quiz_id: 15
+                          type: numeric
+                          updated_at: '2025-03-28T17:19:31.566332'
+                        - created_at: '2025-03-28T22:40:17.912585'
+                          id: 9
+                          question_details:
+                            correct_marks: 4
+                            created_at: '2025-03-28T22:40:17.905832'
+                            id: 6
+                            incorrect_marks: 0
+                            options:
+                              - created_at: '2025-03-28T22:40:30.489022'
+                                id: 19
+                                is_correct: true
+                                text: mass x acceleration
+                                updated_at: '2025-03-28T22:40:30.489026'
+                              - created_at: '2025-03-28T22:40:30.489028'
+                                id: 20
+                                is_correct: false
+                                text: pressure
+                                updated_at: '2025-03-28T22:40:30.489030'
+                              - created_at: '2025-03-28T22:40:30.489031'
+                                id: 21
+                                is_correct: false
+                                text: pressure * time
+                                updated_at: '2025-03-28T22:40:30.489033'
+                              - created_at: '2025-03-28T22:40:30.489034'
+                                id: 22
+                                is_correct: false
+                                text: mass * speed of light
+                                updated_at: '2025-03-28T22:40:30.489035'
+                            question_text: |-
+                              Complete the formula.
+                              Force = 
+                            updated_at: '2025-03-28T22:40:30.485836'
+                          quiz_id: 15
+                          type: mcq
+                          updated_at: '2025-03-28T22:40:17.912588'
+                        - created_at: '2025-03-28T22:41:09.208149'
+                          id: 10
+                          question_details:
+                            answer_lower_bound: 9
+                            answer_upper_bound: 11
+                            correct_marks: 4
+                            created_at: '2025-03-28T22:41:09.206367'
+                            id: 4
+                            incorrect_marks: -1
+                            question_text: What is the value of g ?
+                            updated_at: '2025-03-28T22:41:09.206371'
+                          quiz_id: 15
+                          type: numeric
+                          updated_at: '2025-03-28T22:41:09.208151'
+                      remarks: ''
+                      total_questions: 4
+                      total_score: 16
+                      updated_at: '2025-03-28T22:41:09.207614'
+                    quiz_id: 15
+                    responses:
+                      - answer:
+                          option_id: 18
+                          selected_option:
+                            id: 18
+                            is_correct: true
+                            text: '6'
+                        created_at: '2025-03-28T20:08:06.715518'
+                        id: 1
+                        is_attempted: true
+                        is_correct: true
+                        question:
+                          created_at: '2025-03-28T17:19:10.786601'
+                          details:
+                            correct_marks: 4
+                            id: 5
+                            incorrect_marks: -1
+                            options:
+                              - id: 15
+                                is_correct: false
+                                text: '1'
+                              - id: 16
+                                is_correct: false
+                                text: '2'
+                              - id: 17
+                                is_correct: false
+                                text: '4'
+                              - id: 18
+                                is_correct: true
+                                text: '6'
+                            question_text: What is the atomic number of carbon?
+                          id: 7
+                          type: mcq
+                          updated_at: '2025-03-28T17:19:10.786605'
+                        updated_at: '2025-03-28T20:08:24.824591'
+                      - answer:
+                          value: 3.14
+                        created_at: '2025-03-28T20:08:06.715526'
+                        id: 2
+                        is_attempted: true
+                        is_correct: true
+                        question:
+                          created_at: '2025-03-28T17:19:31.566322'
+                          details:
+                            answer_lower_bound: 3.13
+                            answer_upper_bound: 3.15
+                            correct_marks: 4
+                            id: 3
+                            incorrect_marks: 0
+                            question_text: What is the value of pi?
+                          id: 8
+                          type: numeric
+                          updated_at: '2025-03-28T17:19:31.566332'
+                        updated_at: '2025-03-28T20:08:24.826733'
+                    score: 8
+                    started_at: '2025-03-28T20:08:06.712743'
+                    status: completed
+                    user_id: 2
+      security:
+        - bearerAuth: []
+  /api/quizzes/1/start:
+    post:
+      tags:
+        - Student
+        - Attempt
+      summary: Starting a quiz
+      description: Starting a quiz
+      operationId: startingAQuiz
+      responses:
+        '201':
+          description: Success
+          headers:
+            Connection:
+              schema:
+                type: string
+                example: close
+            Content-Length:
+              schema:
+                type: string
+                example: '874'
+            Date:
+              schema:
+                type: string
+                example: Tue, 25 Mar 2025 18:59:27 GMT
+            Server:
+              schema:
+                type: string
+                example: Werkzeug/3.1.3 Python/3.12.3
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  completed_at:
+                    nullable: true
+                    example: null
+                  created_at:
+                    type: string
+                    example: '2025-03-25T18:59:27.289866'
+                  id:
+                    type: number
+                    example: 1
+                  quiz_id:
+                    type: number
+                    example: 1
+                  responses:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        attempt_id:
+                          type: number
+                          example: 1
+                        created_at:
+                          type: string
+                          example: '2025-03-25T18:59:27.290774'
+                        id:
+                          type: number
+                          example: 1
+                        is_attempted:
+                          type: boolean
+                          example: false
+                        is_correct:
+                          nullable: true
+                          example: null
+                        mcq_question_answer:
+                          nullable: true
+                          example: null
+                        numeric_question_answer:
+                          nullable: true
+                          example: null
+                        question_id:
+                          type: number
+                          example: 1
+                        updated_at:
+                          type: string
+                          example: '2025-03-25T18:59:27.290778'
+                    example:
+                      - attempt_id: 1
+                        created_at: '2025-03-25T18:59:27.290774'
+                        id: 1
+                        is_attempted: false
+                        is_correct: null
+                        mcq_question_answer: null
+                        numeric_question_answer: null
+                        question_id: 1
+                        updated_at: '2025-03-25T18:59:27.290778'
+                      - attempt_id: 1
+                        created_at: '2025-03-25T18:59:27.290780'
+                        id: 2
+                        is_attempted: false
+                        is_correct: null
+                        mcq_question_answer: null
+                        numeric_question_answer: null
+                        question_id: 2
+                        updated_at: '2025-03-25T18:59:27.290781'
+                  score:
+                    type: number
+                    example: 0
+                  started_at:
+                    type: string
+                    example: '2025-03-25T18:59:27.289864'
+                  status:
+                    type: string
+                    example: started
+                  updated_at:
+                    type: string
+                    example: '2025-03-25T18:59:27.289867'
+                  user_id:
+                    type: number
+                    example: 2
+              examples:
+                Success:
+                  value:
+                    completed_at: null
+                    created_at: '2025-03-25T18:59:27.289866'
+                    id: 1
+                    quiz_id: 1
+                    responses:
+                      - attempt_id: 1
+                        created_at: '2025-03-25T18:59:27.290774'
+                        id: 1
+                        is_attempted: false
+                        is_correct: null
+                        mcq_question_answer: null
+                        numeric_question_answer: null
+                        question_id: 1
+                        updated_at: '2025-03-25T18:59:27.290778'
+                      - attempt_id: 1
+                        created_at: '2025-03-25T18:59:27.290780'
+                        id: 2
+                        is_attempted: false
+                        is_correct: null
+                        mcq_question_answer: null
+                        numeric_question_answer: null
+                        question_id: 2
+                        updated_at: '2025-03-25T18:59:27.290781'
+                    score: 0
+                    started_at: '2025-03-25T18:59:27.289864'
+                    status: started
+                    updated_at: '2025-03-25T18:59:27.289867'
+                    user_id: 2
+      security:
+        - bearerAuth: []
+  /api/attempts/1/questions/2/respond:
+    post:
+      tags:
+        - Student
+        - Attempt
+      summary: Respond to a question
+      description: Respond to a question
+      operationId: respondToAQuestion
+      requestBody:
+        content:
+          application/json:
+            examples:
+              Respond to a question:
+                value: |-
+                  // {
+                  //     "option_id": 1
+                  // }
+
+                  {
+                      "answer": 3.141
+                  }
+      responses:
+        '200':
+          description: Success
+          headers:
+            Connection:
+              schema:
+                type: string
+                example: close
+            Content-Length:
+              schema:
+                type: string
+                example: '258'
+            Date:
+              schema:
+                type: string
+                example: Tue, 25 Mar 2025 18:21:35 GMT
+            Server:
+              schema:
+                type: string
+                example: Werkzeug/3.1.3 Python/3.12.3
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  attempt_id:
+                    type: number
+                    example: 1
+                  created_at:
+                    type: string
+                    example: '2025-03-25T18:21:35.725127'
+                  id:
+                    type: number
+                    example: 2
+                  is_attempted:
+                    type: boolean
+                    example: true
+                  is_correct:
+                    nullable: true
+                    example: null
+                  mcq_question_answer:
+                    nullable: true
+                    example: null
+                  numeric_question_answer:
+                    type: number
+                    example: 3.141
+                  question_id:
+                    type: number
+                    example: 2
+                  updated_at:
+                    type: string
+                    example: '2025-03-25T18:21:35.725134'
+              examples:
+                Success:
+                  value:
+                    attempt_id: 1
+                    created_at: '2025-03-25T18:21:35.725127'
+                    id: 2
+                    is_attempted: true
+                    is_correct: null
+                    mcq_question_answer: null
+                    numeric_question_answer: 3.141
+                    question_id: 2
+                    updated_at: '2025-03-25T18:21:35.725134'
+      security:
+        - bearerAuth: []
+  /api/attempts/2/submit:
+    post:
+      tags:
+        - Student
+        - Attempt
+      summary: Submit Quiz
+      description: Submit Quiz
+      operationId: submitQuiz
+      responses:
+        '200':
+          description: success
+          headers:
+            Connection:
+              schema:
+                type: string
+                example: close
+            Content-Length:
+              schema:
+                type: string
+                example: '900'
+            Date:
+              schema:
+                type: string
+                example: Tue, 25 Mar 2025 18:39:34 GMT
+            Server:
+              schema:
+                type: string
+                example: Werkzeug/3.1.3 Python/3.12.3
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  completed_at:
+                    type: string
+                    example: '2025-03-25T18:39:34.450304'
+                  created_at:
+                    type: string
+                    example: '2025-03-25T18:28:54.735333'
+                  id:
+                    type: number
+                    example: 1
+                  quiz_id:
+                    type: number
+                    example: 1
+                  responses:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        attempt_id:
+                          type: number
+                          example: 1
+                        created_at:
+                          type: string
+                          example: '2025-03-25T18:28:54.741105'
+                        id:
+                          type: number
+                          example: 1
+                        is_attempted:
+                          type: boolean
+                          example: false
+                        is_correct:
+                          type: boolean
+                          nullable: true
+                          example: null
+                        mcq_question_answer:
+                          nullable: true
+                          example: null
+                        numeric_question_answer:
+                          type: number
+                          nullable: true
+                          example: null
+                        question_id:
+                          type: number
+                          example: 1
+                        updated_at:
+                          type: string
+                          example: '2025-03-25T18:28:54.741109'
+                    example:
+                      - attempt_id: 1
+                        created_at: '2025-03-25T18:28:54.741105'
+                        id: 1
+                        is_attempted: false
+                        is_correct: null
+                        mcq_question_answer: null
+                        numeric_question_answer: null
+                        question_id: 1
+                        updated_at: '2025-03-25T18:28:54.741109'
+                      - attempt_id: 1
+                        created_at: '2025-03-25T18:28:54.741110'
+                        id: 2
+                        is_attempted: true
+                        is_correct: true
+                        mcq_question_answer: null
+                        numeric_question_answer: 3.141
+                        question_id: 2
+                        updated_at: '2025-03-25T18:39:34.453673'
+                  score:
+                    type: number
+                    example: 1
+                  started_at:
+                    type: string
+                    example: '2025-03-25T18:28:54.735329'
+                  status:
+                    type: string
+                    example: completed
+                  updated_at:
+                    type: string
+                    example: '2025-03-25T18:39:34.451800'
+                  user_id:
+                    type: number
+                    example: 2
+              examples:
+                success:
+                  value:
+                    completed_at: '2025-03-25T18:39:34.450304'
+                    created_at: '2025-03-25T18:28:54.735333'
+                    id: 1
+                    quiz_id: 1
+                    responses:
+                      - attempt_id: 1
+                        created_at: '2025-03-25T18:28:54.741105'
+                        id: 1
+                        is_attempted: false
+                        is_correct: null
+                        mcq_question_answer: null
+                        numeric_question_answer: null
+                        question_id: 1
+                        updated_at: '2025-03-25T18:28:54.741109'
+                      - attempt_id: 1
+                        created_at: '2025-03-25T18:28:54.741110'
+                        id: 2
+                        is_attempted: true
+                        is_correct: true
+                        mcq_question_answer: null
+                        numeric_question_answer: 3.141
+                        question_id: 2
+                        updated_at: '2025-03-25T18:39:34.453673'
+                    score: 1
+                    started_at: '2025-03-25T18:28:54.735329'
+                    status: completed
+                    updated_at: '2025-03-25T18:39:34.451800'
+                    user_id: 2
+      security:
+        - bearerAuth: []
+  /api/student/questions/8:
+    get:
+      tags:
+        - Student
+        - Attempt
+      summary: Fetch a question
+      description: Fetch a question
+      operationId: fetchAQuestion
+      responses:
+        '200':
+          description: success
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: http://localhost:5173
+            Connection:
+              schema:
+                type: string
+                example: close
+            Content-Length:
+              schema:
+                type: string
+                example: '1048'
+            Date:
+              schema:
+                type: string
+                example: Fri, 28 Mar 2025 18:51:05 GMT
+            Server:
+              schema:
+                type: string
+                example: Werkzeug/3.1.3 Python/3.12.3
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  created_at:
+                    type: string
+                    example: '2025-03-28T17:19:10.786601'
+                  id:
+                    type: number
+                    example: 7
+                  mcq_question:
+                    type: object
+                    properties:
+                      correct_marks:
+                        type: number
+                        example: 4
+                      created_at:
+                        type: string
+                        example: '2025-03-28T17:19:10.779727'
+                      id:
+                        type: number
+                        example: 5
+                      incorrect_marks:
+                        type: number
+                        example: -1
+                      options:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            created_at:
+                              type: string
+                              example: '2025-03-28T17:19:10.782089'
+                            id:
+                              type: number
+                              example: 15
+                            text:
+                              type: string
+                              example: '1'
+                            updated_at:
+                              type: string
+                              example: '2025-03-28T17:19:10.782095'
+                        example:
+                          - created_at: '2025-03-28T17:19:10.782089'
+                            id: 15
+                            text: '1'
+                            updated_at: '2025-03-28T17:19:10.782095'
+                          - created_at: '2025-03-28T17:19:10.782096'
+                            id: 16
+                            text: '2'
+                            updated_at: '2025-03-28T17:19:10.782098'
+                          - created_at: '2025-03-28T17:19:10.782100'
+                            id: 17
+                            text: '4'
+                            updated_at: '2025-03-28T17:19:10.782102'
+                          - created_at: '2025-03-28T17:19:10.782103'
+                            id: 18
+                            text: '6'
+                            updated_at: '2025-03-28T17:19:10.782105'
+                      question_text:
+                        type: string
+                        example: What is the atomic number of carbon?
+                      updated_at:
+                        type: string
+                        example: '2025-03-28T17:19:10.779732'
+                  quiz_id:
+                    type: number
+                    example: 15
+                  type:
+                    type: string
+                    example: mcq
+                  updated_at:
+                    type: string
+                    example: '2025-03-28T17:19:10.786605'
+              examples:
+                success:
+                  value:
+                    created_at: '2025-03-28T17:19:10.786601'
+                    id: 7
+                    mcq_question:
+                      correct_marks: 4
+                      created_at: '2025-03-28T17:19:10.779727'
+                      id: 5
+                      incorrect_marks: -1
+                      options:
+                        - created_at: '2025-03-28T17:19:10.782089'
+                          id: 15
+                          text: '1'
+                          updated_at: '2025-03-28T17:19:10.782095'
+                        - created_at: '2025-03-28T17:19:10.782096'
+                          id: 16
+                          text: '2'
+                          updated_at: '2025-03-28T17:19:10.782098'
+                        - created_at: '2025-03-28T17:19:10.782100'
+                          id: 17
+                          text: '4'
+                          updated_at: '2025-03-28T17:19:10.782102'
+                        - created_at: '2025-03-28T17:19:10.782103'
+                          id: 18
+                          text: '6'
+                          updated_at: '2025-03-28T17:19:10.782105'
+                      question_text: What is the atomic number of carbon?
+                      updated_at: '2025-03-28T17:19:10.779732'
+                    quiz_id: 15
+                    type: mcq
+                    updated_at: '2025-03-28T17:19:10.786605'
+      security:
+        - bearerAuth: []
+  /api/quizzes/1/report/csv:
+    post:
+      tags:
+        - Student
+        - Attempt
+      summary: Generate csv
+      description: Generate csv
+      operationId: generateCsv
+      responses:
+        '200':
+          description: Success
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+                example: http://localhost:5173
+            Connection:
+              schema:
+                type: string
+                example: close
+            Content-Length:
+              schema:
+                type: string
+                example: '142'
+            Date:
+              schema:
+                type: string
+                example: Sat, 29 Mar 2025 18:58:49 GMT
+            Server:
+              schema:
+                type: string
+                example: Werkzeug/3.1.3 Python/3.12.3
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: >-
+                      Quiz report is being generated and will be sent to your
+                      email shortly
+                  task_id:
+                    type: string
+                    example: d16b387a-d6a8-4eb8-96ad-60abdd894fad
+              examples:
+                Success:
+                  value:
+                    message: >-
+                      Quiz report is being generated and will be sent to your
+                      email shortly
+                    task_id: d16b387a-d6a8-4eb8-96ad-60abdd894fad
+      security:
+        - bearerAuth: []
+  /api/student/quizzes:
+    get:
+      tags:
+        - Student
+      summary: Fetch Quiz
+      description: Fetch Quiz
+      operationId: fetchQuiz
+      parameters:
+        - name: chapter_id
+          in: query
+          schema:
+            type: string
+            example: '1'
+        - name: name
+          in: query
+          schema:
+            type: string
+            example: First
+        - name: page
+          in: query
+          schema:
+            type: string
+            example: '1'
+        - name: per_page
+          in: query
+          schema:
+            type: string
+            example: '20'
+        - name: date_lb
+          in: query
+          schema:
+            type: string
+            example: '2020-03-01'
+        - name: date_ub
+          in: query
+          schema:
+            type: string
+            example: '2025-03-26'
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            example: date_of_quiz
+        - name: sort
+          in: query
+          schema:
+            type: string
+            example: ASC
+      responses:
+        '200':
+          description: ''
+      security:
+        - bearerAuth: []
+  /api/stats:
+    get:
+      tags:
+        - Student
+      summary: stats
+      description: stats
+      operationId: stats
+      responses:
+        '200':
+          description: ''
+      security:
+        - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+tags:
+  - name: Auth
+    description: Authentication Related APIs
+  - name: Users
+  - name: Admin
+  - name: Subject
+  - name: Chapter
+  - name: Quiz
+  - name: Questions
+  - name: Attempts
+  - name: Student
+  - name: Attempt

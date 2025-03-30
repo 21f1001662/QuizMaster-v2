@@ -1,0 +1,2663 @@
+{
+	"info": {
+		"_postman_id": "19bcdfd0-9b27-4684-ac4f-da2f90eb18c3",
+		"name": "QuizMaster V2",
+		"description": "**API Doc for QuizMaster is an AI-powered quiz management system that allows educators to generate and manage quizzes while enabling students to attempt quizzes, track progress, and view performance analytics. The project involves building a responsive web interface with automated question generation, real-time assessments, and interactive learning features.**",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32768981"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"shahbaz44\",\n    \"password\": \"123456789\",\n    \"full_name\": \"Shahbaz ali\",\n    \"dob\": \"2000-12-08\",\n    \"qualification\": \"student\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/auth/register",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Register User",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"shahbazali42\",\n    \"password\": \"123456789\",\n    \"full_name\": \"Shahbaz ali\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:3000/auth/register",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"auth",
+										"register"
+									]
+								}
+							},
+							"status": "CREATED",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.3"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 18 Mar 2025 09:10:14 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "43"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"User registered successfully\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Login User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Parse the JSON response",
+									"let responseData = pm.response.json();",
+									"",
+									"// Check if access_token exists",
+									"if (responseData.access_token) {",
+									"    // Set the token in Postman environment variable",
+									"    pm.environment.set(\"userToken\", responseData.access_token);",
+									"    ",
+									"    // Log success message",
+									"    console.log(\"userToken updated:\", responseData.access_token);",
+									"} else {",
+									"    console.log(\"No access_token found in response.\");",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"shahbaz43\",\n    \"password\": \"123456789\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/auth/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Sample Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"shahbaz42\",\n    \"password\": \"123456789\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:3000/auth/login",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"auth",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.3"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 18 Mar 2025 08:37:48 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "499"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MjI4NzA2OCwianRpIjoiMGM1NmRjYjEtMDFhNi00YTkwLWJkMDItYTk1Mzc4OWYzZGY4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MywibmJmIjoxNzQyMjg3MDY4LCJjc3JmIjoiOTQzNDFjMDctZDFhMy00ZTAxLWI3YjYtOWRiY2ZmZDJiOGQwIiwiZXhwIjoxNzQyMjg3OTY4fQ.fnT14lW7wV4Q4ArDezO1aY3T5F_XokKyh0R897JJcZc\",\n    \"user\": {\n        \"created_at\": \"2025-03-18T04:57:07.928813\",\n        \"dob\": null,\n        \"full_name\": \"Shahbaz Ali\",\n        \"id\": 3,\n        \"is_admin\": false,\n        \"qualification\": null,\n        \"username\": \"shahbaz42\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "[ Admin ] Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Parse the JSON response",
+									"let responseData = pm.response.json();",
+									"",
+									"// Check if access_token exists",
+									"if (responseData.access_token) {",
+									"    // Set the token in Postman environment variable",
+									"    pm.environment.set(\"adminToken\", responseData.access_token);",
+									"    ",
+									"    // Log success message",
+									"    console.log(\"adminToken updated:\", responseData.access_token);",
+									"} else {",
+									"    console.log(\"No access_token found in response.\");",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/auth/admin/login",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"auth",
+								"admin",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Sample Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:3000/auth/admin/login",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"auth",
+										"admin",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.3"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 18 Mar 2025 09:09:40 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "496"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MjI4ODk4MCwianRpIjoiYmI1ZjY4N2ItYWNlMS00M2FmLTgxMjItZGMzYjkwNjY2MzI1IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6MSwibmJmIjoxNzQyMjg4OTgwLCJjc3JmIjoiYmJjOTYzZDItMTY2OS00NGQ1LWFkMTItZTZkNzAyMGFhOGVkIiwiZXhwIjoxNzQyMjg5ODgwfQ.DeTcv_lzjEw0V3p0ZL4sM9RHr9vI_0pjyIuI23tURO4\",\n    \"user\": {\n        \"created_at\": \"2025-03-18T04:53:31.181333\",\n        \"dob\": null,\n        \"full_name\": \"Administrator\",\n        \"id\": 1,\n        \"is_admin\": true,\n        \"qualification\": null,\n        \"username\": \"admin\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get own user details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer YOUR_JWT_TOKEN"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/auth/own",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"auth",
+								"own"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication Related APIs"
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{userToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/user/profile",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"user",
+								"profile"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Sample Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:3000/user/profile",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"user",
+										"profile"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.3"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 18 Mar 2025 09:16:56 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "149"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"created_at\": \"2025-03-18T04:57:07.928813\",\n    \"dob\": null,\n    \"full_name\": \"Shahbaz Ali\",\n    \"id\": 3,\n    \"is_admin\": false,\n    \"qualification\": null,\n    \"username\": \"shahbaz42\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": [
+						{
+							"name": "Sample Response",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer YOUR_JWT_TOKEN"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"full_name\": \"New Full Name\",\n    \"dob\": \"1990-01-01\",\n    \"qualification\": \"Bachelors\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:3000/user/profile",
+									"host": [
+										"localhost"
+									],
+									"port": "3000",
+									"path": [
+										"user",
+										"profile"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "Werkzeug/3.1.3 Python/3.12.3"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 18 Mar 2025 09:30:43 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "195"
+								},
+								{
+									"key": "Connection",
+									"value": "close"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"created_at\": \"2025-03-18T04:57:07.928813\",\n    \"dob\": \"1990-01-01\",\n    \"full_name\": \"New Full Name\",\n    \"id\": 3,\n    \"is_admin\": false,\n    \"qualification\": \"Bachelors\",\n    \"username\": \"shahbaz42\"\n}"
+						}
+					]
+				},
+				{
+					"name": "[ Admin ] Get Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/user/users?search=Sbaz&page=1&per_page=10&sort_by=created_at&sort=desc",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"user",
+								"users"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "Sbaz"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "10"
+								},
+								{
+									"key": "sort_by",
+									"value": "created_at"
+								},
+								{
+									"key": "sort",
+									"value": "desc"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Subject",
+					"item": [
+						{
+							"name": "Create a subject",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <your_jwt_token>"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Physics\",\n    \"description\": \"Advanced physics course covering algebra and calculus\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5000/api/subjects",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"subjects"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Subjects",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <your_jwt_token>"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/subjects?page=1&per_page=10",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"subjects"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "per_page",
+											"value": "10"
+										},
+										{
+											"key": "search",
+											"value": "math",
+											"disabled": true
+										},
+										{
+											"key": "subject_id",
+											"value": "2",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Subject",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <your_jwt_token>"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Advanced Mathematics\",\n    \"description\": \"Updated description for mathematics course\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5000/api/subjects/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"subjects",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete a subject",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <your_jwt_token>"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/subjects/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"subjects",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Chapter",
+					"item": [
+						{
+							"name": "Create a new Chapter",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <your_jwt_token>"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Calculus\",\n    \"description\": \"Introduction to vectors, matrices, and linear transformations\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5000/api/subjects/1/chapters",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"subjects",
+										"1",
+										"chapters"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get all chapters",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <your_jwt_token>"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/chapters?page=1&per_page=10&sort_by=created_at&sort=DESC",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"chapters"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "per_page",
+											"value": "10"
+										},
+										{
+											"key": "chapter_id",
+											"value": "1",
+											"disabled": true
+										},
+										{
+											"key": "subject_id",
+											"value": "2",
+											"disabled": true
+										},
+										{
+											"key": "sort_by",
+											"value": "created_at"
+										},
+										{
+											"key": "sort",
+											"value": "DESC"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update a chapter",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <your_jwt_token>"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Advanced Linear Algebra\",\n    \"description\": \"Updated chapter description\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5000/api/chapters/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"chapters",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete a chapter",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": ""
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/chapters/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"chapters",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Quiz",
+					"item": [
+						{
+							"name": "Questions",
+							"item": [
+								{
+									"name": "Add an MCQ question",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{adminToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer YOUR_ADMIN_TOKEN"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"type\": \"mcq\",\n    \"question_text\": \"What is the capital of India?\",\n    \"correct_marks\": 4,\n    \"incorrect_marks\": -1,\n    \"options\": [\n        {\n            \"text\": \"Paris\",\n            \"is_correct\": false\n        },\n        {\n            \"text\": \"New Delhi\",\n            \"is_correct\": true\n        },\n        {\n            \"text\": \"Berlin\",\n            \"is_correct\": false\n        },\n        {\n            \"text\": \"Madrid\",\n            \"is_correct\": false\n        }\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:5000/api/quizzes/1/questions",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"quizzes",
+												"1",
+												"questions"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Add a numeric Question",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{adminToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer YOUR_ADMIN_TOKEN"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "// {\n//     \"type\": \"numeric\",\n//     \"question_text\": \"What is the value of pi (up to 2 decimal places)?\",\n//     \"answer_lower_bound\": 3.14,\n//     \"answer_upper_bound\": 3.15\n// }\n\n{\n    \"type\": \"numeric\",\n    \"question_text\": \"What is the value of gravity (m/s²)?\",\n    \"answer_lower_bound\": 9.8,\n    \"answer_upper_bound\": 9.81,\n    \"correct_marks\": 4.0,\n    \"incorrect_marks\": -1\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:5000/api/quizzes/1/questions",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"quizzes",
+												"1",
+												"questions"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update an MCQ question",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{adminToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer YOUR_ADMIN_TOKEN"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"question_text\": \"Updated question text\",\n    \"correct_marks\": 5,\n    \"options\": [\n        {\n            \"text\": \"New Option 1\",\n            \"is_correct\": true\n        },\n        {\n            \"text\": \"New Option 2\",\n            \"is_correct\": false\n        }\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:5000/api/quizzes/1/questions/1",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"quizzes",
+												"1",
+												"questions",
+												"1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update a numeric Question",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{adminToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer YOUR_ADMIN_TOKEN"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"question_text\": \"What is the acceleration due to gravity on Earth (in m/s²)?\",\n    \"answer_lower_bound\": 9.8,\n    \"answer_upper_bound\": 9.81\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:5000/api/quizzes/1/questions/2",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"quizzes",
+												"1",
+												"questions",
+												"2"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete a question",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{adminToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer YOUR_ADMIN_TOKEN"
+											}
+										],
+										"url": {
+											"raw": "http://localhost:5000/api/quizzes/1/questions/2",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"quizzes",
+												"1",
+												"questions",
+												"2"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Generate MCQ question ai",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{adminToken}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											},
+											{
+												"key": "Authorization",
+												"value": "Bearer YOUR_JWT_TOKEN"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"num_questions\": 2,\n    \"question_type\": \"numeric\",\n    \"correct_marks\": 4,\n    \"incorrect_marks\": -1,\n    \"context\": \"Indian General Knowledge questions, easy\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:5000/api/quizzes/17/ai/generate",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"quizzes",
+												"17",
+												"ai",
+												"generate"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Create Quiz",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer YOUR_ADMIN_TOKEN"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\" : \"First Quiz\",\n    \"chapter_id\": 1,\n    \"date_of_quiz\": \"2024-03-20T14:00:00\",\n    \"duration\": 60,\n    \"total_questions\": 10,\n    \"remarks\": \"Midterm quiz\",\n    \"instructions\": \"Answer all questions\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5000/api/quizzes",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"quizzes"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All Quizzes",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer YOUR_ADMIN_TOKEN"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/quizzes?page=1&per_page=10&quiz_id=1&chapter_id=1&name=First",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"quizzes"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "per_page",
+											"value": "10"
+										},
+										{
+											"key": "quiz_id",
+											"value": "1"
+										},
+										{
+											"key": "chapter_id",
+											"value": "1"
+										},
+										{
+											"key": "name",
+											"value": "First"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update a Quiz",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer YOUR_ADMIN_TOKEN"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"duration\": 90,\n    \"remarks\": \"Updated remarks\",\n    \"date_of_quiz\" : \"2024-03-20T14:00:00\",\n    \"instructions\" : \"Updated Remarks\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5000/api/quizzes/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"quizzes",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete a quiz",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer YOUR_ADMIN_TOKEN"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/quizzes/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"quizzes",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Admin Stats",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer <your_jwt_token>"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/admin/stats",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"admin",
+										"stats"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Attempts",
+					"item": [
+						{
+							"name": "Get User Attempts",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer YOUR_JWT_TOKEN"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/attempts?page=1&per_page=10&sort_by=created_at&sort_order=desc&user_id=2",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"attempts"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "per_page",
+											"value": "10"
+										},
+										{
+											"key": "sort_by",
+											"value": "created_at"
+										},
+										{
+											"key": "sort_order",
+											"value": "desc"
+										},
+										{
+											"key": "search",
+											"value": "math",
+											"disabled": true
+										},
+										{
+											"key": "quiz_id",
+											"value": "15",
+											"disabled": true
+										},
+										{
+											"key": "subject_id",
+											"value": "2",
+											"disabled": true
+										},
+										{
+											"key": "chapter_id",
+											"value": "1",
+											"disabled": true
+										},
+										{
+											"key": "user_id",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "success",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer YOUR_JWT_TOKEN"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "http://localhost:5000/api/attempts?page=1&per_page=10&sort_by=created_at&sort_order=desc&search=math&quiz_id=15&subject_id=2&chapter_id=1",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"attempts"
+											],
+											"query": [
+												{
+													"key": "page",
+													"value": "1"
+												},
+												{
+													"key": "per_page",
+													"value": "10"
+												},
+												{
+													"key": "sort_by",
+													"value": "created_at"
+												},
+												{
+													"key": "sort_order",
+													"value": "desc"
+												},
+												{
+													"key": "search",
+													"value": "math"
+												},
+												{
+													"key": "quiz_id",
+													"value": "15"
+												},
+												{
+													"key": "subject_id",
+													"value": "2"
+												},
+												{
+													"key": "chapter_id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Server",
+											"value": "Werkzeug/3.1.3 Python/3.12.3"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 28 Mar 2025 21:13:54 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "1643"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "http://localhost:5173"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"attempts\": [\n        {\n            \"completed_at\": \"2025-03-28T20:08:24.825508\",\n            \"created_at\": \"2025-03-28T20:08:06.712748\",\n            \"id\": 1,\n            \"quiz\": {\n                \"chapter\": {\n                    \"description\": \"Updated chapter description\",\n                    \"id\": 1,\n                    \"name\": \"Advanced Linear Algebra.\",\n                    \"subject\": {\n                        \"description\": \"Science III\",\n                        \"id\": 2,\n                        \"name\": \"Science\"\n                    }\n                },\n                \"date_of_quiz\": \"2025-03-28T18:30:00\",\n                \"duration\": 3600,\n                \"id\": 15,\n                \"name\": \"Physics\",\n                \"total_questions\": 2,\n                \"total_score\": 8\n            },\n            \"quiz_id\": 15,\n            \"responses\": [\n                {\n                    \"attempt_id\": 1,\n                    \"created_at\": \"2025-03-28T20:08:06.715518\",\n                    \"id\": 1,\n                    \"is_attempted\": true,\n                    \"is_correct\": true,\n                    \"mcq_question_answer\": 18,\n                    \"numeric_question_answer\": null,\n                    \"question_id\": 7,\n                    \"updated_at\": \"2025-03-28T20:08:24.824591\"\n                },\n                {\n                    \"attempt_id\": 1,\n                    \"created_at\": \"2025-03-28T20:08:06.715526\",\n                    \"id\": 2,\n                    \"is_attempted\": true,\n                    \"is_correct\": true,\n                    \"mcq_question_answer\": null,\n                    \"numeric_question_answer\": 3.14,\n                    \"question_id\": 8,\n                    \"updated_at\": \"2025-03-28T20:08:24.826733\"\n                }\n            ],\n            \"score\": 8,\n            \"started_at\": \"2025-03-28T20:08:06.712743\",\n            \"status\": \"completed\",\n            \"updated_at\": \"2025-03-28T20:08:24.825889\",\n            \"user_id\": 2\n        }\n    ],\n    \"pagination\": {\n        \"page\": 1,\n        \"per_page\": 10,\n        \"total_items\": 1,\n        \"total_pages\": 1\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Get Attempt Responses",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer YOUR_JWT_TOKEN"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/attempts/1/responses?user_id=2",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"attempts",
+										"1",
+										"responses"
+									],
+									"query": [
+										{
+											"key": "user_id",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "success",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer YOUR_JWT_TOKEN"
+											}
+										],
+										"url": {
+											"raw": "http://localhost:5000/api/attempts/1/responses",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"attempts",
+												"1",
+												"responses"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Server",
+											"value": "Werkzeug/3.1.3 Python/3.12.3"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 28 Mar 2025 23:06:11 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "6672"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "http://localhost:5173"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"attempt_id\": 1,\n    \"completed_at\": \"2025-03-28T20:08:24.825508\",\n    \"quiz\": {\n        \"chapter\": {\n            \"description\": \"Updated chapter description\",\n            \"id\": 1,\n            \"name\": \"Advanced Linear Algebra.\",\n            \"subject\": {\n                \"description\": \"Science III\",\n                \"id\": 2,\n                \"name\": \"Science\"\n            }\n        },\n        \"created_at\": \"2025-03-28T17:10:37.328950\",\n        \"date_of_quiz\": \"2025-03-28T18:30:00\",\n        \"duration\": 3600,\n        \"id\": 15,\n        \"instructions\": \"asdfasdfasdf\",\n        \"name\": \"Physics\",\n        \"questions\": [\n            {\n                \"created_at\": \"2025-03-28T17:19:10.786601\",\n                \"id\": 7,\n                \"question_details\": {\n                    \"correct_marks\": 4,\n                    \"created_at\": \"2025-03-28T17:19:10.779727\",\n                    \"id\": 5,\n                    \"incorrect_marks\": -1,\n                    \"options\": [\n                        {\n                            \"created_at\": \"2025-03-28T17:19:10.782089\",\n                            \"id\": 15,\n                            \"is_correct\": false,\n                            \"text\": \"1\",\n                            \"updated_at\": \"2025-03-28T17:19:10.782095\"\n                        },\n                        {\n                            \"created_at\": \"2025-03-28T17:19:10.782096\",\n                            \"id\": 16,\n                            \"is_correct\": false,\n                            \"text\": \"2\",\n                            \"updated_at\": \"2025-03-28T17:19:10.782098\"\n                        },\n                        {\n                            \"created_at\": \"2025-03-28T17:19:10.782100\",\n                            \"id\": 17,\n                            \"is_correct\": false,\n                            \"text\": \"4\",\n                            \"updated_at\": \"2025-03-28T17:19:10.782102\"\n                        },\n                        {\n                            \"created_at\": \"2025-03-28T17:19:10.782103\",\n                            \"id\": 18,\n                            \"is_correct\": true,\n                            \"text\": \"6\",\n                            \"updated_at\": \"2025-03-28T17:19:10.782105\"\n                        }\n                    ],\n                    \"question_text\": \"What is the atomic number of carbon?\",\n                    \"updated_at\": \"2025-03-28T17:19:10.779732\"\n                },\n                \"quiz_id\": 15,\n                \"type\": \"mcq\",\n                \"updated_at\": \"2025-03-28T17:19:10.786605\"\n            },\n            {\n                \"created_at\": \"2025-03-28T17:19:31.566322\",\n                \"id\": 8,\n                \"question_details\": {\n                    \"answer_lower_bound\": 3.13,\n                    \"answer_upper_bound\": 3.15,\n                    \"correct_marks\": 4,\n                    \"created_at\": \"2025-03-28T17:19:31.562984\",\n                    \"id\": 3,\n                    \"incorrect_marks\": 0,\n                    \"question_text\": \"What is the value of pi?\",\n                    \"updated_at\": \"2025-03-28T17:19:31.562989\"\n                },\n                \"quiz_id\": 15,\n                \"type\": \"numeric\",\n                \"updated_at\": \"2025-03-28T17:19:31.566332\"\n            },\n            {\n                \"created_at\": \"2025-03-28T22:40:17.912585\",\n                \"id\": 9,\n                \"question_details\": {\n                    \"correct_marks\": 4,\n                    \"created_at\": \"2025-03-28T22:40:17.905832\",\n                    \"id\": 6,\n                    \"incorrect_marks\": 0,\n                    \"options\": [\n                        {\n                            \"created_at\": \"2025-03-28T22:40:30.489022\",\n                            \"id\": 19,\n                            \"is_correct\": true,\n                            \"text\": \"mass x acceleration\",\n                            \"updated_at\": \"2025-03-28T22:40:30.489026\"\n                        },\n                        {\n                            \"created_at\": \"2025-03-28T22:40:30.489028\",\n                            \"id\": 20,\n                            \"is_correct\": false,\n                            \"text\": \"pressure\",\n                            \"updated_at\": \"2025-03-28T22:40:30.489030\"\n                        },\n                        {\n                            \"created_at\": \"2025-03-28T22:40:30.489031\",\n                            \"id\": 21,\n                            \"is_correct\": false,\n                            \"text\": \"pressure * time\",\n                            \"updated_at\": \"2025-03-28T22:40:30.489033\"\n                        },\n                        {\n                            \"created_at\": \"2025-03-28T22:40:30.489034\",\n                            \"id\": 22,\n                            \"is_correct\": false,\n                            \"text\": \"mass * speed of light\",\n                            \"updated_at\": \"2025-03-28T22:40:30.489035\"\n                        }\n                    ],\n                    \"question_text\": \"Complete the formula.\\nForce = \",\n                    \"updated_at\": \"2025-03-28T22:40:30.485836\"\n                },\n                \"quiz_id\": 15,\n                \"type\": \"mcq\",\n                \"updated_at\": \"2025-03-28T22:40:17.912588\"\n            },\n            {\n                \"created_at\": \"2025-03-28T22:41:09.208149\",\n                \"id\": 10,\n                \"question_details\": {\n                    \"answer_lower_bound\": 9,\n                    \"answer_upper_bound\": 11,\n                    \"correct_marks\": 4,\n                    \"created_at\": \"2025-03-28T22:41:09.206367\",\n                    \"id\": 4,\n                    \"incorrect_marks\": -1,\n                    \"question_text\": \"What is the value of g ?\",\n                    \"updated_at\": \"2025-03-28T22:41:09.206371\"\n                },\n                \"quiz_id\": 15,\n                \"type\": \"numeric\",\n                \"updated_at\": \"2025-03-28T22:41:09.208151\"\n            }\n        ],\n        \"remarks\": \"\",\n        \"total_questions\": 4,\n        \"total_score\": 16,\n        \"updated_at\": \"2025-03-28T22:41:09.207614\"\n    },\n    \"quiz_id\": 15,\n    \"responses\": [\n        {\n            \"answer\": {\n                \"option_id\": 18,\n                \"selected_option\": {\n                    \"id\": 18,\n                    \"is_correct\": true,\n                    \"text\": \"6\"\n                }\n            },\n            \"created_at\": \"2025-03-28T20:08:06.715518\",\n            \"id\": 1,\n            \"is_attempted\": true,\n            \"is_correct\": true,\n            \"question\": {\n                \"created_at\": \"2025-03-28T17:19:10.786601\",\n                \"details\": {\n                    \"correct_marks\": 4,\n                    \"id\": 5,\n                    \"incorrect_marks\": -1,\n                    \"options\": [\n                        {\n                            \"id\": 15,\n                            \"is_correct\": false,\n                            \"text\": \"1\"\n                        },\n                        {\n                            \"id\": 16,\n                            \"is_correct\": false,\n                            \"text\": \"2\"\n                        },\n                        {\n                            \"id\": 17,\n                            \"is_correct\": false,\n                            \"text\": \"4\"\n                        },\n                        {\n                            \"id\": 18,\n                            \"is_correct\": true,\n                            \"text\": \"6\"\n                        }\n                    ],\n                    \"question_text\": \"What is the atomic number of carbon?\"\n                },\n                \"id\": 7,\n                \"type\": \"mcq\",\n                \"updated_at\": \"2025-03-28T17:19:10.786605\"\n            },\n            \"updated_at\": \"2025-03-28T20:08:24.824591\"\n        },\n        {\n            \"answer\": {\n                \"value\": 3.14\n            },\n            \"created_at\": \"2025-03-28T20:08:06.715526\",\n            \"id\": 2,\n            \"is_attempted\": true,\n            \"is_correct\": true,\n            \"question\": {\n                \"created_at\": \"2025-03-28T17:19:31.566322\",\n                \"details\": {\n                    \"answer_lower_bound\": 3.13,\n                    \"answer_upper_bound\": 3.15,\n                    \"correct_marks\": 4,\n                    \"id\": 3,\n                    \"incorrect_marks\": 0,\n                    \"question_text\": \"What is the value of pi?\"\n                },\n                \"id\": 8,\n                \"type\": \"numeric\",\n                \"updated_at\": \"2025-03-28T17:19:31.566332\"\n            },\n            \"updated_at\": \"2025-03-28T20:08:24.826733\"\n        }\n    ],\n    \"score\": 8,\n    \"started_at\": \"2025-03-28T20:08:06.712743\",\n    \"status\": \"completed\",\n    \"user_id\": 2\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "get Monthly report",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Student",
+			"item": [
+				{
+					"name": "Attempt",
+					"item": [
+						{
+							"name": "Starting a quiz",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer YOUR_JWT_TOKEN"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/quizzes/1/start",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"quizzes",
+										"1",
+										"start"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer YOUR_JWT_TOKEN"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "http://localhost:5000/api/quizzes/1/start",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"quizzes",
+												"1",
+												"start"
+											]
+										}
+									},
+									"status": "CREATED",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Server",
+											"value": "Werkzeug/3.1.3 Python/3.12.3"
+										},
+										{
+											"key": "Date",
+											"value": "Tue, 25 Mar 2025 18:59:27 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "874"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"completed_at\": null,\n    \"created_at\": \"2025-03-25T18:59:27.289866\",\n    \"id\": 1,\n    \"quiz_id\": 1,\n    \"responses\": [\n        {\n            \"attempt_id\": 1,\n            \"created_at\": \"2025-03-25T18:59:27.290774\",\n            \"id\": 1,\n            \"is_attempted\": false,\n            \"is_correct\": null,\n            \"mcq_question_answer\": null,\n            \"numeric_question_answer\": null,\n            \"question_id\": 1,\n            \"updated_at\": \"2025-03-25T18:59:27.290778\"\n        },\n        {\n            \"attempt_id\": 1,\n            \"created_at\": \"2025-03-25T18:59:27.290780\",\n            \"id\": 2,\n            \"is_attempted\": false,\n            \"is_correct\": null,\n            \"mcq_question_answer\": null,\n            \"numeric_question_answer\": null,\n            \"question_id\": 2,\n            \"updated_at\": \"2025-03-25T18:59:27.290781\"\n        }\n    ],\n    \"score\": 0,\n    \"started_at\": \"2025-03-25T18:59:27.289864\",\n    \"status\": \"started\",\n    \"updated_at\": \"2025-03-25T18:59:27.289867\",\n    \"user_id\": 2\n}"
+								}
+							]
+						},
+						{
+							"name": "Respond to a question",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer YOUR_JWT_TOKEN"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "// {\n//     \"option_id\": 1\n// }\n\n{\n    \"answer\": 3.141\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:5000/api/attempts/1/questions/2/respond",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"attempts",
+										"1",
+										"questions",
+										"2",
+										"respond"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer YOUR_JWT_TOKEN"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "// {\n//     \"option_id\": 1\n// }\n\n{\n    \"answer\": 3.141\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:5000/api/attempts/1/questions/2/respond",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"attempts",
+												"1",
+												"questions",
+												"2",
+												"respond"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Server",
+											"value": "Werkzeug/3.1.3 Python/3.12.3"
+										},
+										{
+											"key": "Date",
+											"value": "Tue, 25 Mar 2025 18:21:35 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "258"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"attempt_id\": 1,\n    \"created_at\": \"2025-03-25T18:21:35.725127\",\n    \"id\": 2,\n    \"is_attempted\": true,\n    \"is_correct\": null,\n    \"mcq_question_answer\": null,\n    \"numeric_question_answer\": 3.141,\n    \"question_id\": 2,\n    \"updated_at\": \"2025-03-25T18:21:35.725134\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Get Attempts",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer YOUR_JWT_TOKEN"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/attempts?page=1&per_page=10&sort_by=created_at&sort_order=desc&search=math&quiz_id=15&subject_id=2&chapter_id=1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"attempts"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "per_page",
+											"value": "10"
+										},
+										{
+											"key": "sort_by",
+											"value": "created_at"
+										},
+										{
+											"key": "sort_order",
+											"value": "desc"
+										},
+										{
+											"key": "search",
+											"value": "math"
+										},
+										{
+											"key": "quiz_id",
+											"value": "15"
+										},
+										{
+											"key": "subject_id",
+											"value": "2"
+										},
+										{
+											"key": "chapter_id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "success",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer YOUR_JWT_TOKEN"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "http://localhost:5000/api/attempts?page=1&per_page=10&sort_by=created_at&sort_order=desc&search=math&quiz_id=15&subject_id=2&chapter_id=1",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"attempts"
+											],
+											"query": [
+												{
+													"key": "page",
+													"value": "1"
+												},
+												{
+													"key": "per_page",
+													"value": "10"
+												},
+												{
+													"key": "sort_by",
+													"value": "created_at"
+												},
+												{
+													"key": "sort_order",
+													"value": "desc"
+												},
+												{
+													"key": "search",
+													"value": "math"
+												},
+												{
+													"key": "quiz_id",
+													"value": "15"
+												},
+												{
+													"key": "subject_id",
+													"value": "2"
+												},
+												{
+													"key": "chapter_id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Server",
+											"value": "Werkzeug/3.1.3 Python/3.12.3"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 28 Mar 2025 21:13:54 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "1643"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "http://localhost:5173"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"attempts\": [\n        {\n            \"completed_at\": \"2025-03-28T20:08:24.825508\",\n            \"created_at\": \"2025-03-28T20:08:06.712748\",\n            \"id\": 1,\n            \"quiz\": {\n                \"chapter\": {\n                    \"description\": \"Updated chapter description\",\n                    \"id\": 1,\n                    \"name\": \"Advanced Linear Algebra.\",\n                    \"subject\": {\n                        \"description\": \"Science III\",\n                        \"id\": 2,\n                        \"name\": \"Science\"\n                    }\n                },\n                \"date_of_quiz\": \"2025-03-28T18:30:00\",\n                \"duration\": 3600,\n                \"id\": 15,\n                \"name\": \"Physics\",\n                \"total_questions\": 2,\n                \"total_score\": 8\n            },\n            \"quiz_id\": 15,\n            \"responses\": [\n                {\n                    \"attempt_id\": 1,\n                    \"created_at\": \"2025-03-28T20:08:06.715518\",\n                    \"id\": 1,\n                    \"is_attempted\": true,\n                    \"is_correct\": true,\n                    \"mcq_question_answer\": 18,\n                    \"numeric_question_answer\": null,\n                    \"question_id\": 7,\n                    \"updated_at\": \"2025-03-28T20:08:24.824591\"\n                },\n                {\n                    \"attempt_id\": 1,\n                    \"created_at\": \"2025-03-28T20:08:06.715526\",\n                    \"id\": 2,\n                    \"is_attempted\": true,\n                    \"is_correct\": true,\n                    \"mcq_question_answer\": null,\n                    \"numeric_question_answer\": 3.14,\n                    \"question_id\": 8,\n                    \"updated_at\": \"2025-03-28T20:08:24.826733\"\n                }\n            ],\n            \"score\": 8,\n            \"started_at\": \"2025-03-28T20:08:06.712743\",\n            \"status\": \"completed\",\n            \"updated_at\": \"2025-03-28T20:08:24.825889\",\n            \"user_id\": 2\n        }\n    ],\n    \"pagination\": {\n        \"page\": 1,\n        \"per_page\": 10,\n        \"total_items\": 1,\n        \"total_pages\": 1\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Submit Quiz",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer YOUR_JWT_TOKEN"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/attempts/2/submit",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"attempts",
+										"2",
+										"submit"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "success",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer YOUR_JWT_TOKEN"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "http://localhost:5000/api/attempts/1/submit",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"attempts",
+												"1",
+												"submit"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Server",
+											"value": "Werkzeug/3.1.3 Python/3.12.3"
+										},
+										{
+											"key": "Date",
+											"value": "Tue, 25 Mar 2025 18:39:34 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "900"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"completed_at\": \"2025-03-25T18:39:34.450304\",\n    \"created_at\": \"2025-03-25T18:28:54.735333\",\n    \"id\": 1,\n    \"quiz_id\": 1,\n    \"responses\": [\n        {\n            \"attempt_id\": 1,\n            \"created_at\": \"2025-03-25T18:28:54.741105\",\n            \"id\": 1,\n            \"is_attempted\": false,\n            \"is_correct\": null,\n            \"mcq_question_answer\": null,\n            \"numeric_question_answer\": null,\n            \"question_id\": 1,\n            \"updated_at\": \"2025-03-25T18:28:54.741109\"\n        },\n        {\n            \"attempt_id\": 1,\n            \"created_at\": \"2025-03-25T18:28:54.741110\",\n            \"id\": 2,\n            \"is_attempted\": true,\n            \"is_correct\": true,\n            \"mcq_question_answer\": null,\n            \"numeric_question_answer\": 3.141,\n            \"question_id\": 2,\n            \"updated_at\": \"2025-03-25T18:39:34.453673\"\n        }\n    ],\n    \"score\": 1,\n    \"started_at\": \"2025-03-25T18:28:54.735329\",\n    \"status\": \"completed\",\n    \"updated_at\": \"2025-03-25T18:39:34.451800\",\n    \"user_id\": 2\n}"
+								}
+							]
+						},
+						{
+							"name": "Fetch a question",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer YOUR_JWT_TOKEN"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/student/questions/8",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"student",
+										"questions",
+										"8"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "success",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer YOUR_JWT_TOKEN"
+											}
+										],
+										"url": {
+											"raw": "http://localhost:5000/api/student/questions/8",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"student",
+												"questions",
+												"8"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Server",
+											"value": "Werkzeug/3.1.3 Python/3.12.3"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 28 Mar 2025 18:51:05 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "1048"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "http://localhost:5173"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"created_at\": \"2025-03-28T17:19:10.786601\",\n    \"id\": 7,\n    \"mcq_question\": {\n        \"correct_marks\": 4,\n        \"created_at\": \"2025-03-28T17:19:10.779727\",\n        \"id\": 5,\n        \"incorrect_marks\": -1,\n        \"options\": [\n            {\n                \"created_at\": \"2025-03-28T17:19:10.782089\",\n                \"id\": 15,\n                \"text\": \"1\",\n                \"updated_at\": \"2025-03-28T17:19:10.782095\"\n            },\n            {\n                \"created_at\": \"2025-03-28T17:19:10.782096\",\n                \"id\": 16,\n                \"text\": \"2\",\n                \"updated_at\": \"2025-03-28T17:19:10.782098\"\n            },\n            {\n                \"created_at\": \"2025-03-28T17:19:10.782100\",\n                \"id\": 17,\n                \"text\": \"4\",\n                \"updated_at\": \"2025-03-28T17:19:10.782102\"\n            },\n            {\n                \"created_at\": \"2025-03-28T17:19:10.782103\",\n                \"id\": 18,\n                \"text\": \"6\",\n                \"updated_at\": \"2025-03-28T17:19:10.782105\"\n            }\n        ],\n        \"question_text\": \"What is the atomic number of carbon?\",\n        \"updated_at\": \"2025-03-28T17:19:10.779732\"\n    },\n    \"quiz_id\": 15,\n    \"type\": \"mcq\",\n    \"updated_at\": \"2025-03-28T17:19:10.786605\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Get Attempt Responses",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer YOUR_JWT_TOKEN"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/attempts/1/responses",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"attempts",
+										"1",
+										"responses"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "success",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer YOUR_JWT_TOKEN"
+											}
+										],
+										"url": {
+											"raw": "http://localhost:5000/api/attempts/1/responses",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"attempts",
+												"1",
+												"responses"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Server",
+											"value": "Werkzeug/3.1.3 Python/3.12.3"
+										},
+										{
+											"key": "Date",
+											"value": "Fri, 28 Mar 2025 23:06:11 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "6672"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "http://localhost:5173"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"attempt_id\": 1,\n    \"completed_at\": \"2025-03-28T20:08:24.825508\",\n    \"quiz\": {\n        \"chapter\": {\n            \"description\": \"Updated chapter description\",\n            \"id\": 1,\n            \"name\": \"Advanced Linear Algebra.\",\n            \"subject\": {\n                \"description\": \"Science III\",\n                \"id\": 2,\n                \"name\": \"Science\"\n            }\n        },\n        \"created_at\": \"2025-03-28T17:10:37.328950\",\n        \"date_of_quiz\": \"2025-03-28T18:30:00\",\n        \"duration\": 3600,\n        \"id\": 15,\n        \"instructions\": \"asdfasdfasdf\",\n        \"name\": \"Physics\",\n        \"questions\": [\n            {\n                \"created_at\": \"2025-03-28T17:19:10.786601\",\n                \"id\": 7,\n                \"question_details\": {\n                    \"correct_marks\": 4,\n                    \"created_at\": \"2025-03-28T17:19:10.779727\",\n                    \"id\": 5,\n                    \"incorrect_marks\": -1,\n                    \"options\": [\n                        {\n                            \"created_at\": \"2025-03-28T17:19:10.782089\",\n                            \"id\": 15,\n                            \"is_correct\": false,\n                            \"text\": \"1\",\n                            \"updated_at\": \"2025-03-28T17:19:10.782095\"\n                        },\n                        {\n                            \"created_at\": \"2025-03-28T17:19:10.782096\",\n                            \"id\": 16,\n                            \"is_correct\": false,\n                            \"text\": \"2\",\n                            \"updated_at\": \"2025-03-28T17:19:10.782098\"\n                        },\n                        {\n                            \"created_at\": \"2025-03-28T17:19:10.782100\",\n                            \"id\": 17,\n                            \"is_correct\": false,\n                            \"text\": \"4\",\n                            \"updated_at\": \"2025-03-28T17:19:10.782102\"\n                        },\n                        {\n                            \"created_at\": \"2025-03-28T17:19:10.782103\",\n                            \"id\": 18,\n                            \"is_correct\": true,\n                            \"text\": \"6\",\n                            \"updated_at\": \"2025-03-28T17:19:10.782105\"\n                        }\n                    ],\n                    \"question_text\": \"What is the atomic number of carbon?\",\n                    \"updated_at\": \"2025-03-28T17:19:10.779732\"\n                },\n                \"quiz_id\": 15,\n                \"type\": \"mcq\",\n                \"updated_at\": \"2025-03-28T17:19:10.786605\"\n            },\n            {\n                \"created_at\": \"2025-03-28T17:19:31.566322\",\n                \"id\": 8,\n                \"question_details\": {\n                    \"answer_lower_bound\": 3.13,\n                    \"answer_upper_bound\": 3.15,\n                    \"correct_marks\": 4,\n                    \"created_at\": \"2025-03-28T17:19:31.562984\",\n                    \"id\": 3,\n                    \"incorrect_marks\": 0,\n                    \"question_text\": \"What is the value of pi?\",\n                    \"updated_at\": \"2025-03-28T17:19:31.562989\"\n                },\n                \"quiz_id\": 15,\n                \"type\": \"numeric\",\n                \"updated_at\": \"2025-03-28T17:19:31.566332\"\n            },\n            {\n                \"created_at\": \"2025-03-28T22:40:17.912585\",\n                \"id\": 9,\n                \"question_details\": {\n                    \"correct_marks\": 4,\n                    \"created_at\": \"2025-03-28T22:40:17.905832\",\n                    \"id\": 6,\n                    \"incorrect_marks\": 0,\n                    \"options\": [\n                        {\n                            \"created_at\": \"2025-03-28T22:40:30.489022\",\n                            \"id\": 19,\n                            \"is_correct\": true,\n                            \"text\": \"mass x acceleration\",\n                            \"updated_at\": \"2025-03-28T22:40:30.489026\"\n                        },\n                        {\n                            \"created_at\": \"2025-03-28T22:40:30.489028\",\n                            \"id\": 20,\n                            \"is_correct\": false,\n                            \"text\": \"pressure\",\n                            \"updated_at\": \"2025-03-28T22:40:30.489030\"\n                        },\n                        {\n                            \"created_at\": \"2025-03-28T22:40:30.489031\",\n                            \"id\": 21,\n                            \"is_correct\": false,\n                            \"text\": \"pressure * time\",\n                            \"updated_at\": \"2025-03-28T22:40:30.489033\"\n                        },\n                        {\n                            \"created_at\": \"2025-03-28T22:40:30.489034\",\n                            \"id\": 22,\n                            \"is_correct\": false,\n                            \"text\": \"mass * speed of light\",\n                            \"updated_at\": \"2025-03-28T22:40:30.489035\"\n                        }\n                    ],\n                    \"question_text\": \"Complete the formula.\\nForce = \",\n                    \"updated_at\": \"2025-03-28T22:40:30.485836\"\n                },\n                \"quiz_id\": 15,\n                \"type\": \"mcq\",\n                \"updated_at\": \"2025-03-28T22:40:17.912588\"\n            },\n            {\n                \"created_at\": \"2025-03-28T22:41:09.208149\",\n                \"id\": 10,\n                \"question_details\": {\n                    \"answer_lower_bound\": 9,\n                    \"answer_upper_bound\": 11,\n                    \"correct_marks\": 4,\n                    \"created_at\": \"2025-03-28T22:41:09.206367\",\n                    \"id\": 4,\n                    \"incorrect_marks\": -1,\n                    \"question_text\": \"What is the value of g ?\",\n                    \"updated_at\": \"2025-03-28T22:41:09.206371\"\n                },\n                \"quiz_id\": 15,\n                \"type\": \"numeric\",\n                \"updated_at\": \"2025-03-28T22:41:09.208151\"\n            }\n        ],\n        \"remarks\": \"\",\n        \"total_questions\": 4,\n        \"total_score\": 16,\n        \"updated_at\": \"2025-03-28T22:41:09.207614\"\n    },\n    \"quiz_id\": 15,\n    \"responses\": [\n        {\n            \"answer\": {\n                \"option_id\": 18,\n                \"selected_option\": {\n                    \"id\": 18,\n                    \"is_correct\": true,\n                    \"text\": \"6\"\n                }\n            },\n            \"created_at\": \"2025-03-28T20:08:06.715518\",\n            \"id\": 1,\n            \"is_attempted\": true,\n            \"is_correct\": true,\n            \"question\": {\n                \"created_at\": \"2025-03-28T17:19:10.786601\",\n                \"details\": {\n                    \"correct_marks\": 4,\n                    \"id\": 5,\n                    \"incorrect_marks\": -1,\n                    \"options\": [\n                        {\n                            \"id\": 15,\n                            \"is_correct\": false,\n                            \"text\": \"1\"\n                        },\n                        {\n                            \"id\": 16,\n                            \"is_correct\": false,\n                            \"text\": \"2\"\n                        },\n                        {\n                            \"id\": 17,\n                            \"is_correct\": false,\n                            \"text\": \"4\"\n                        },\n                        {\n                            \"id\": 18,\n                            \"is_correct\": true,\n                            \"text\": \"6\"\n                        }\n                    ],\n                    \"question_text\": \"What is the atomic number of carbon?\"\n                },\n                \"id\": 7,\n                \"type\": \"mcq\",\n                \"updated_at\": \"2025-03-28T17:19:10.786605\"\n            },\n            \"updated_at\": \"2025-03-28T20:08:24.824591\"\n        },\n        {\n            \"answer\": {\n                \"value\": 3.14\n            },\n            \"created_at\": \"2025-03-28T20:08:06.715526\",\n            \"id\": 2,\n            \"is_attempted\": true,\n            \"is_correct\": true,\n            \"question\": {\n                \"created_at\": \"2025-03-28T17:19:31.566322\",\n                \"details\": {\n                    \"answer_lower_bound\": 3.13,\n                    \"answer_upper_bound\": 3.15,\n                    \"correct_marks\": 4,\n                    \"id\": 3,\n                    \"incorrect_marks\": 0,\n                    \"question_text\": \"What is the value of pi?\"\n                },\n                \"id\": 8,\n                \"type\": \"numeric\",\n                \"updated_at\": \"2025-03-28T17:19:31.566332\"\n            },\n            \"updated_at\": \"2025-03-28T20:08:24.826733\"\n        }\n    ],\n    \"score\": 8,\n    \"started_at\": \"2025-03-28T20:08:06.712743\",\n    \"status\": \"completed\",\n    \"user_id\": 2\n}"
+								}
+							]
+						},
+						{
+							"name": "Generate csv",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer YOUR_JWT_TOKEN"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:5000/api/quizzes/1/report/csv",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"quizzes",
+										"1",
+										"report",
+										"csv"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer YOUR_JWT_TOKEN"
+											},
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "http://localhost:5000/api/quizzes/1/report/csv",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "5000",
+											"path": [
+												"api",
+												"quizzes",
+												"1",
+												"report",
+												"csv"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Server",
+											"value": "Werkzeug/3.1.3 Python/3.12.3"
+										},
+										{
+											"key": "Date",
+											"value": "Sat, 29 Mar 2025 18:58:49 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "142"
+										},
+										{
+											"key": "Access-Control-Allow-Origin",
+											"value": "http://localhost:5173"
+										},
+										{
+											"key": "Connection",
+											"value": "close"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"Quiz report is being generated and will be sent to your email shortly\",\n    \"task_id\": \"d16b387a-d6a8-4eb8-96ad-60abdd894fad\"\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Fetch Quiz",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{userToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc0MjkyOTAwOCwianRpIjoiNTdhMTQyZjgtMjhhYy00ZjMyLWE0Y2EtYzQzOGFiNzQ4N2NhIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjIiLCJuYmYiOjE3NDI5MjkwMDgsImNzcmYiOiJmZTQzNzViNy05NDQzLTQ2YjMtODUxNy0xZDMyMDNmY2Y1NTkiLCJleHAiOjE3NDMwMTU0MDh9.2kmuS6r0WIFugYyVxtmVwVTawhB_senAm8A_8VDQ3kU"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/student/quizzes?chapter_id=1&name=First&page=1&per_page=20&date_lb=2020-03-01&date_ub=2025-03-26&sort_by=date_of_quiz&sort=ASC",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"student",
+								"quizzes"
+							],
+							"query": [
+								{
+									"key": "chapter_id",
+									"value": "1"
+								},
+								{
+									"key": "name",
+									"value": "First"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "20"
+								},
+								{
+									"key": "date_lb",
+									"value": "2020-03-01"
+								},
+								{
+									"key": "date_ub",
+									"value": "2025-03-26"
+								},
+								{
+									"key": "sort_by",
+									"value": "date_of_quiz"
+								},
+								{
+									"key": "sort",
+									"value": "ASC"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "stats",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{userToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer YOUR_JWT_TOKEN"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:5000/api/stats",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"stats"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

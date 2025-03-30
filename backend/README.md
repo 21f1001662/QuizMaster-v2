@@ -16,6 +16,9 @@ A Flask-based backend for the QuizMaster application with JWT authentication and
 - SQLite database with SQLAlchemy ORM
 - RESTful API endpoints
 
+## API Doc:
+[https://documenter.getpostman.com/view/32768981/2sB2cPk5ny](https://documenter.getpostman.com/view/32768981/2sB2cPk5ny)
+
 ## Setup
 
 1. Clone the repository
@@ -31,7 +34,6 @@ pip install -r requirements.txt
 ```
 
 4. Set up environment variables:
-   - Copy `.env.example` to `.env`
    - Update the variables in `.env` with your values
 
 ## Running the Application
