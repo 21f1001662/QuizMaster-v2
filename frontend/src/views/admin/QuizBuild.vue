@@ -281,123 +281,134 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <div class="d-flex align-items-center">
-        <button class="btn btn-link text-dark me-3 p-0" @click="router.push('/admin/dashboard/quizzes')">
-          <i class="bi bi-arrow-left fs-4"></i>
-        </button>
-        <div>
-          <div class="d-flex align-items-center mb-1">
-            <h2 class="mb-0">{{ quiz?.name }}</h2>
-          </div>
-          <div class="d-flex align-items-center text-muted">
-            <div class="me-3">
-              <i class="bi bi-book me-1"></i>
-              {{ quiz?.chapter?.subject?.name }}
+  <div class="quiz-build-page">
+    <!-- Header Section -->
+    <div class="header-section mb-4">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+          <button class="btn btn-link text-dark me-3 p-0" @click="router.push('/admin/dashboard/quizzes')">
+            <i class="bi bi-arrow-left fs-4"></i>
+          </button>
+          <div>
+            <div class="d-flex align-items-center mb-1">
+              <h2 class="mb-0">{{ quiz?.name }}</h2>
             </div>
-            <div class="me-3">
-              <i class="bi bi-journal-text me-1"></i>
-              {{ quiz?.chapter?.name }}
-            </div>
-            <div>
-              <i class="bi bi-clock me-1"></i>
-              {{ quiz?.duration }} minutes
+            <div class="d-flex align-items-center text-muted">
+              <div class="me-3">
+                <i class="bi bi-book me-1"></i>
+                {{ quiz?.chapter?.subject?.name }}
+              </div>
+              <div class="me-3">
+                <i class="bi bi-journal-text me-1"></i>
+                {{ quiz?.chapter?.name }}
+              </div>
+              <div>
+                <i class="bi bi-clock me-1"></i>
+                {{ quiz?.duration }} minutes
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="d-flex align-items-center">
-        <i class="bi bi-pencil text-primary me-3 cursor-pointer hover-opacity" @click="handleEditQuiz"></i>
-        <i class="bi bi-trash text-danger me-3 cursor-pointer hover-opacity" @click="handleDeleteQuiz"></i>
-        <button class="btn btn-outline-primary me-2 generate-ai-btn" @click="aiModal.show()">
-          <span class="btn-content">
+        <div class="d-flex align-items-center gap-3">
+          <button class="btn btn-icon" @click="handleEditQuiz" title="Edit Quiz">
+            <i class="bi bi-pencil text-primary"></i>
+          </button>
+          <button class="btn btn-icon" @click="handleDeleteQuiz" title="Delete Quiz">
+            <i class="bi bi-trash text-danger"></i>
+          </button>
+          <button v-if="questions.length !== 0" class="btn btn-gradient" @click="aiModal.show()">
             <i class="bi bi-robot me-2"></i>Generate with AI
-          </span>
-          <span class="glass-reflection"></span>
-        </button>
-        <button class="btn btn-primary" @click="handleAddQuestion">
-          <i class="bi bi-plus-lg me-2"></i>Add Question
-        </button>
+          </button>
+          <button class="btn btn-primary" @click="handleAddQuestion">
+            <i class="bi bi-plus-lg me-2"></i>Add Question
+          </button>
+        </div>
       </div>
     </div>
 
-    <div v-if="loading" class="text-center">
+    <!-- Loading State -->
+    <div v-if="loading" class="text-center py-5">
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
     </div>
 
+    <!-- Error State -->
     <div v-else-if="error" class="alert alert-danger">
       {{ error }}
     </div>
 
-    <div v-else class="card">
-      <div class="card-body">
-        <div v-if="questions.length === 0" class="text-center py-5">
-          <p class="text-muted">No questions added yet. Click the button above to add a question.</p>
+    <!-- Questions List -->
+    <div v-else>
+      <div v-if="questions.length === 0" class="empty-state">
+        <div class="text-center py-5">
+          <i class="bi bi-journal-text display-1 text-muted mb-3"></i>
+          <h4>No Questions Yet</h4>
+          <p class="text-muted">Start building your quiz by adding questions</p>
+          <button class="mt-2 btn btn-gradient" @click="aiModal.show()">
+            <i class="bi bi-robot me-2"></i>Generate Questions with AI
+          </button>
         </div>
+      </div>
 
-        <div v-else class="list-group">
-          <div v-for="(question, index) in questions" :key="question.id" class="list-group-item border-0 mb-4">
-            <div class="d-flex justify-content-between align-items-start mb-3">
-              <div>
-                <div class="d-flex align-items-center mb-2">
-                  <span class="badge bg-primary me-2">Question {{ index + 1 }}</span>
-                  <span class="badge" :class="question.type === 'mcq' ? 'bg-info' : 'bg-success'">
-                    {{ question.type.toUpperCase() }}
-                  </span>
-                </div>
-                <h5 class="mb-2">{{ question.question_details.question_text }}</h5>
-                <div class="text-muted small">
-                  <span class="me-3">
-                    <i class="bi bi-check-circle-fill text-success me-1"></i>
-                    +{{ question.question_details.correct_marks }} marks
-                  </span>
-                  <span>
-                    <i class="bi bi-x-circle-fill text-danger me-1"></i>
-                    {{ question.question_details.incorrect_marks }} marks
-                  </span>
-                </div>
-              </div>
-              <div>
-                <button class="btn btn-sm btn-link text-primary me-2" @click="handleEditQuestion(question)">
-                  <i class="bi bi-pencil"></i>
-                </button>
-                <button class="btn btn-sm btn-link text-danger" @click="handleDeleteQuestion(question)">
-                  <i class="bi bi-trash"></i>
-                </button>
-              </div>
+      <div v-else class="questions-grid">
+        <div v-for="(question, index) in questions" 
+             :key="question.id" 
+             class="question-card">
+          <div class="question-header">
+            <div class="d-flex align-items-center">
+              <span class="question-number">{{ index + 1 }}</span>
+              <span class="question-text">{{ question.question_details.question_text }}</span> 
+            </div>
+            <div class="question-actions">
+              <button class="btn btn-icon" @click="handleEditQuestion(question)" title="Edit Question">
+                <i class="bi bi-pencil text-primary"></i>
+              </button>
+              <button class="btn btn-icon" @click="handleDeleteQuestion(question)" title="Delete Question">
+                <i class="bi bi-trash text-danger"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="question-content">
+            
+            
+            
+            <div class="question-marks">
+              <span class="question-type" :class="question.type">
+                {{ question.type.toUpperCase() }}
+              </span>
+              <span class="mark correct">
+                <i class="bi bi-check-circle-fill"></i>
+                +{{ question.question_details.correct_marks }}
+              </span>
+              <span class="mark incorrect">
+                <i class="bi bi-x-circle-fill"></i>
+                {{ question.question_details.incorrect_marks }}
+              </span>
             </div>
 
             <!-- MCQ Options -->
-            <div v-if="question.type === 'mcq'" class="ms-4">
+            <div v-if="question.type === 'mcq'" class="options-list">
               <div v-for="(option, optIndex) in question.question_details.options" 
                    :key="optIndex"
-                   class="d-flex align-items-center mb-2">
-                <div class="form-check me-2">
-                  <input type="radio" 
-                         class="form-check-input" 
-                         :checked="option.is_correct"
-                         disabled>
-                </div>
-                <div class="flex-grow-1 p-2 rounded" 
-                     :class="option.is_correct ? 'bg-success bg-opacity-10' : 'bg-light'">
-                  {{ option.text }}
+                   class="option-item"
+                   :class="{ 'correct': option.is_correct }">
+                <div class="option-circle">{{ String.fromCharCode(65 + optIndex) }}</div>
+                <div class="option-text">{{ option.text }}</div>
+                <div class="option-status">
+                  <i v-if="option.is_correct" class="bi bi-check-circle-fill text-success"></i>
                 </div>
               </div>
             </div>
 
             <!-- Numeric Answer Range -->
-            <div v-else class="ms-4">
-              <div class="d-flex align-items-center">
-                <i class="bi bi-arrow-left-right me-2"></i>
-                <span class="text-muted">
-                  Answer should be between 
-                  <strong>{{ question.question_details.answer_lower_bound }}</strong> 
-                  and 
-                  <strong>{{ question.question_details.answer_upper_bound }}</strong>
-                </span>
+            <div v-else class="numeric-range">
+              <div class="range-label">Answer Range</div>
+              <div class="range-values">
+                <span class="range-value">{{ question.question_details.answer_lower_bound }}</span>
+                <i class="bi bi-arrow-left-right mx-2"></i>
+                <span class="range-value">{{ question.question_details.answer_upper_bound }}</span>
               </div>
             </div>
           </div>
@@ -409,12 +420,12 @@ onMounted(() => {
     <div class="modal fade" id="questionModal" tabindex="-1" aria-labelledby="questionModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <div class="modal-header">
+          <div class="modal-header border-0">
             <h5 class="modal-title" id="questionModalLabel">{{ isEditMode ? 'Edit Question' : 'Add Question' }}</h5>
             <button type="button" class="btn-close" @click="handleCloseModal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <div class="mb-3">
+            <div class="mb-4">
               <label class="form-label">Question Type</label>
               <select class="form-select" v-model="questionType" @change="formData.type = questionType">
                 <option value="mcq">Multiple Choice</option>
@@ -422,12 +433,12 @@ onMounted(() => {
               </select>
             </div>
 
-            <div class="mb-3">
+            <div class="mb-4">
               <label class="form-label">Question Text</label>
               <textarea class="form-control" v-model="formData.question_text" rows="3"></textarea>
             </div>
 
-            <div class="row mb-3">
+            <div class="row mb-4">
               <div class="col-md-6">
                 <label class="form-label">Correct Marks</label>
                 <input type="number" class="form-control" v-model="formData.correct_marks" min="0" step="0.5">
@@ -439,29 +450,35 @@ onMounted(() => {
             </div>
 
             <template v-if="questionType === 'mcq'">
-              <div class="mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
+              <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
                   <label class="form-label mb-0">Options</label>
-                  <button type="button" class="btn btn-sm btn-outline-primary" @click="addOption">
+                  <button type="button" class="btn btn-outline-primary btn-sm" @click="addOption">
                     <i class="bi bi-plus-lg"></i> Add Option
                   </button>
                 </div>
-                <div v-for="(option, index) in formData.options" :key="index" class="input-group mb-2">
-                  <input type="text" class="form-control" v-model="option.text" placeholder="Option text">
-                  <div class="input-group-text">
-                    <input type="checkbox" class="form-check-input mt-0" 
-                           v-model="option.is_correct"
-                           @change="handleCorrectOptionChange(index)">
+                <div v-for="(option, index) in formData.options" :key="index" class="option-input-group mb-2">
+                  <div class="input-group">
+                    <span class="input-group-text option-circle-edit">{{ String.fromCharCode(65 + index) }}</span>
+                    <input type="text" class="form-control" v-model="option.text" placeholder="Option text">
+                    <div class="input-group-text">
+                      <div class="form-check">
+                        <input type="checkbox" class="form-check-input" 
+                               v-model="option.is_correct"
+                               @change="handleCorrectOptionChange(index)">
+                        <label class="form-check-label">Correct</label>
+                      </div>
+                    </div>
+                    <button class="btn btn-outline-danger" type="button" @click="removeOption(index)">
+                      <i class="bi bi-trash"></i>
+                    </button>
                   </div>
-                  <button class="btn btn-outline-danger" type="button" @click="removeOption(index)">
-                    <i class="bi bi-trash"></i>
-                  </button>
                 </div>
               </div>
             </template>
 
             <template v-else>
-              <div class="row mb-3">
+              <div class="row mb-4">
                 <div class="col-md-6">
                   <label class="form-label">Lower Bound</label>
                   <input type="number" class="form-control" v-model="formData.answer_lower_bound" step="any">
@@ -473,8 +490,8 @@ onMounted(() => {
               </div>
             </template>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="handleCloseModal">Cancel</button>
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-light" @click="handleCloseModal">Cancel</button>
             <button type="button" class="btn btn-primary" @click="handleSubmitQuestion">
               {{ isEditMode ? 'Update' : 'Create' }}
             </button>
@@ -496,12 +513,12 @@ onMounted(() => {
     <div class="modal fade" id="aiModal" tabindex="-1" aria-labelledby="aiModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
-          <div class="modal-header">
+          <div class="modal-header border-0">
             <h5 class="modal-title" id="aiModalLabel">Generate Questions with AI</h5>
             <button type="button" class="btn-close" @click="handleCloseAIModal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <div class="mb-3">
+            <div class="mb-4">
               <label class="form-label">Context</label>
               <textarea 
                 class="form-control" 
@@ -511,7 +528,7 @@ onMounted(() => {
               ></textarea>
             </div>
 
-            <div class="row mb-3">
+            <div class="row mb-4">
               <div class="col-md-6">
                 <label class="form-label">Question Type</label>
                 <select class="form-select" v-model="aiFormData.question_type">
@@ -531,7 +548,7 @@ onMounted(() => {
               </div>
             </div>
 
-            <div class="row mb-3">
+            <div class="row mb-4">
               <div class="col-md-6">
                 <label class="form-label">Correct Marks</label>
                 <input 
@@ -554,8 +571,8 @@ onMounted(() => {
               </div>
             </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="handleCloseAIModal">Cancel</button>
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-light" @click="handleCloseAIModal">Cancel</button>
             <button 
               type="button" 
               class="btn btn-primary" 
@@ -573,115 +590,270 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.modal {
-  background-color: rgba(0, 0, 0, 0.5);
+.quiz-build-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
-.btn-link {
-  text-decoration: none;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.btn-link:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
-.btn-link.text-primary:hover {
-  color: #0b5ed7 !important;
-}
-
-.btn-link.text-danger:hover {
-  color: #bb2d3b !important;
-}
-
-.list-group-item {
-  background-color: #fff;
-  border-radius: 8px !important;
+.header-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-.list-group-item:hover {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.hover-opacity {
-  transition: opacity 0.2s ease;
-}
-
-.hover-opacity:hover {
-  opacity: 0.7;
-}
-
-.btn-outline-primary {
-  border-width: 2px;
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
   transition: all 0.2s ease;
 }
 
-.btn-outline-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.btn-icon:hover {
+  background: rgba(0,0,0,0.05);
 }
 
-.spinner-border {
-  width: 1rem;
-  height: 1rem;
-}
-
-.generate-ai-btn {
-  position: relative;
-  overflow: hidden;
-  border-width: 2px;
-  background: linear-gradient(135deg, #10b981, #059669, #047857);
+.btn-gradient {
+  background: linear-gradient(135deg, #10b981, #059669);
   color: white;
   border: none;
   padding: 0.5rem 1.5rem;
+  border-radius: 8px;
   font-weight: 500;
   transition: all 0.3s ease;
   box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
 }
 
-.generate-ai-btn:hover {
+.btn-gradient:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
   color: white;
-  background: linear-gradient(135deg, #34d399, #10b981, #059669);
+  background: linear-gradient(135deg, #34d399, #10b981);
 }
 
-.generate-ai-btn .btn-content {
-  position: relative;
-  z-index: 1;
+.empty-state {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.questions-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.question-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+
+.question-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.question-number {
+  background: var(--bs-primary);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: 600;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
 }
 
-.generate-ai-btn .glass-reflection {
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.3),
-    transparent
-  );
-  animation: reflection 3s infinite;
-  z-index: 2;
+.question-text {
+  font-size: 1.1rem;
+  color: #2c3e50;
+  line-height: 1.5;
+  margin: 0;
 }
 
-@keyframes reflection {
-  0% {
-    left: -100%;
-  }
-  20% {
-    left: 100%;
-  }
-  100% {
-    left: 100%;
-  }
+.question-type {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.question-type.mcq {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.question-type.numeric {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.question-marks {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.mark {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.mark.correct {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.mark.incorrect {
+  background: #fce8e8;
+  color: #dc3545;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: #f8f9fa;
+  transition: all 0.2s ease;
+}
+
+.option-item.correct {
+  background: #e8f5e9;
+}
+
+.option-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  margin-right: 1rem;
+}
+
+.option-circle-edit {
+  background: #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+}
+
+.option-item.correct .option-circle {
+  background: #2e7d32;
+  color: white;
+}
+
+.option-text {
+  flex: 1;
+}
+
+.option-status {
+  font-size: 1.2rem;
+}
+
+.numeric-range {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.range-label {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+}
+
+.range-values {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.range-value {
+  color: #2e7d32;
+}
+
+.option-input-group .input-group-text {
+  background: #f8f9fa;
+  border-right: none;
+}
+
+.option-input-group .form-control {
+  border-left: none;
+}
+
+.option-input-group .input-group-text:last-child {
+  border-left: none;
+}
+
+.modal-content {
+  border: none;
+  border-radius: 12px;
+}
+
+.modal-header {
+  padding: 1.5rem;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  padding: 1.5rem;
+}
+
+.form-label {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+.btn-light {
+  background: #f8f9fa;
+  border: none;
+  color: #2c3e50;
+}
+
+.btn-light:hover {
+  background: #e9ecef;
 }
 </style> 
