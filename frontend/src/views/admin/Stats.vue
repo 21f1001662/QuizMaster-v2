@@ -86,7 +86,7 @@
       <div class="row mt-4">
         <div class="col-12">
           <div class="table-card">
-            <h3 class="card-title mb-4">Top Attempted Quizzes</h3>
+            <h3 class="card-title mb-4">Recent Attempted Quizzes</h3>
             <div class="table-responsive">
               <table class="table table-hover">
                 <thead>
@@ -180,7 +180,7 @@ const doughnutOptions = {
     },
     title: {
       display: true,
-      text: 'Top Attempted Quizzes Distribution'
+      text: 'Recent Attempted Quizzes Distribution'
     }
   }
 }

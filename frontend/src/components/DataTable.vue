@@ -43,10 +43,6 @@ const props = defineProps({
   error: {
     type: String,
     default: ''
-  },
-  searchQuery: {
-    type: String,
-    default: ''
   }
 })
 
@@ -71,9 +67,9 @@ const getCellValue = (item, column) => {
           <input
             type="text"
             class="form-control"
-            placeholder="Search..."
-            :value="searchQuery"
-            @input="$emit('update:searchQuery', $event.target.value); $emit('search', $event.target.value)"
+            :placeholder="searchPlaceholder"
+            :value="modelValue"
+            @input="$emit('update:modelValue', $event.target.value); $emit('search', $event.target.value)"
           >
         </div>
         <slot name="headerActions"></slot>

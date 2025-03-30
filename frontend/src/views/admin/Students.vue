@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useToast } from 'vue-toastification'
 import DataTable from '../../components/DataTable.vue'
+import StudentAttemptsModal from '../../components/StudentAttemptsModal.vue'
 
 const toast = useToast()
 
@@ -13,6 +14,10 @@ const searchQuery = ref('')
 const currentPage = ref(1)
 const totalPages = ref(1)
 const searchTimeout = ref(null)
+
+// Modal state
+const showAttemptsModal = ref(false)
+const selectedStudent = ref(null)
 
 const columns = [
   { 
@@ -108,6 +113,11 @@ const handlePageChange = (page) => {
   fetchStudents()
 }
 
+const viewAttempts = (student) => {
+  selectedStudent.value = student
+  showAttemptsModal.value = true
+}
+
 onMounted(() => {
   fetchStudents()
 })
@@ -133,11 +143,40 @@ onMounted(() => {
       search-placeholder="Search students by name or username..."
       :current-page="currentPage"
       :total-pages="totalPages"
-      v-model="searchQuery"
+      :model-value="searchQuery"
       @search="handleSearch"
       @page-change="handlePageChange"
       :show-create-button="false"
-      :show-actions="false"
+      :show-actions="true"
+    >
+      <template #actions="{ item }">
+        <button 
+          class="btn btn-sm btn-primary"
+          @click="viewAttempts(item)"
+        >
+          <i class="bi bi-eye me-1"></i>
+          View Attempts
+        </button>
+      </template>
+    </DataTable>
+
+    <!-- Attempts Modal -->
+    <StudentAttemptsModal
+      :show="showAttemptsModal"
+      :user-id="selectedStudent?.id"
+      :student-name="selectedStudent?.full_name"
+      @close="showAttemptsModal = false"
     />
   </div>
-</template> 
+</template>
+
+<style scoped>
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.btn i {
+  font-size: 0.9rem;
+}
+</style> 
