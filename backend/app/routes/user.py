@@ -74,8 +74,8 @@ def get_users():
     if sort not in ['asc', 'desc']:
         return jsonify({'message': 'Invalid sort. Must be either "asc" or "desc"'}), 400
     
-    # Base query
-    query = User.query
+    # Base query - exclude admin users
+    query = User.query.filter_by(is_admin=False)
     
     # Apply search filter if search parameter is provided
     if search:
