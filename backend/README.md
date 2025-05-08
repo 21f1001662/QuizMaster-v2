@@ -35,6 +35,26 @@ pip install -r requirements.txt
 
 4. Set up environment variables:
    - Update the variables in `.env` with your values
+   ```bash
+   FLASK_APP=app
+   FLASK_ENV=development
+   FLASK_DEBUG=1
+   SECRET_KEY=your-super-secret-key-change-in-production
+   DATABASE_URL=sqlite:///quizmaster.db?timeout=30&check_same_thread=False&cached_statements=128
+   ADMIN_USERNAME=admin
+   ADMIN_PASSWORD=admin123
+   ADMIN_FULLNAME=Administrator 
+   OPEN_AI_KEY=<open ai key>
+   GEMINI_API_KEY=<gemini API Key>
+   GMAIL_USERNAME=shahbaz.ali.connect@gmail.com
+   GMAIL_PASSWORD=<gmail app password>
+   REDIS_URL=redis://localhost:6379/0
+   CELERY_BROKER_URL=redis://localhost:6379/0
+   CELERY_RESULT_BACKEND=redis://localhost:6379/0
+   REDIS_HOST=localhost
+   REDIS_PORT=6379
+   REDIS_DB=0
+   ```
 
 ## Running the Application
 
