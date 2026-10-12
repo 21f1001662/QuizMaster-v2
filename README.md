@@ -5,6 +5,8 @@ view performance analytics. The project involves building a responsive web inter
 automated question generation, real-time assessments, and interactive learning 
 features.
 
+<img width="793" height="558" alt="image" src="https://github.com/user-attachments/assets/5a51c7ca-9302-44ca-bc2b-d788624e99ba" />
+
 ## Screenshots
 ![qm_landing_page](https://github.com/user-attachments/assets/011f44d0-d567-48d6-bdd7-1b8e465207e8)
 
